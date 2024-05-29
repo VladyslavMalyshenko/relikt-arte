@@ -1,0 +1,23 @@
+.button {
+    width: 274px;
+    height: 59px;
+    background: var(--white);
+    color: var(--dark-grey);
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+
+    &:active {
+        background: var(--dark-grey);
+        color: var(--white);
+    }
+}
+
+@media (hover: hover) {
+    .button:hover {
+        background: var(--dark-grey);
+        color: var(--white);
+    }
+}
