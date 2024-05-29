@@ -1,0 +1,66 @@
+@use "../variables";
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 99px;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    transition: 0.3s;
+    z-index: 10;
+
+    &.scrolled {
+        color: var(--black);
+        background: var(--white);
+        box-shadow: 0 0 10px var(--black);
+    }
+}
+
+.navbar {
+    &-link {
+        color: currentColor;
+        text-decoration: none;
+        opacity: 0.6;
+        transition: 0.3s;
+
+        &-static {
+            height: 80%;
+
+            img {
+                height: 100%;
+            }
+        }
+
+        &.active {
+            opacity: 1;
+        }
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &-category {
+        width: calc(100% / 3);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 50px;
+        box-sizing: border-box;
+
+        &:nth-child(1) {
+            justify-content: flex-start;
+            padding: 0 0 0 variables.$offset;
+        }
+
+        &:nth-child(3) {
+            justify-content: flex-end;
+            padding: 0 variables.$offset 0 0;
+        }
+    }
+}
