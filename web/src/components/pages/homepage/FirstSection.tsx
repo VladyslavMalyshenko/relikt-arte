@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import "../../../styles/components/pages/homepage/FirstSection.scss";
 import Button from "../../UI/Button";
 
 const FirstSection = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="header-section">
             <div className="header-section-inner">
@@ -22,7 +25,7 @@ const FirstSection = () => {
                 <Button
                     text="Подивитись продукцію"
                     additionalClasses={["upper"]}
-                    onClickCallback={() => console.log("Works")}
+                    onClickCallback={() => navigate("/buy")}
                 />
             </div>
         </div>

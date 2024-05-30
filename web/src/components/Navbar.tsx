@@ -1,26 +1,12 @@
-import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { paths } from "../router/paths";
 import "../styles/components/Navbar.scss";
+import useNavbar from "../utils/useNavbar";
 import NavbarLink from "./UI/NavbarLink";
 
 const Navbar = () => {
-    const navbarRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        window.addEventListener("scroll", (e) => {
-            console.log(e);
-
-            if (navbarRef.current) {
-                if (window.scrollY > 0) {
-                    navbarRef.current.classList.add("scrolled");
-                } else {
-                    navbarRef.current.classList.remove("scrolled");
-                }
-            }
-        });
-    }, []);
+    const { navbarRef } = useNavbar();
 
     return (
         <nav ref={navbarRef}>
@@ -72,8 +58,8 @@ const Navbar = () => {
                             <path
                                 d="M6.99967 5.30416H20.9997C23.577 5.30416 25.6663 7.3935 25.6663 9.97082V15.8042C25.6663 18.3815 23.577 20.4708 20.9997 20.4708H11.6663C9.08901 20.4708 6.99967 18.3815 6.99967 15.8042V5.30416ZM6.99967 5.30416C6.99967 4.01549 5.95501 2.97083 4.66634 2.97083H2.33301M6.99967 9.97082H25.083"
                                 stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             />
                         </g>
                     </svg>

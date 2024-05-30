@@ -3,9 +3,11 @@ import styles from "../../styles/components/UI/Button.module.scss";
 
 type ButtonProps = {
     text?: string;
-    onClickCallback: () => void;
+    onClickCallback?: () => void;
     children?: any;
     additionalClasses?: string[];
+    inversed?: boolean;
+    borderless?: boolean;
 };
 
 const Button = ({
@@ -13,11 +15,17 @@ const Button = ({
     onClickCallback,
     children,
     additionalClasses,
+    inversed,
+    borderless = true,
 }: ButtonProps) => {
     const [buttonClassName, setButtonClassName] = useState(styles.button);
 
     useEffect(() => {
-        let updatedClassName = styles.button;
+        console.log(styles);
+
+        let updatedClassName = `${styles.button}${
+            inversed ? ` ${styles.inverse}` : ""
+        }${borderless ? "" : ` ${styles.border}`}`;
 
         if (additionalClasses) {
             additionalClasses.forEach((additionalClass) => {
@@ -26,7 +34,7 @@ const Button = ({
         }
 
         setButtonClassName(updatedClassName);
-    }, [additionalClasses]);
+    }, [additionalClasses, inversed, borderless]);
 
     return (
         <button className={buttonClassName} onClick={onClickCallback}>

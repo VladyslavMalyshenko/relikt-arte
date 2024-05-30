@@ -1,6 +1,10 @@
 .button {
     width: 274px;
     height: 59px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     background: var(--white);
     color: var(--dark-grey);
     border-radius: 6px;
@@ -13,11 +17,32 @@
         background: var(--dark-grey);
         color: var(--white);
     }
+
+    &.border {
+        border: 1px solid var(--dark-grey);
+    }
+
+    &.inverse {
+        background: var(--dark-grey);
+        color: var(--white);
+
+        &:active {
+            background: var(--white);
+            color: var(--dark-grey);
+        }
+    }
 }
 
 @media (hover: hover) {
-    .button:hover {
-        background: var(--dark-grey);
-        color: var(--white);
+    .button {
+        &:hover {
+            background: var(--dark-grey);
+            color: var(--white);
+
+            &.inverse {
+                background: var(--white);
+                color: var(--dark-grey);
+            }
+        }
     }
 }
