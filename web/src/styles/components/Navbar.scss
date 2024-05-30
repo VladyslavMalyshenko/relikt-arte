@@ -39,7 +39,7 @@ nav {
             opacity: 1;
         }
 
-        &:hover {
+        &:active {
             opacity: 1;
         }
     }
@@ -62,5 +62,11 @@ nav {
             justify-content: flex-end;
             padding: 0 variables.$offset 0 0;
         }
+    }
+}
+
+@media (hover: hover) {
+    .navbar-link:hover {
+        opacity: 1;
     }
 }

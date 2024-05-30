@@ -1,0 +1,23 @@
+@use "../../../variables";
+
+.buy-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 200px variables.$offset 0 variables.$offset;
+    box-sizing: border-box;
+
+    &-text {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        color: var(--transparent-black-60);
+    }
+
+    &-inner {
+        width: 100%;
+        display: flex;
+        gap: 50px;
+    }
+}
