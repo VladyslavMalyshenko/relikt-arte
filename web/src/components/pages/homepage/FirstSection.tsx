@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/homepage/FirstSection.scss";
 import Button from "../../UI/Button";
 
@@ -25,7 +26,7 @@ const FirstSection = () => {
                 <Button
                     text="Подивитись продукцію"
                     additionalClasses={["upper"]}
-                    onClickCallback={() => navigate("/buy")}
+                    onClickCallback={() => navigate(paths.buy)}
                 />
             </div>
         </div>

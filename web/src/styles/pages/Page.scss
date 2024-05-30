@@ -12,4 +12,9 @@
     &.bottom {
         margin-bottom: 100px;
     }
+
+    &.centered {
+        align-items: center;
+        justify-content: center;
+    }
 }
