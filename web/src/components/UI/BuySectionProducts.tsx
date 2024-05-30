@@ -54,7 +54,9 @@ const BuySectionProducts = () => {
                 {pages > 0 ? (
                     Array.from({ length: pages }, (_, index) => (
                         <div
-                            className="buy-products-pagination-button"
+                            className={`buy-products-pagination-button${
+                                currentPage === index + 1 ? " active" : ""
+                            }`}
                             onClick={() => changePage(index + 1)}
                         >
                             {index + 1}
