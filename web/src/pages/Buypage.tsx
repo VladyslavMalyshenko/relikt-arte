@@ -4,7 +4,7 @@ import "../styles/pages/Page.scss";
 
 const Buypage = () => {
     return (
-        <div className="page">
+        <div className="page bottom">
             <BuySection />
         </div>
     );

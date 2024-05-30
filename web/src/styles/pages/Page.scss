@@ -8,4 +8,8 @@
     align-items: center;
     flex-direction: column;
     gap: variables.$blockGap;
+
+    &.bottom {
+        margin-bottom: 100px;
+    }
 }
