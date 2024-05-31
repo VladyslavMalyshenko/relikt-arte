@@ -1,24 +1,26 @@
 import { Route, Routes } from "react-router-dom";
-import Buypage from "../pages/Buypage";
-import Homepage from "../pages/Homepage";
-import Passrecoverypage from "../pages/Passrecoverypage";
-import Productpage from "../pages/Productpage";
-import Registerpage from "../pages/Registerpage";
-import Singinpage from "../pages/Singinpage";
+import BuyPage from "../pages/BuyPage";
+import HomePage from "../pages/HomePage";
+import PasswordRecoveryPage from "../pages/PasswordRecoveryPage";
+import ProductPage from "../pages/ProductPage";
+import ProfilePage from "../pages/ProfilePage";
+import RegisterPage from "../pages/RegisterPage";
+import SingInPage from "../pages/SingInPage";
 import { paths } from "./paths";
 
 const Router = () => {
     return (
         <Routes>
-            <Route path={paths.main} element={<Homepage />} />
-            <Route path={paths.buy} element={<Buypage />} />
-            <Route path={paths.register} element={<Registerpage />} />
-            <Route path={paths.singIn} element={<Singinpage />} />
+            <Route path={paths.main} element={<HomePage />} />
+            <Route path={paths.buy} element={<BuyPage />} />
+            <Route path={paths.register} element={<RegisterPage />} />
+            <Route path={paths.singIn} element={<SingInPage />} />
             <Route
                 path={paths.passwordRecover}
-                element={<Passrecoverypage />}
+                element={<PasswordRecoveryPage />}
             />
-            <Route path={paths.product} element={<Productpage />} />
+            <Route path={paths.product} element={<ProductPage />} />
+            <Route path={paths.profile} element={<ProfilePage />} />
         </Routes>
     );
 };

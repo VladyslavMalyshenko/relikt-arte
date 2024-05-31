@@ -1,7 +1,7 @@
 import RegisterSection from "../components/pages/registerpage/RegisterSection";
 import "../styles/pages/Page.scss";
 
-const Registerpage = () => {
+const RegisterPage = () => {
     return (
         <div className="page centered">
             <RegisterSection />
@@ -9,4 +9,4 @@ const Registerpage = () => {
     );
 };
 
-export default Registerpage;
+export default RegisterPage;

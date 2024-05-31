@@ -1,8 +1,7 @@
 import BuySection from "../components/pages/buypage/BuySection";
-import "../styles/pages/Buypage.scss";
 import "../styles/pages/Page.scss";
 
-const Buypage = () => {
+const BuyPage = () => {
     return (
         <div className="page bottom">
             <BuySection />
@@ -10,4 +9,4 @@ const Buypage = () => {
     );
 };
 
-export default Buypage;
+export default BuyPage;

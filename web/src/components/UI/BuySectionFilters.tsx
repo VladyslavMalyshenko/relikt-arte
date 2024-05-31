@@ -17,8 +17,11 @@ const BuySectionFilters = () => {
                     <input
                         type="text"
                         value={minPrice}
-                        onChange={(e) =>
-                            handleInputByAllowedSymbols(e, setMinPrice)
+                        onChange={(event) =>
+                            handleInputByAllowedSymbols({
+                                event,
+                                set: setMinPrice,
+                            })
                         }
                         placeholder="ВІД"
                     />
@@ -26,8 +29,11 @@ const BuySectionFilters = () => {
                     <input
                         type="text"
                         value={maxPrice}
-                        onChange={(e) =>
-                            handleInputByAllowedSymbols(e, setMaxPrice)
+                        onChange={(event) =>
+                            handleInputByAllowedSymbols({
+                                event,
+                                set: setMaxPrice,
+                            })
                         }
                         placeholder="ДО"
                     />
