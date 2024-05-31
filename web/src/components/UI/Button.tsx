@@ -62,8 +62,8 @@ const Button = ({
                         <path
                             d="M12.5 1H9.5C6.73858 1 4.5 3.23858 4.5 6V8H0.5V12H4.5V19H8.5V12H12.5V8H8.5V6C8.5 5.44772 8.94771 5 9.5 5H12.5V1Z"
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                     </svg>
                     Facebook

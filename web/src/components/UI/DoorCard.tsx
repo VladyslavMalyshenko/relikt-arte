@@ -15,7 +15,7 @@ const DoorCard = ({ product }: DoorCardProps) => {
             {product.tags && (
                 <div className="tags">
                     {product.tags.map((tag, index) => (
-                        <p key={index} className="pre-small gray">
+                        <p key={`tag[${index}]`} className="pre-small gray">
                             {tag}
                         </p>
                     ))}

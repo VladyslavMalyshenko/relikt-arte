@@ -5,8 +5,8 @@ const Doors = () => {
     return (
         <div className="doors-categories">
             {doorsData.length > 0 ? (
-                doorsData.map((door) => (
-                    <div key={door.name} className="doors-category">
+                doorsData.map((door, index) => (
+                    <div key={`door[${index}]`} className="doors-category">
                         <div className="doors-category-image">
                             <img src={door.image} alt={door.name} />
                         </div>

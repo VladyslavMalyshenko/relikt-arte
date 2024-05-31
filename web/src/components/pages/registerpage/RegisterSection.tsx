@@ -1,20 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
-import "../../../styles/components/pages/registerpage/RegisterSection.scss";
+import "../../../styles/components/UI/Auth.scss";
 import Button from "../../UI/Button";
 
 const RegisterSection = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="register-section">
-            <div className="register-modal">
+        <div className="auth-section">
+            <div className="auth-modal">
                 <p className="upper biggest black">реєстрація</p>
-                <div className="register-modal-inputs-wrapper">
-                    <div className="register-modal-inputs">
-                        <input type="text" placeholder="email" />
-                        <div className="register-modal-inputs-phone">
-                            <div className="register-modal-inputs-phone-article small">
+                <div className="auth-modal-inputs-wrapper">
+                    <div className="auth-modal-inputs">
+                        <input type="email" placeholder="email" />
+                        <div className="auth-modal-inputs-phone">
+                            <div className="auth-modal-inputs-phone-article small">
                                 +38
                             </div>
                             <input
@@ -23,9 +23,12 @@ const RegisterSection = () => {
                                 placeholder="номер телефону"
                             />
                         </div>
-                        <div className="register-modal-inputs-devided">
-                            <input type="text" placeholder="пароль" />
-                            <input type="text" placeholder="повторити пароль" />
+                        <div className="auth-modal-inputs-devided">
+                            <input type="password" placeholder="пароль" />
+                            <input
+                                type="password"
+                                placeholder="повторити пароль"
+                            />
                         </div>
                     </div>
 

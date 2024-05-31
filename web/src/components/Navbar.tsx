@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { paths } from "../router/paths";
@@ -7,6 +8,7 @@ import NavbarLink from "./UI/NavbarLink";
 
 const Navbar = () => {
     const { navbarRef } = useNavbar();
+    const isAuth = useSelector((state: any) => state.AuthReducer.auth);
 
     return (
         <nav ref={navbarRef}>
@@ -23,7 +25,7 @@ const Navbar = () => {
                 <NavbarLink to={paths.contacts}>Контакти</NavbarLink>
             </div>
             <div className="navbar-category">
-                <NavbarLink to={paths.main}>
+                <NavbarLink to={isAuth ? paths.profile : paths.register}>
                     <svg
                         width="18"
                         height="23"

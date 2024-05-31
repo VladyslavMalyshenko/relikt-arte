@@ -4,4 +4,6 @@ export const paths = {
     contacts: "/contacts",
     register: "/register",
     singIn: "/sing-in",
+    profile: "/profile",
+    passwordRecover: "/password-recover",
 };

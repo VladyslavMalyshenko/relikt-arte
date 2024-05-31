@@ -1,16 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
-import "../../../styles/components/pages/registerpage/RegisterSection.scss";
+import "../../../styles/components/UI/Auth.scss";
 import Button from "../../UI/Button";
 
 const SingInSection = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="register-section">
-            <div className="register-modal">
+        <div className="auth-section">
+            <div className="auth-modal">
                 <p className="upper biggest black">Увійти</p>
-                <div className="register-modal-inputs-wrapper">
+                <div className="auth-modal-inputs-wrapper">
                     <Button
                         colorScheme={"facebook"}
                         style={{ width: "100%" }}
@@ -19,9 +19,16 @@ const SingInSection = () => {
 
                     <p className="upper black pre-small">або</p>
 
-                    <div className="register-modal-inputs">
-                        <input type="text" placeholder="email" />
-                        <input type="text" placeholder="пароль" />
+                    <div className="auth-modal-inputs">
+                        <input type="email" placeholder="email" />
+                        <input type="password" placeholder="пароль" />
+
+                        <Link
+                            to={paths.passwordRecover}
+                            className="upper black forgot-password"
+                        >
+                            забули пароль?
+                        </Link>
                     </div>
 
                     <Button
@@ -30,7 +37,7 @@ const SingInSection = () => {
                         borderless={false}
                         style={{ width: "100%" }}
                     >
-                        зареєструватись
+                        увійти
                     </Button>
 
                     <Button

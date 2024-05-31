@@ -14,8 +14,7 @@ const NavbarLink = ({ text, children, to }: NavbarLinkProps) => {
     const location = useLocation();
 
     useEffect(() => {
-        const toSegment = to !== "/" ? `/${to}` : to;
-        setIsActive(location.pathname === toSegment);
+        setIsActive(location.pathname == to);
     }, [location.pathname, to]);
 
     return (
