@@ -43,7 +43,10 @@ const Filter = ({ filter }: FilterProps) => {
             >
                 {filter.options &&
                     filter.options.map((option: string, index: number) => (
-                        <FilterCheckbox key={index} label={option} />
+                        <FilterCheckbox
+                            key={`option[${index}]`}
+                            label={option}
+                        />
                     ))}
             </div>
         </div>

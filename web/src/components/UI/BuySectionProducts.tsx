@@ -22,7 +22,7 @@ const BuySectionProducts = () => {
             <div className="buy-products-wrapper">
                 {productsData &&
                     productsData.map((product: ProductType, index) => (
-                        <DoorCard key={index} product={product} />
+                        <DoorCard key={`product[${index}]`} product={product} />
                     ))}
             </div>
 
@@ -45,8 +45,8 @@ const BuySectionProducts = () => {
                         <path
                             d="M5.33301 1.16675L0.666341 7.00008L5.33301 12.8334"
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                     </svg>
                 </div>
@@ -54,7 +54,10 @@ const BuySectionProducts = () => {
                 {pages > 0 ? (
                     Array.from({ length: pages }, (_, index) => (
                         <div
-                            className="buy-products-pagination-button"
+                            key={`pagination[${index}]`}
+                            className={`buy-products-pagination-button${
+                                currentPage === index + 1 ? " active" : ""
+                            }`}
                             onClick={() => changePage(index + 1)}
                         >
                             {index + 1}
@@ -84,8 +87,8 @@ const BuySectionProducts = () => {
                         <path
                             d="M0.666016 12.8333L5.33268 6.99992L0.666017 1.16658"
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                     </svg>
                 </div>

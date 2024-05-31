@@ -45,7 +45,7 @@ const BuySectionFilters = () => {
             </div>
 
             {filtersData.map((filter: FilterType, index: number) => (
-                <Filter key={index} filter={filter} />
+                <Filter key={`filter[${index}]`} filter={filter} />
             ))}
         </div>
     );

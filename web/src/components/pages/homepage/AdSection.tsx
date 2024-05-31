@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/homepage/AdSection.scss";
 import Button from "../../UI/Button";
 
@@ -9,7 +10,7 @@ const AdSection = () => {
             <Button
                 text="Подивитись продукцію"
                 additionalClasses={["upper"]}
-                onClickCallback={() => navigate("/buy")}
+                onClickCallback={() => navigate(paths.buy)}
             />
         </div>
     );

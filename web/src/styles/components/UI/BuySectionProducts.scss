@@ -39,6 +39,11 @@
                 cursor: not-allowed;
             }
 
+            &.active {
+                background: var(--dark-grey);
+                color: var(--white);
+            }
+
             &:active:not(.disabled) {
                 background: var(--dark-grey);
                 color: var(--white);
