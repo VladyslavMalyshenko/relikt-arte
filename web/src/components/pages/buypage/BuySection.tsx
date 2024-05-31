@@ -1,14 +1,18 @@
+import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/buypage/BuySection.scss";
 import BuySectionFilters from "../../UI/BuySectionFilters";
 import BuySectionProducts from "../../UI/BuySectionProducts";
+import Path from "../../UI/Path";
 
 const BuySection = () => {
     return (
         <div className="buy-section">
-            <p className="upper small buy-section-text">
-                головна<span>/</span>
-                <span className="black">продукція</span>
-            </p>
+            <Path
+                segments={[
+                    { name: "головна", location: paths.main },
+                    { name: "продукція", location: paths.buy },
+                ]}
+            />
 
             <p className="upper biggest black bold">продукція</p>
 

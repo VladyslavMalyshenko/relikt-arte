@@ -3,7 +3,7 @@ import styles from "../../styles/components/UI/Button.module.scss";
 
 type ButtonProps = {
     text?: string;
-    onClickCallback?: () => void;
+    onClickCallback?: any;
     children?: any;
     additionalClasses?: string[];
     inversed?: boolean;

@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import { ProductType } from "../../data/products";
+import { paths } from "../../router/paths";
 import "../../styles/components/UI/DoorCard.scss";
 import Button from "./Button";
 
@@ -7,8 +9,13 @@ type DoorCardProps = {
 };
 
 const DoorCard = ({ product }: DoorCardProps) => {
+    const navigate = useNavigate();
+
     return (
-        <div className="door-card">
+        <div
+            className="door-card"
+            onClick={() => navigate(paths.buy + `/${product.id}`)}
+        >
             <img src={product.image} alt={product.model} />
             <p className="pre-small upper model">{product.model}</p>
             <p className="mid black bold">{product.price} ₴</p>
@@ -25,6 +32,9 @@ const DoorCard = ({ product }: DoorCardProps) => {
                 inversed={true}
                 borderless={false}
                 additionalClasses={["upper"]}
+                onClickCallback={(e: any) => {
+                    e.stopPropagation();
+                }}
             >
                 <svg
                     width="19"
