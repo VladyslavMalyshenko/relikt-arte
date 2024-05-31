@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "relict-arte-api"
+version = "0.1.0"
+description = "Relict Arte API"
+authors = ["Oleg Kuzmenko <okuzmenko31us@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+sqlalchemy = "^2.0.30"
+pydantic-settings = "^2.2.1"
+alembic = "^1.13.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
