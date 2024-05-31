@@ -1,26 +1,12 @@
 import { useState } from "react";
 import { Filter as FilterType, filtersData } from "../../data/filters";
 import "../../styles/components/UI/BuySectionFilters.scss";
+import { handleInputByAllowedSymbols } from "../../utils/handleInputByAllowedSymbols";
 import Filter from "./Filter";
 
 const BuySectionFilters = () => {
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
-    const allowedSymbols = "0123456789";
-
-    const handleInput = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        set: (value: string) => void
-    ) => {
-        const newValue = e.target.value;
-        const isValid = newValue
-            .split("")
-            .every((char) => allowedSymbols.includes(char));
-
-        if (isValid || newValue === "") {
-            set(newValue);
-        }
-    };
 
     return (
         <div className="filters-container">
@@ -31,14 +17,18 @@ const BuySectionFilters = () => {
                     <input
                         type="text"
                         value={minPrice}
-                        onChange={(e) => handleInput(e, setMinPrice)}
+                        onChange={(e) =>
+                            handleInputByAllowedSymbols(e, setMinPrice)
+                        }
                         placeholder="ВІД"
                     />
                     <span></span>
                     <input
                         type="text"
                         value={maxPrice}
-                        onChange={(e) => handleInput(e, setMaxPrice)}
+                        onChange={(e) =>
+                            handleInputByAllowedSymbols(e, setMaxPrice)
+                        }
                         placeholder="ДО"
                     />
                 </div>

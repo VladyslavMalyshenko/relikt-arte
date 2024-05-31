@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Buypage from "../pages/Buypage";
 import Homepage from "../pages/Homepage";
 import Passrecoverypage from "../pages/Passrecoverypage";
+import Productpage from "../pages/Productpage";
 import Registerpage from "../pages/Registerpage";
 import Singinpage from "../pages/Singinpage";
 import { paths } from "./paths";
@@ -17,6 +18,7 @@ const Router = () => {
                 path={paths.passwordRecover}
                 element={<Passrecoverypage />}
             />
+            <Route path={paths.product} element={<Productpage />} />
         </Routes>
     );
 };

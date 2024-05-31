@@ -68,6 +68,13 @@
                 transition: 0.3s;
             }
 
+            &.border {
+                border: 1px solid var(--transparent-black-10);
+                border-radius: 6px;
+                padding: 0 10px;
+                box-sizing: border-box;
+            }
+
             &.opened {
                 svg {
                     transform: rotate(180deg);

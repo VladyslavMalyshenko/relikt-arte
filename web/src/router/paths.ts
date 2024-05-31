@@ -6,4 +6,5 @@ export const paths = {
     singIn: "/sing-in",
     profile: "/profile",
     passwordRecover: "/password-recover",
+    product: "/buy/:product_id",
 };

@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
+import { handleInputByAllowedSymbols } from "../../../utils/handleInputByAllowedSymbols";
 import Button from "../../UI/Button";
 
 const RegisterSection = () => {
     const navigate = useNavigate();
+    const [phoneNumber, setPhoneNumber] = useState("");
 
     return (
         <div className="auth-section">
@@ -21,6 +24,13 @@ const RegisterSection = () => {
                                 type="text"
                                 maxLength={10}
                                 placeholder="номер телефону"
+                                value={phoneNumber}
+                                onChange={(e) =>
+                                    handleInputByAllowedSymbols(
+                                        e,
+                                        setPhoneNumber
+                                    )
+                                }
                             />
                         </div>
                         <div className="auth-modal-inputs-devided">
