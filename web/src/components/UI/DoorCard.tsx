@@ -11,16 +11,23 @@ type DoorCardProps = {
 const DoorCard = ({ product }: DoorCardProps) => {
     const navigate = useNavigate();
 
+    const stopPropagation = (e: any) => e.stopPropagation();
+
     return (
         <div
             className="door-card"
             onClick={() => navigate(paths.buy + `/${product.id}`)}
         >
             <img src={product.image} alt={product.model} />
-            <p className="pre-small upper model">{product.model}</p>
-            <p className="mid black bold">{product.price} ₴</p>
+            <div className="door-card-inner" onClick={stopPropagation}></div>
+            <p className="pre-small upper model" onClick={stopPropagation}>
+                {product.model}
+            </p>
+            <p className="mid black bold" onClick={stopPropagation}>
+                {product.price} ₴
+            </p>
             {product.tags && (
-                <div className="tags">
+                <div className="tags" onClick={stopPropagation}>
                     {product.tags.map((tag, index) => (
                         <p key={`tag[${index}]`} className="pre-small gray">
                             {tag}
@@ -32,9 +39,7 @@ const DoorCard = ({ product }: DoorCardProps) => {
                 inversed={true}
                 borderless={false}
                 additionalClasses={["upper"]}
-                onClickCallback={(e: any) => {
-                    e.stopPropagation();
-                }}
+                onClickCallback={stopPropagation}
             >
                 <svg
                     width="19"

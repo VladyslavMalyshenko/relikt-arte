@@ -16,7 +16,7 @@ nav {
     &.scrolled {
         color: var(--black);
         background: var(--white);
-        box-shadow: 0 0 10px var(--black);
+        border-bottom: 1px solid var(--transparent-black-10);
     }
 }
 

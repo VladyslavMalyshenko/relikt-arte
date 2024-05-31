@@ -6,7 +6,7 @@
     a,
     span {
         text-decoration: none;
-        color: var(--transparent-black-60);
+        color: var(--transparent-black-10);
         transition: 0.3s;
     }
 
@@ -18,7 +18,7 @@
         color: var(--black);
 
         & ~ a.black {
-            color: var(--transparent-black-60);
+            color: var(--transparent-black-10);
         }
     }
 }

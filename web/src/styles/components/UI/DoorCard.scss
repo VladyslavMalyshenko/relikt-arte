@@ -11,6 +11,10 @@
     cursor: pointer;
     aspect-ratio: 296/563;
 
+    p {
+        cursor: auto;
+    }
+
     .model {
         color: var(--transparent-black-10);
     }
@@ -23,6 +27,7 @@
         align-items: center;
         flex-wrap: wrap;
         overflow: auto;
+        cursor: auto;
         gap: 20px;
 
         p {
