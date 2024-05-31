@@ -1,7 +1,7 @@
 import SingInSection from "../components/pages/singinpage/SingInSection";
 import "../styles/pages/Page.scss";
 
-const Singinpage = () => {
+const SingInPage = () => {
     return (
         <div className="page centered">
             <SingInSection />
@@ -9,4 +9,4 @@ const Singinpage = () => {
     );
 };
 
-export default Singinpage;
+export default SingInPage;

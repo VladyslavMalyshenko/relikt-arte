@@ -27,7 +27,9 @@ const Button = ({
     useEffect(() => {
         let updatedClassName = `${styles.button}${
             inversed ? ` ${styles.inverse}` : ""
-        }${borderless ? "" : ` ${styles.border}`}`;
+        }${borderless ? "" : ` ${styles.border}`}${
+            colorScheme ? ` ${styles[colorScheme]}` : ""
+        }`;
 
         if (additionalClasses) {
             additionalClasses.forEach((additionalClass) => {
@@ -35,12 +37,8 @@ const Button = ({
             });
         }
 
-        if (colorScheme) {
-            updatedClassName += ` ${styles[colorScheme]}`;
-        }
-
         setButtonClassName(updatedClassName);
-    }, [additionalClasses, inversed, borderless]);
+    }, [additionalClasses, inversed, borderless, colorScheme]);
 
     return (
         <button

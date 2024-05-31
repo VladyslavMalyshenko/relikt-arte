@@ -1,7 +1,7 @@
 import ProductSection from "../components/pages/productpage/ProductSection";
 import "../styles/pages/Page.scss";
 
-const Productpage = () => {
+const ProductPage = () => {
     return (
         <div className="page bottom">
             <ProductSection />
@@ -9,4 +9,4 @@ const Productpage = () => {
     );
 };
 
-export default Productpage;
+export default ProductPage;

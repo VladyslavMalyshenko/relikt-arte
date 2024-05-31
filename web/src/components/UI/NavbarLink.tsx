@@ -6,16 +6,28 @@ type NavbarLinkProps = {
     text?: string;
     children?: any;
     to: string;
-    activeClassName?: string;
+    activeLocations?: string[];
 };
 
-const NavbarLink = ({ text, children, to }: NavbarLinkProps) => {
+const NavbarLink = ({
+    text,
+    children,
+    to,
+    activeLocations,
+}: NavbarLinkProps) => {
     const [isActive, setIsActive] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
-        setIsActive(location.pathname == to);
-    }, [location.pathname, to]);
+        const isActive =
+            location.pathname === to ||
+            (activeLocations?.some(
+                (locationPath) => locationPath === location.pathname
+            ) ??
+                false);
+
+        setIsActive(isActive);
+    }, [location.pathname, to, activeLocations, setIsActive]);
 
     return (
         <Link

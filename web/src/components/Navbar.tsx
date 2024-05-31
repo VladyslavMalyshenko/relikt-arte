@@ -32,7 +32,14 @@ const Navbar = () => {
                     <NavbarLink to={paths.contacts}>Контакти</NavbarLink>
                 </div>
                 <div className="navbar-category">
-                    <NavbarLink to={isAuth ? paths.profile : paths.register}>
+                    <NavbarLink
+                        to={isAuth ? paths.profile : paths.register}
+                        activeLocations={[
+                            paths.profile,
+                            paths.register,
+                            paths.singIn,
+                        ]}
+                    >
                         <svg
                             width="18"
                             height="23"
