@@ -3,7 +3,8 @@ export type ProductType = {
     image: string;
     model: string;
     price: number;
-    tags: string[];
+    tags?: string[];
+    count?: number;
 };
 
 export const productsData: ProductType[] = [

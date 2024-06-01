@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
 import Button from "../../UI/Button";
-import Errors from "../../UI/Errors";
+import Input from "../../UI/Input";
 
 const SingInSection = () => {
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ const SingInSection = () => {
 
     const {
         handleSubmit,
-        register,
+        control,
         formState: { errors },
     } = useForm<SingInFormData>({
         defaultValues,
@@ -44,25 +44,27 @@ const SingInSection = () => {
                     <p className="upper black pre-small">або</p>
 
                     <div className="auth-modal-inputs">
-                        <input
+                        <Input
                             type="email"
+                            control={control}
+                            errors={errors}
                             placeholder="email"
-                            className={errors.email ? "invalid" : ""}
-                            {...register("email", {
-                                required: "Email is required",
-                                pattern: {
-                                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                                    message: "Invalid email address",
-                                },
-                            })}
+                            name="email"
                         />
-                        <input
+
+                        <Input
                             type="password"
+                            control={control}
+                            errors={errors}
                             placeholder="пароль"
-                            className={errors.password ? "invalid" : ""}
-                            {...register("password", {
-                                required: "Password is required",
-                            })}
+                            name="password"
+                            rules={{
+                                required: "Пароль є обов'язковим",
+                                minLength: {
+                                    value: 6,
+                                    message: "Пароль занадто короткий",
+                                },
+                            }}
                         />
 
                         <Link
@@ -72,8 +74,6 @@ const SingInSection = () => {
                             забули пароль?
                         </Link>
                     </div>
-
-                    <Errors errors={errors} />
 
                     <Button
                         additionalClasses={["upper"]}

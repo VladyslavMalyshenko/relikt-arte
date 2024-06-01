@@ -49,8 +49,8 @@ const DropDown = ({ label, options, borderless = true }: DropDownProps) => {
                         key={`option-${index}`}
                         label={option}
                         groupName={label}
-                        isChecked={selectedOption === option}
-                        onChange={() => setSelectedOption(option)}
+                        isChecked={selectedOption === `option-${index}`}
+                        onChange={() => setSelectedOption(`option-${index}`)}
                     />
                 ))}
             </div>

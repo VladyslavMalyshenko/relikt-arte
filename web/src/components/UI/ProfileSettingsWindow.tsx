@@ -187,6 +187,39 @@ const ProfileSettingsWindow = ({
                     </Button>
                 </>
             )}
+
+            {currentCategory === "приватні дані" && (
+                <>
+                    <div className="profile-settings-main-content-info">
+                        <p className="pre-small black">
+                            Ваш обліковий запис містить особисті дані, які ви
+                            надали нам. На цій сторінці можна скачати або
+                            видалити ці дані.
+                        </p>
+                        <p className="pre-small black bold">
+                            Видалення цих даних призведе до безповоротного
+                            видалення вашого облікового запису, і його не можна
+                            буде відновити.
+                        </p>
+                    </div>
+
+                    <Button
+                        inversed={true}
+                        borderless={false}
+                        additionalClasses={["upper"]}
+                    >
+                        завантажити
+                    </Button>
+
+                    <Button
+                        style={{ maxWidth: "230px" }}
+                        colorScheme={"grey"}
+                        additionalClasses={["upper"]}
+                    >
+                        видалити
+                    </Button>
+                </>
+            )}
         </div>
     );
 };

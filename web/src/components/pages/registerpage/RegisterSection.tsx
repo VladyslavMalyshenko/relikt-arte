@@ -1,9 +1,10 @@
-import { Controller, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
 import Button from "../../UI/Button";
-import Errors from "../../UI/Errors";
+import Input from "../../UI/Input";
 
 interface RegisterFormData {
     email: string;
@@ -23,7 +24,6 @@ const RegisterSection = () => {
     const {
         control,
         handleSubmit,
-        register,
         formState: { errors },
         watch,
     } = useForm<RegisterFormData>({
@@ -34,89 +34,63 @@ const RegisterSection = () => {
         console.log(data);
     };
 
+    useEffect(() => {
+        console.log(errors);
+    }, [errors]);
+
     return (
         <div className="auth-section">
             <div className="auth-modal">
                 <p className="upper biggest black">реєстрація</p>
                 <div className="auth-modal-inputs-wrapper">
                     <div className="auth-modal-inputs">
-                        <input
-                            {...register("email", {
-                                required: "Email is required",
-                                pattern: {
-                                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                                    message: "Invalid email address",
-                                },
-                            })}
-                            className={errors.email ? "invalid" : ""}
+                        <Input
                             type="email"
+                            control={control}
+                            errors={errors}
                             placeholder="email"
+                            name="email "
                         />
-                        <div className="auth-modal-inputs-phone">
-                            <div className="auth-modal-inputs-phone-article small">
-                                +38
-                            </div>
-                            <Controller
-                                name="phoneNumber"
-                                control={control}
-                                rules={{
-                                    required: "Phone number is required",
-                                    minLength: {
-                                        value: 10,
-                                        message: "Invalid phone number",
-                                    },
-                                }}
-                                render={({ field }) => (
-                                    <input
-                                        type="text"
-                                        maxLength={10}
-                                        {...field}
-                                        className={
-                                            errors.phoneNumber ? "invalid" : ""
-                                        }
-                                        placeholder="номер телефону"
-                                        onChange={(e) => {
-                                            const cleanValue =
-                                                e.target.value.replace(
-                                                    /[^0-9]/g,
-                                                    ""
-                                                );
-                                            field.onChange(cleanValue);
-                                        }}
-                                    />
-                                )}
-                            />
-                        </div>
+
+                        <Input
+                            type="phone"
+                            control={control}
+                            errors={errors}
+                            placeholder="номер телефону"
+                            name="phoneNumber"
+                        />
+
                         <div className="auth-modal-inputs-devided">
-                            <input
-                                {...register("password", {
-                                    required: "Password is required",
+                            <Input
+                                type="password"
+                                control={control}
+                                errors={errors}
+                                placeholder="пароль"
+                                name="password"
+                                rules={{
+                                    required: "Пароль є обов'язковим",
                                     minLength: {
                                         value: 6,
-                                        message: "Password is too short",
+                                        message: "Пароль занадто короткий",
                                     },
-                                })}
-                                className={errors.password ? "invalid" : ""}
-                                type="password"
-                                placeholder="пароль"
+                                }}
                             />
-                            <input
-                                {...register("confirmPassword", {
-                                    required: "Please confirm your password",
-                                    validate: (value) =>
-                                        value === watch("password") ||
-                                        "Passwords do not match",
-                                })}
-                                className={
-                                    errors.confirmPassword ? "invalid" : ""
-                                }
+
+                            <Input
                                 type="password"
+                                control={control}
+                                errors={errors}
                                 placeholder="повторити пароль"
+                                name="confirmPassword"
+                                rules={{
+                                    required: "Повторний пароль є обов'язковим",
+                                    validate: (value: string) =>
+                                        value === watch("password") ||
+                                        "Паролі не співпадають",
+                                }}
                             />
                         </div>
                     </div>
-
-                    <Errors errors={errors} />
 
                     <Button
                         additionalClasses={["upper"]}
