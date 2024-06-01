@@ -93,6 +93,15 @@ services:
       - rabbitmq
       - celery
 
+  redis:
+    image: "redis:latest"
+    container_name: "redis"
+    restart: always
+    ports:
+      - "6379:${REDIS_PORT}"
+    env_file:
+      - .env.dev
+
 volumes:
   postgres_data:
   pg_admin_data:

@@ -4,11 +4,14 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import settings
+from .core.caching import init_caching
 
 
 # Lifespan events
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa
+    # Initialize the cache backend
+    init_caching()
     yield
 
 
