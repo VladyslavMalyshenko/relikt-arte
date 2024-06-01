@@ -31,7 +31,39 @@ services:
     env_file:
       - .env.prod
     expose:
-      - ${API_APP_PORT}
+      - ${APP_PORT}
+    volumes:
+      - .:/app/api
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "rabbitmq"
+    restart: always
+    ports:
+      - "5672:${RABBITMQ_PORT}"
+      - "15672:${RABBITMQ_PORT_SECOND}"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    env_file:
+      - .env.prod
+
+  celery:
+    build:
+      context: .
+    container_name: "celery"
+    command: /bin/sh -c /app/celery.sh
+    depends_on:
+      - rabbitmq
+    environment:
+      MODE: "PROD"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+    env_file:
+      - .env.prod
     volumes:
       - .:/app/api
 
