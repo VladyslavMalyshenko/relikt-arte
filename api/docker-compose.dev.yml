@@ -67,7 +67,7 @@ services:
     build:
       context: .
     container_name: "celery"
-    command: celery -A src.core.celery.app worker --loglevel=INFO
+    command: /bin/sh -c /app/celery.sh
     depends_on:
       - rabbitmq
     environment:

@@ -52,10 +52,12 @@ class CelerySettings(BaseSettings):
     rabbit_user: str = Field(alias="rabbitmq_user")
     rabbit_password: str = Field(alias="rabbitmq_password")
     rabbit_port: int = Field(alias="rabbitmq_port")
-
-    @property
-    def broker_url(self) -> str:
-        return f"amqp://{self.rabbit_user}:{self.rabbit_password}@rabbitmq:{self.rabbit_port}//"
+    timezone: str = Field(alias="celery_timezone", default="UTC")
+    broker_url: str | None = Field(alias="celery_broker_url", default=None)
+    result_backend: str = Field(
+        alias="celery_result_backend",
+        default="rpc://",
+    )
 
 
 class Settings(BaseSettings):

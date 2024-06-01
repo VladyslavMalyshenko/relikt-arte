@@ -2,9 +2,10 @@ from celery import Celery
 
 from .config import settings
 
-app = Celery(
-    "worker",
-    broker=settings.celery.broker_url,
-    result_backend="rpc://",
+app = Celery(__name__)
+app.conf.update(
+    broker_url=settings.celery.broker_url,
+    result_backend=settings.celery.result_backend,
+    timezone=settings.celery.timezone,
+    broker_heartbeat=240,
 )
-app.conf.update(task_track_started=True)

@@ -45,7 +45,9 @@ COPY ./supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Make run script executable
 COPY --chmod=765 scripts/run.sh /app/run.sh
+COPY --chmod=765 scripts/celery.sh /app/celery.sh
 RUN chmod +x /app/run.sh
+RUN chmod +x /app/celery.sh
 
 # Run application as root user
 USER root
