@@ -141,7 +141,6 @@ const ProductSection = () => {
                                 дверей;
                             </p>
                             <p className="black small">
-                                {" "}
                                 - екологічно чистий матеріал;
                             </p>
                             <p className="black small">

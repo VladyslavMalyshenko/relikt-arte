@@ -1,10 +1,11 @@
 export const paths = {
     main: "/",
-    buy: "/buy",
+    buy: "/products",
     contacts: "/contacts",
     register: "/register",
     singIn: "/sing-in",
     profile: "/profile",
     passwordRecover: "/password-recover",
     product: "/buy/:product_id",
+    checkout: "/checkout",
 };

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import "../../../styles/components/UI/Auth.scss";
 import "../../../styles/components/pages/passwordrecoverypage/PasswordRecoverySection.scss";
 import Button from "../../UI/Button";
-import Errors from "../../UI/Errors";
+import Input from "../../UI/Input";
 
 const PasswordRecoverySection = () => {
     interface RecoverFormData {
@@ -15,7 +15,7 @@ const PasswordRecoverySection = () => {
 
     const {
         handleSubmit,
-        register,
+        control,
         formState: { errors },
     } = useForm<RecoverFormData>({
         defaultValues,
@@ -31,21 +31,14 @@ const PasswordRecoverySection = () => {
             <div className="password-modal">
                 <div className="auth-modal-inputs-wrapper">
                     <div className="auth-modal-inputs">
-                        <input
-                            {...register("email", {
-                                required: "Email is required",
-                                pattern: {
-                                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                                    message: "Invalid email address",
-                                },
-                            })}
-                            className={errors.email ? "invalid" : ""}
+                        <Input
                             type="email"
+                            control={control}
+                            errors={errors}
                             placeholder="email"
+                            name="email"
                         />
                     </div>
-
-                    <Errors errors={errors} />
 
                     <Button
                         additionalClasses={["upper"]}
