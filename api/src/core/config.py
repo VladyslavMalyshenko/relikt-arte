@@ -49,15 +49,17 @@ class DBSettings(BaseSettings):
 
 
 class CelerySettings(BaseSettings):
-    rabbit_user: str = Field(alias="rabbitmq_user")
-    rabbit_password: str = Field(alias="rabbitmq_password")
-    rabbit_port: int = Field(alias="rabbitmq_port")
     timezone: str = Field(alias="celery_timezone", default="UTC")
     broker_url: str | None = Field(alias="celery_broker_url", default=None)
     result_backend: str = Field(
         alias="celery_result_backend",
         default="rpc://",
     )
+
+
+class CacheSettings(BaseSettings):
+    use_redis: bool = Field(alias="cache_use_redis", default=True)
+    redis_url: str
 
 
 class Settings(BaseSettings):
@@ -77,6 +79,9 @@ class Settings(BaseSettings):
 
     # Celery
     celery: CelerySettings = Field(default_factory=CelerySettings)
+
+    # Cache
+    cache: CacheSettings = Field(default_factory=CacheSettings)
 
 
 @lru_cache

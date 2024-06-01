@@ -4,7 +4,7 @@
 APP_DIR="/app/api"
 
 # Wait some time for the rabbitmq to be ready
-sleep 15
+sleep 18
 
 # Automatically load the .env file if found
 set -a
