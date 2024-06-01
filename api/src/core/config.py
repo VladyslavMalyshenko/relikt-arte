@@ -48,6 +48,16 @@ class DBSettings(BaseSettings):
         return str(url)
 
 
+class CelerySettings(BaseSettings):
+    rabbit_user: str = Field(alias="rabbitmq_user")
+    rabbit_password: str = Field(alias="rabbitmq_password")
+    rabbit_port: int = Field(alias="rabbitmq_port")
+
+    @property
+    def broker_url(self) -> str:
+        return f"amqp://{self.rabbit_user}:{self.rabbit_password}@rabbitmq:{self.rabbit_port}//"
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -62,6 +72,9 @@ class Settings(BaseSettings):
 
     # Database settings
     db: DBSettings = Field(default_factory=DBSettings)
+
+    # Celery
+    celery: CelerySettings = Field(default_factory=CelerySettings)
 
 
 @lru_cache
