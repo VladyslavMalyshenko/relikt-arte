@@ -1,0 +1,98 @@
+services:
+  postgresql:
+    image: "postgres:15"
+    restart: always
+    container_name: "postgresql"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+    env_file:
+      - .env.dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+    container_name: "app"
+    depends_on:
+      - postgresql
+    environment:
+      MODE: "DEV"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+    env_file:
+      - .env.dev
+    ports:
+      - "8000:${APP_PORT}"
+    volumes:
+      - .:/app/api
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: pg_admin
+    restart: always
+    ports:
+      - "82:80"
+    depends_on:
+      - postgresql
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PG_ADMIN_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PG_ADMIN_PASSWORD}"
+    volumes:
+      - pg_admin_data:/var/lib/pgadmin
+    env_file:
+      - .env.dev
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "rabbitmq"
+    restart: always
+    ports:
+      - "5672:${RABBITMQ_PORT}"
+      - "15672:${RABBITMQ_PORT_SECOND}"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    env_file:
+      - .env.dev
+
+  celery:
+    build:
+      context: .
+    container_name: "celery"
+    command: celery -A src.core.celery.app worker --loglevel=INFO
+    depends_on:
+      - rabbitmq
+    environment:
+      MODE: "DEV"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+    env_file:
+      - .env.dev
+    volumes:
+      - .:/app/api
+
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A src.core.celery.app flower --port=${FLOWER_PORT}
+    ports:
+      - ${FLOWER_MAIN_PORT}:${FLOWER_PORT}
+    depends_on:
+      - app
+      - rabbitmq
+      - celery
+
+volumes:
+  postgres_data:
+  pg_admin_data:
