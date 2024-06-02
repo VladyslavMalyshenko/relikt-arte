@@ -15,7 +15,13 @@ const defaultValues = {
 };
 
 const ProfileSettings = () => {
-    const { handleSubmit, setValue, control } = useForm({ defaultValues });
+    const {
+        handleSubmit,
+        reset,
+        formState: { errors },
+        control,
+        watch,
+    } = useForm({ defaultValues });
     const [currentCategory, setCurrentCategory] = useState("профіль");
     const [username, setUsername] = useState("");
 
@@ -61,8 +67,14 @@ const ProfileSettings = () => {
                 </div>
 
                 <ProfileSettingsWindow
-                    control={control}
-                    currentCategory={currentCategory}
+                    options={{
+                        control,
+                        errors,
+                        currentCategory,
+                        handleSubmit,
+                        watch,
+                        reset,
+                    }}
                 />
             </div>
         </div>

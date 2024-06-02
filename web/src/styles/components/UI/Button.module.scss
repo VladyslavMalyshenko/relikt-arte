@@ -1,8 +1,9 @@
 .button {
     --primary: var(--white);
     --secondary: var(--dark-grey);
-    width: 274px;
-    height: 59px;
+    width: 100%;
+    max-width: 274px;
+    max-height: 59px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,6 +43,14 @@
     &.inverse {
         --primary: var(--dark-grey);
         --secondary: var(--white);
+    }
+}
+
+@media (max-width: 900px) {
+    .button {
+        aspect-ratio: 3/1;
+        font-size: 14px;
+        gap: 5px;
     }
 }
 

@@ -14,7 +14,17 @@
         color: var(--black);
     }
 
-    a:not(.black):hover {
+    a:not(.black):active {
+        color: var(--black);
+
+        & ~ a.black {
+            color: var(--transparent-black-10);
+        }
+    }
+}
+
+@media (hover: hover) {
+    .path-text a:not(.black):hover {
         color: var(--black);
 
         & ~ a.black {

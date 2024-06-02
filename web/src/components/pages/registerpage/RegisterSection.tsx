@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
@@ -33,10 +32,6 @@ const RegisterSection = () => {
     const onSubmit = (data: RegisterFormData) => {
         console.log(data);
     };
-
-    useEffect(() => {
-        console.log(errors);
-    }, [errors]);
 
     return (
         <div className="auth-section">

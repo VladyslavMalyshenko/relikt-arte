@@ -1,11 +1,9 @@
-@use "../../../variables";
-
 .why-us {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 50px;
-    padding: 0 variables.$offset;
+    padding: 0 var(--offset);
     box-sizing: border-box;
 
     &-features {
@@ -26,6 +24,23 @@
 
         .small {
             color: var(--transparent-black-60);
+        }
+    }
+}
+
+@media (max-width: 900px) {
+    .why-us {
+        text-align: center;
+
+        &-features {
+            gap: 50px;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        &-feature {
+            width: 100%;
+            gap: 15px;
         }
     }
 }

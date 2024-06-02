@@ -1,4 +1,3 @@
-@use "./variables";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
 * {
@@ -18,6 +17,8 @@ html {
     --transparent-black-10: rgba(0, 0, 0, 0.1);
     --transparent-black-20: rgba(0, 0, 0, 0.2);
     --transparent-black-60: rgba(0, 0, 0, 0.6);
+    --offset: 100px;
+    --block-gap: 200px;
 }
 
 html,
@@ -90,4 +91,60 @@ p {
 
 .black {
     color: var(--black);
+}
+
+@media (min-width: 401px) and (max-width: 900px) {
+    html {
+        --offset: 40px;
+        --block-gap: 100px;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 1300px) {
+    .biggest {
+        font-size: 66px;
+    }
+}
+
+@media (min-width: 461px) and (max-width: 650px) {
+    .biggest {
+        font-size: 56px;
+    }
+
+    .big {
+        font-size: 45px;
+    }
+
+    .mid {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 460px) {
+    .biggest {
+        font-size: 40px;
+    }
+
+    .big {
+        font-size: 26px;
+    }
+
+    .mid {
+        font-size: 20px;
+    }
+
+    .pre-small {
+        font-size: 18px;
+    }
+
+    .small {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 400px) {
+    html {
+        --offset: 20px;
+        --block-gap: 75px;
+    }
 }
