@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
@@ -11,10 +11,47 @@ import NavbarLink from "./UI/NavbarLink";
 const Navbar = () => {
     const [isModalOpened, setIsModalOpened] = useState(false);
     const { navbarRef } = useNavbar();
+    const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
     const isAuth = useSelector((state: any) => state.AuthReducer.auth);
+
+    const handleNavbar = (e: any) => {
+        if (navbarRef.current) {
+            navbarRef.current.classList.toggle("active");
+        }
+
+        if (e.currentTarget) {
+            e.currentTarget.classList.toggle("active");
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener("resize", () => {
+            setCurrentWidth(window.innerWidth);
+        });
+    }, []);
 
     return (
         <>
+            {currentWidth <= 900 && (
+                <div className="navbar-button" onClick={handleNavbar}>
+                    <svg
+                        width="800px"
+                        height="800px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20M4 12H20M4 18H20"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                </div>
+            )}
+
             {isModalOpened && (
                 <CartModal closeModal={() => setIsModalOpened(false)} />
             )}

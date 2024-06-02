@@ -6,6 +6,37 @@
         gap: 50px;
     }
 
+    &-button {
+        position: fixed;
+        top: 100px;
+        left: 0;
+        width: 20px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--black);
+        background: var(--transparent-black-10);
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        z-index: 3;
+
+        svg {
+            transform: rotate(90deg);
+            transition: 0.3s;
+        }
+
+        &.active {
+            left: unset;
+            right: 0;
+            border-radius: 6px 0 0 6px;
+
+            svg {
+                transform: rotate(-90deg);
+            }
+        }
+    }
+
     &-price {
         width: 100%;
         max-width: 226px;
@@ -48,7 +79,7 @@
     }
 
     &-filter {
-        width: 100%;
+        width: 90%;
         max-width: 271px;
         display: flex;
         flex-direction: column;
@@ -146,6 +177,33 @@
             p {
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+        }
+    }
+}
+
+@media (max-width: 900px) {
+    .filters {
+        &-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--white);
+            padding: 75px var(--offset);
+            overflow: auto;
+            transform: translateX(-100%);
+            z-index: 2;
+            transition: 0.3s;
+
+            &.active {
+                transform: translateX(0);
+            }
+
+            p.upper.pre-small.black.bold {
+                width: 90%;
+                text-align: start;
             }
         }
     }

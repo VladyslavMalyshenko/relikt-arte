@@ -26,8 +26,8 @@ const CartModal = ({ closeModal }: CartModalProps) => {
                         <path
                             d="M12.6575 1.34318L1.34375 12.6569M12.6575 12.6568L1.34375 1.34311"
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                     </svg>
                 </div>

@@ -1,5 +1,7 @@
 .door-card {
-    width: 296px;
+    width: 100%;
+    max-width: 296px;
+    max-height: 563px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -9,6 +11,7 @@
     box-sizing: border-box;
     border-radius: 10px;
     cursor: pointer;
+    gap: 20px;
     aspect-ratio: 296/563;
 
     p {

@@ -17,8 +17,9 @@ type FormProps = {
 const Form = ({ control, errors, fields }: FormProps) => {
     return (
         <>
-            {fields.map((field) => (
+            {fields.map((field, index) => (
                 <Input
+                    key={`formField[${index}]`}
                     type={field.type}
                     control={control}
                     errors={errors}

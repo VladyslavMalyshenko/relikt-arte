@@ -9,3 +9,10 @@ footer {
     grid-row: 3;
     border-top: 1px solid var(--transparent-black-10);
 }
+
+@media (max-width: 400px) {
+    footer {
+        text-align: center;
+        flex-direction: column;
+    }
+}

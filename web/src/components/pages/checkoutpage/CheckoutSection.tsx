@@ -72,13 +72,11 @@ const CheckoutSection = () => {
                     type: "phone",
                     placeholder: "номер телефону",
                     name: "phoneNumber",
-                    rules: {},
                 },
                 {
                     type: "email",
                     placeholder: "email",
                     name: "email",
-                    rules: {},
                 },
             ],
         },
@@ -136,7 +134,6 @@ const CheckoutSection = () => {
                     type: "text",
                     placeholder: "Додаткова інформація",
                     name: "additional",
-                    rules: {},
                 },
             ],
         },
@@ -161,8 +158,11 @@ const CheckoutSection = () => {
 
             <div className="checkout-section-inner">
                 <div className="checkout-section-inner-inputs">
-                    {checkoutFields.map((fieldGroup) => (
-                        <div className="checkout-section-inner-inputs-group">
+                    {checkoutFields.map((fieldGroup, index) => (
+                        <div
+                            key={`fieldGroup[${index}]`}
+                            className="checkout-section-inner-inputs-group"
+                        >
                             <Form
                                 control={fieldGroup.control}
                                 errors={fieldGroup.errors}

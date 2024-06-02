@@ -48,10 +48,16 @@
                 cursor: pointer;
                 transition: 0.3s;
 
-                &:hover {
+                &:active {
                     color: var(--red);
                 }
             }
         }
+    }
+}
+
+@media (hover: hover) {
+    .cart-modal-inner-header svg:hover {
+        color: var(--red);
     }
 }

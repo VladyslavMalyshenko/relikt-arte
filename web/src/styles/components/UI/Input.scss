@@ -28,6 +28,13 @@
         gap: 5px;
     }
 
+    &-label {
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
     &-phone {
         width: 100%;
         display: flex;
