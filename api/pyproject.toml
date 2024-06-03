@@ -15,8 +15,8 @@ psycopg = {version = "^3.1.19", extras = ["binary", "pool"]}
 celery = "^5.4.0"
 gunicorn = "^22.0.0"
 flower = "^2.0.1"
-fastapi-cache2 = "^0.2.1"
 redis = "^5.0.4"
+redis-cli = "^1.0.1"
 
 
 [build-system]
