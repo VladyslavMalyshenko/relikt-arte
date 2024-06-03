@@ -1,5 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import BuyPage from "../pages/BuyPage";
+import CheckoutPage from "../pages/CheckoutPage";
+import ContactsPage from "../pages/ContactsPage";
 import HomePage from "../pages/HomePage";
 import PasswordRecoveryPage from "../pages/PasswordRecoveryPage";
 import ProductPage from "../pages/ProductPage";
@@ -7,7 +9,6 @@ import ProfilePage from "../pages/ProfilePage";
 import RegisterPage from "../pages/RegisterPage";
 import SingInPage from "../pages/SingInPage";
 import { paths } from "./paths";
-import CheckoutPage from "../pages/CheckoutPage";
 
 const Router = () => {
     return (
@@ -23,6 +24,7 @@ const Router = () => {
             <Route path={paths.product} element={<ProductPage />} />
             <Route path={paths.profile} element={<ProfilePage />} />
             <Route path={paths.checkout} element={<CheckoutPage />} />
+            <Route path={paths.contacts} element={<ContactsPage />} />
         </Routes>
     );
 };
