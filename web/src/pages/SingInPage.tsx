@@ -3,7 +3,7 @@ import "../styles/pages/Page.scss";
 
 const SingInPage = () => {
     return (
-        <div className="page centered">
+        <div className="page bottom">
             <SingInSection />
         </div>
     );

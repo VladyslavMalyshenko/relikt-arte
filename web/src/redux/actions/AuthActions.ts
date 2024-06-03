@@ -1,6 +1,8 @@
-export const SetAuth = (payload: any) => {
+import { SET_AUTH } from "../actionTypes/AuthTypes";
+
+export const SetAuth = (payload: boolean) => {
     return {
-        type: "SET_AUTH",
+        type: SET_AUTH,
         payload,
     };
 };

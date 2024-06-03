@@ -6,7 +6,7 @@
         justify-content: center;
         flex-direction: column;
         gap: 50px;
-        padding: 100px var(--offset) 0 var(--offset);
+        padding: var(--top-padding) var(--offset) 0 var(--offset);
         box-sizing: border-box;
         text-align: center;
     }
@@ -61,6 +61,25 @@
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
+                gap: 15px;
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-modal {
+        width: 100%;
+
+        &-inputs {
+            &-wrapper {
+                width: 100%;
+            }
+            &-devided {
+                width: 100%;
+                display: flex;
+                justify-content: unset;
+                flex-direction: column;
                 gap: 15px;
             }
         }

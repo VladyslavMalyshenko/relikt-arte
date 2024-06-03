@@ -1,10 +1,12 @@
+import { SET_AUTH } from "../actionTypes/AuthTypes";
+
 const initialState = {
     auth: false,
 };
 
 export const AuthReducer = (state = initialState, action: any) => {
     switch (action.type) {
-        case "SET_AUTH":
+        case SET_AUTH:
             return {
                 auth: action.payload,
             };
