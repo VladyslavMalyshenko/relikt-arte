@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { Filter as FilterType, filtersData } from "../../data/filters";
 import "../../styles/components/UI/BuySectionFilters.scss";
 import { handleInputByAllowedSymbols } from "../../utils/handleInputByAllowedSymbols";
@@ -9,7 +10,9 @@ const BuySectionFilters = () => {
     const [maxPrice, setMaxPrice] = useState("");
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
+    const currentWidth = useSelector(
+        (state: any) => state.ScreenPropertiesReducer.width
+    );
 
     const handleFilters = (e: any) => {
         if (sidebarRef.current) {
@@ -20,12 +23,6 @@ const BuySectionFilters = () => {
             e.currentTarget.classList.toggle("active");
         }
     };
-
-    useEffect(() => {
-        window.addEventListener("resize", () => {
-            setCurrentWidth(window.innerWidth);
-        });
-    }, []);
 
     return (
         <>

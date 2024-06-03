@@ -3,7 +3,7 @@ import "../styles/pages/Page.scss";
 
 const PasswordRecoveryPage = () => {
     return (
-        <div className="page centered">
+        <div className="page bottom centered">
             <PassRecoverySection />
         </div>
     );

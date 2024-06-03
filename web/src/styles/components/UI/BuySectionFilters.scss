@@ -182,6 +182,12 @@
     }
 }
 
+@media (min-width: 901px) and (max-width: 1142px) {
+    .filters-container {
+        width: 30%;
+    }
+}
+
 @media (max-width: 900px) {
     .filters {
         &-container {
@@ -192,6 +198,7 @@
             height: 100vh;
             background: var(--white);
             padding: 75px var(--offset);
+            box-sizing: border-box;
             overflow: auto;
             transform: translateX(-100%);
             z-index: 2;

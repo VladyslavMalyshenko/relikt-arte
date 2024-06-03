@@ -7,6 +7,7 @@ type NavbarLinkProps = {
     children?: any;
     to: string;
     activeLocations?: string[];
+    onClick?: any;
 };
 
 const NavbarLink = ({
@@ -14,6 +15,7 @@ const NavbarLink = ({
     children,
     to,
     activeLocations,
+    onClick,
 }: NavbarLinkProps) => {
     const [isActive, setIsActive] = useState(false);
     const location = useLocation();
@@ -31,6 +33,7 @@ const NavbarLink = ({
 
     return (
         <Link
+            onClick={onClick}
             className={`${isActive ? "active " : ""}upper navbar-link`}
             to={to}
         >

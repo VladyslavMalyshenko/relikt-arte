@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png";
@@ -11,29 +11,36 @@ import NavbarLink from "./UI/NavbarLink";
 const Navbar = () => {
     const [isModalOpened, setIsModalOpened] = useState(false);
     const { navbarRef } = useNavbar();
-    const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
+    const buttonRef = useRef<HTMLDivElement>(null);
+    const currentWidth = useSelector(
+        (state: any) => state.ScreenPropertiesReducer.width
+    );
     const isAuth = useSelector((state: any) => state.AuthReducer.auth);
 
-    const handleNavbar = (e: any) => {
-        if (navbarRef.current) {
-            navbarRef.current.classList.toggle("active");
-        }
+    const handleNavbar = (remove?: boolean) => {
+        const navbarRefClasslist = navbarRef?.current?.classList;
+        const buttonRefClasslist = buttonRef?.current?.classList;
 
-        if (e.currentTarget) {
-            e.currentTarget.classList.toggle("active");
+        if (navbarRefClasslist && buttonRefClasslist) {
+            if (remove) {
+                navbarRefClasslist.remove("active");
+                buttonRefClasslist.remove("active");
+                return;
+            }
+
+            navbarRefClasslist.toggle("active");
+            buttonRefClasslist.toggle("active");
         }
     };
-
-    useEffect(() => {
-        window.addEventListener("resize", () => {
-            setCurrentWidth(window.innerWidth);
-        });
-    }, []);
 
     return (
         <>
             {currentWidth <= 900 && (
-                <div className="navbar-button" onClick={handleNavbar}>
+                <div
+                    className="navbar-button"
+                    ref={buttonRef}
+                    onClick={() => handleNavbar()}
+                >
                     <svg
                         width="800px"
                         height="800px"
@@ -57,19 +64,39 @@ const Navbar = () => {
             )}
             <nav ref={navbarRef}>
                 <div className="navbar-category">
-                    <Link className="navbar-link-static" to="/">
+                    <Link
+                        className="navbar-link-static"
+                        onClick={() => handleNavbar(true)}
+                        to="/"
+                    >
                         <img src={Logo} alt="Logo" />
                     </Link>
                 </div>
                 <div className="navbar-category">
-                    <NavbarLink to={paths.main}>Головна</NavbarLink>
+                    <NavbarLink
+                        onClick={() => handleNavbar(true)}
+                        to={paths.main}
+                    >
+                        Головна
+                    </NavbarLink>
 
-                    <NavbarLink to={paths.buy}>Продукція</NavbarLink>
+                    <NavbarLink
+                        onClick={() => handleNavbar(true)}
+                        to={paths.buy}
+                    >
+                        Продукція
+                    </NavbarLink>
 
-                    <NavbarLink to={paths.contacts}>Контакти</NavbarLink>
+                    <NavbarLink
+                        onClick={() => handleNavbar(true)}
+                        to={paths.contacts}
+                    >
+                        Контакти
+                    </NavbarLink>
                 </div>
                 <div className="navbar-category">
                     <NavbarLink
+                        onClick={() => handleNavbar(true)}
                         to={isAuth ? paths.profile : paths.register}
                         activeLocations={[
                             paths.profile,
@@ -92,7 +119,10 @@ const Navbar = () => {
                     </NavbarLink>
 
                     <svg
-                        onClick={() => setIsModalOpened(true)}
+                        onClick={() => {
+                            handleNavbar(true);
+                            setIsModalOpened(true);
+                        }}
                         width="28"
                         height="29"
                         viewBox="0 0 28 29"

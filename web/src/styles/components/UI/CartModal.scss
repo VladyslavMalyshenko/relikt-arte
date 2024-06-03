@@ -56,6 +56,12 @@
     }
 }
 
+@media (max-width: 900px) {
+    .cart-modal-inner {
+        width: 90%;
+    }
+}
+
 @media (hover: hover) {
     .cart-modal-inner-header svg:hover {
         color: var(--red);

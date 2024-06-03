@@ -46,3 +46,9 @@
         height: 50%;
     }
 }
+
+@media (max-width: 1399px) {
+    .door-card {
+        max-width: 260px;
+    }
+}
