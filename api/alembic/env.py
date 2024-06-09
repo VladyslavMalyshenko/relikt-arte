@@ -9,6 +9,7 @@ from src.core.config import settings
 from src.core.db.base import Base
 
 import src.user.models  # noqa: F401
+import src.product.models  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
