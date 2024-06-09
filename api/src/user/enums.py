@@ -1,12 +1,12 @@
-from enum import Enum
+from ..utils.enums import BaseEnum
 
 
-class UserRole(Enum):
+class UserRole(BaseEnum):
     ADMIN = "admin"
     USER = "user"
 
 
-class UserPriority(Enum):
+class UserPriority(BaseEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
