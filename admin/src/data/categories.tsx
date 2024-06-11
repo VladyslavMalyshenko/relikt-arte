@@ -2,9 +2,12 @@ export type Category = {
     icon: JSX.Element;
     label: string;
     link: string;
+    getUrl: string;
+    editUrl: string;
+    deleteUrl: string;
 };
 
-export const categories: Category[] = [
+export const categoriesData: Category[] = [
     {
         icon: (
             <svg
@@ -19,6 +22,9 @@ export const categories: Category[] = [
         ),
         label: "Дешборд",
         link: "/",
+        getUrl: "/api/v1/dashboard",
+        editUrl: "/api/v1/dashboard",
+        deleteUrl: "/api/v1/dashboard",
     },
     {
         icon: (
@@ -34,6 +40,9 @@ export const categories: Category[] = [
         ),
         label: "Категория 1",
         link: "/category1",
+        getUrl: "/api/v1/category1",
+        editUrl: "/api/v1/category1",
+        deleteUrl: "/api/v1/category1",
     },
     {
         icon: (
@@ -49,5 +58,8 @@ export const categories: Category[] = [
         ),
         label: "Категория 2",
         link: "/category2",
+        getUrl: "/api/v1/category2",
+        editUrl: "/api/v1/category2",
+        deleteUrl: "/api/v1/category2",
     },
 ];

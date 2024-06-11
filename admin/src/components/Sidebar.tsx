@@ -1,26 +1,35 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Category, categories } from "../data/categories";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Category, categoriesData } from "../data/categories";
+import { SetCurrentCategory } from "../redux/actions/currentCategoryActions";
 import "../styles/components/Sidebar.scss";
 
 const Sidebar = () => {
-    const { category } = useParams();
-    const [isSidebarFull, setIsSidebarFull] = useState(false);
+    const category = useSelector(
+        (state: any) => state.categoryReducer.category
+    );
+    const dispatch = useDispatch();
+    const [isSidebarFull, setIsSidebarFull] = useState(true);
 
     return (
         <div className={`sidebar${!isSidebarFull ? " short" : ""}`}>
             <ul className="categories">
-                {categories.map((categoryObject: Category, index) => (
+                {categoriesData.map((categoryObject: Category, index) => (
                     <li
                         key={index}
                         className={`category${
-                            (category || "") ===
-                            categoryObject.link.split("/").join("")
+                            (category.link || {}) === categoryObject.link
                                 ? " active"
                                 : ""
                         }`}
                     >
-                        <Link to={categoryObject.link}>
+                        <Link
+                            to={categoryObject.link}
+                            onClick={() =>
+                                dispatch(SetCurrentCategory(categoryObject))
+                            }
+                        >
                             {categoryObject.icon ? (
                                 <span className="icon">
                                     {categoryObject.icon}

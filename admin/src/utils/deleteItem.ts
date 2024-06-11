@@ -1,9 +1,7 @@
 import axios from "axios";
+import { generateUrl } from "./generateUrl";
 
-export const deleteItem = (id: number) => {
-    axios.delete(
-        `${
-            process.env.REACT_APP_BACKEND_DOMAIN || "http://localhost:8000"
-        }/products/${id}`
-    );
+export const deleteItem = async (url_part: string, id: number) => {
+    const validUrl = generateUrl(url_part);
+    await axios.delete(`${validUrl}/${id}`);
 };

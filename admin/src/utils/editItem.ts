@@ -1,10 +1,8 @@
 import axios from "axios";
+import { generateUrl } from "./generateUrl";
 
-export const editItem = (id: number, newItem: any) => {
-    axios.patch(
-        `${
-            process.env.REACT_APP_BACKEND_DOMAIN || "http://localhost:8000"
-        }/products/${id}`,
-        newItem
-    );
+export const editItem = async (url_part: string, id: number, newItem: any) => {
+    const validUrl = generateUrl(url_part);
+
+    await axios.patch(`${validUrl}/${id}`, newItem);
 };
