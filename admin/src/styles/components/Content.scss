@@ -71,6 +71,12 @@
                             height: 100%;
                         }
 
+                        &.show:hover {
+                            color: var(--active-color);
+                            background: var(--active-background);
+                            border-color: var(--active-color);
+                        }
+
                         &.edit:hover {
                             color: var(--green);
                             background: var(--green-background);
