@@ -1,52 +1,31 @@
-from abc import ABC, abstractmethod
+import json
+import logging
+import base64
 
 
-class AbstractFilterProcessor(ABC):
-    @abstractmethod
-    async def process_equals(self, field: str, value: str):
-        raise NotImplementedError
+logger = logging.getLogger(__name__)
 
-    @abstractmethod
-    async def process_range(self, field: str, range_values: list):
-        raise NotImplementedError
 
-    @abstractmethod
-    async def process_value_in(self, field: str, values: list):
-        raise NotImplementedError
+class BaseFilterProcessor:
+    def decode_filters(self, filters_token: str) -> dict | None:
+        try:
+            decoded_filters = (
+                filters_token.replace("_", "=")
+                .replace("-", "+")
+                .replace(".", "/")
+            )
+            decoded_filters_json = base64.urlsafe_b64decode(
+                decoded_filters
+            ).decode()
+            return json.loads(decoded_filters_json)
+        except Exception as e:
+            logger.exception(e)
+            return None
 
-    @abstractmethod
-    async def process_value_more_than(self, field: str, value: str):
-        raise NotImplementedError
 
-    @abstractmethod
-    async def process_value_less_than(self, field: str, value: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def process_value_more_than_or_equals(self, field: str, value: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def process_value_less_than_or_equals(self, field: str, value: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    @abstractmethod
-    async def process_filters(self, filters: list):
-        """
-        Process multiple filters
-
-        Args:
-            filters (list): list of filters
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    async def process_filter(self, filter_lst: list):
-        """
-        Process a single filter
-
-        Args:
-            filter_lst (list): filter list, e.g ["category", "in", [1, 5]]
-        """
-        raise NotImplementedError
+bfp = BaseFilterProcessor()
+print(
+    bfp.decode_filters(
+        "W1siQVNEQVNEQVNEQVNEQVNEIiwiaXMiLDNdLFtudWxsLCJjdW0iLCJzZXh5Il0sWyJhc3MiLCJwdXQgaW4iLCJkaWNrIl1d"
+    )
+)

@@ -3,8 +3,7 @@ from enum import Enum as PyEnum
 from sqlalchemy import ForeignKey, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from .mixins import BaseProductRelMixin
 from .enums import ProductOrientation
@@ -16,7 +15,6 @@ from ..core.db.mixins import BaseModelMixin
 
 class ProductCategory(BaseProductRelMixin, Base):
     instance_name = "Category"
-    table_name = "product_category"
     __tablename__ = "product_category"
 
 

@@ -5,9 +5,9 @@ import base64
 # ts = """
 # {
 #     "filters": [
-#         ["category", "in", [1, 5]],
-#         ["price", "><", [5000, 10000]], # range
-#         ["price", ">", 1000]
+# ["category", "in", [1, 5]],
+# ["price", "><", [5000, 10000]], # range
+# ["price", ">", 1000]
 #     ]
 # }
 # """
@@ -31,7 +31,7 @@ import base64
 
 # Step 1: Custom replacements back to original
 decoded_custom_encoded_filters = (
-    "eyJmaWx0ZXJzIjpbWyJjYXRlZ29yeSIsImluIixbNSwxMF1dLFsicHJpY2UiLCI-PCIsWzUwMDAsMTI1MDAwXV0sWyJjb2xvciIsIj0iLCJnb2xkIl1dfQ__".replace(
+    "W1siQVNEQVNEQVNEQVNEQVNEIiwiaXMiLDNdLFtudWxsLCJjdW0iLCJzZXh5Il0sWyJhc3MiLCJwdXQgaW4iLCJkaWNrIl1d".replace(
         "_", "="
     )
     .replace("-", "+")
