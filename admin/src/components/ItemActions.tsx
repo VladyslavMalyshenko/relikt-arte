@@ -14,17 +14,20 @@ const ItemActions = ({ id }: ItemActionsProps) => {
     const action = useSelector((state: any) => state.actionReducer.action);
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (action === "") return;
+    useEffect(() => {}, [action]);
 
-        getItem(category.getUrl, id);
-    }, [action]);
+    const sendRequest = async (action: string) => {
+        dispatch(SetCurrentAction(action));
+        await getItem(category.getUrl, id);
+    };
 
     return (
         <td className="actions">
             <button
                 className="show"
-                onClick={() => dispatch(SetCurrentAction("show"))}
+                onClick={async () => {
+                    await sendRequest("show");
+                }}
             >
                 <svg
                     fill="currentColor"
@@ -40,7 +43,9 @@ const ItemActions = ({ id }: ItemActionsProps) => {
             </button>
             <button
                 className="edit"
-                onClick={() => dispatch(SetCurrentAction("edit"))}
+                onClick={async () => {
+                    await sendRequest("edit");
+                }}
             >
                 <svg
                     fill="currentColor"
@@ -56,7 +61,9 @@ const ItemActions = ({ id }: ItemActionsProps) => {
             </button>
             <button
                 className="delete"
-                onClick={() => dispatch(SetCurrentAction("delete"))}
+                onClick={async () => {
+                    await sendRequest("delete");
+                }}
             >
                 <svg
                     viewBox="0 0 24 24"
