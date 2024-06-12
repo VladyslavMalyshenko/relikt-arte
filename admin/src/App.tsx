@@ -1,5 +1,6 @@
 import Content from "./components/Content";
 import Header from "./components/Header";
+import Notifications from "./components/Notifications";
 import Sidebar from "./components/Sidebar";
 import "./styles/App.scss";
 
@@ -12,6 +13,8 @@ const App = () => {
                 <Sidebar />
                 <Content />
             </div>
+
+            <Notifications />
         </div>
     );
 };

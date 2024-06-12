@@ -20,7 +20,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 3,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -30,7 +30,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 4,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -40,7 +40,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 5,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -50,7 +50,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 6,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -60,7 +60,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 7,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -70,7 +70,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 8,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -80,7 +80,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 9,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -90,7 +90,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 10,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -100,7 +100,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 11,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -110,7 +110,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 12,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -120,7 +120,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 13,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -130,7 +130,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 14,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -140,7 +140,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 15,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -150,7 +150,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 16,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -160,7 +160,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 17,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -170,7 +170,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 18,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -180,7 +180,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 19,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -190,7 +190,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 20,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -200,7 +200,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 1,
+        id: 21,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
@@ -210,7 +210,7 @@ export const products = [
         glass: "Bronze",
     },
     {
-        id: 2,
+        id: 22,
         name: "Electronic Cotton Chicken",
         color: "red",
         size: "2500x2500",
