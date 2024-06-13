@@ -16,25 +16,30 @@ from ..core.db.mixins import BaseModelMixin
 class ProductCategory(BaseProductRelMixin, Base):
     instance_name = "Category"
     __tablename__ = "product_category"
+    __label__ = "product_category"
 
 
 class ProductColor(BaseProductRelMixin, Base):
     instance_name = "Color"
     __tablename__ = "product_color"
+    __label__ = "product_color"
 
 
 class ProductCovering(BaseProductRelMixin, Base):
     instance_name = "Covering"
     __tablename__ = "product_covering"
+    __label__ = "product_covering"
 
 
 class ProductGlassColor(BaseProductRelMixin, Base):
     instance_name = "Glass color"
     __tablename__ = "product_glass_color"
+    __label__ = "product_glass_color"
 
 
 class ProductSize(BaseModelMixin, Base):
     __tablename__ = "product_size"
+    __label__ = "product_size"
 
     height: Mapped[int] = mapped_column(
         nullable=False, index=True, doc="Height"
@@ -53,6 +58,8 @@ class ProductSize(BaseModelMixin, Base):
 
 
 class Product(BaseModelMixin, Base):
+    __label__ = "product"
+
     name: Mapped[str] = mapped_column(nullable=False, index=True, doc="Name")
     price: Mapped[int] = mapped_column(nullable=False, index=True, doc="Price")
     orientation: Mapped[PyEnum] = mapped_column(
@@ -68,6 +75,11 @@ class Product(BaseModelMixin, Base):
         JSONB,
         default=text(f"{_default_product_description_json()}"),
         doc="Description",
+    )
+    photo: Mapped[str] = mapped_column(
+        nullable=False,
+        info={"directory": "products"},
+        doc="Photo",
     )
 
     category_id = mapped_column(

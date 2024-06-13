@@ -34,3 +34,16 @@ class IdNotFoundException(HTTPException, Generic[ModelType]):
             detail=f"{model.__label__} with id {id} not found",
             headers=headers,
         )
+
+
+class ObjectCreateException(HTTPException):
+    def __init__(
+        self,
+        object_name: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to create {object_name}",
+            headers=headers,
+        )

@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .core.caching import init_caching
 
+from .utils.exception_handlers import exception_handlers
+
 from .product.router import router as product_router
 
 
@@ -36,3 +38,8 @@ app.add_middleware(
 routers: list[APIRouter] = [product_router]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")
+
+
+# Include custom exception handlers
+for exc_cls, handler in exception_handlers():
+    app.add_exception_handler(exc_cls, handler)
