@@ -57,7 +57,8 @@ class ProductRelCreate(MainSchema):
     name: str
 
 
-class ProductRelUpdate(ProductRelCreate):
+class ProductRelUpdate(MainSchema):
+    name: Optional[str] = None
     active: Optional[bool] = None
 
 

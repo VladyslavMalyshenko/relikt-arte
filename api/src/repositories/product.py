@@ -39,28 +39,23 @@ class ProductRepository(
 class ProductRelRepository(
     GenericRepository[ProductRel, ProductRelCreate, ProductRelUpdate]
 ):
-    async def create_product_rel(self, *, obj_in: ProductRelCreate) -> None:
-        await self.create(obj_in=obj_in)
+    model_class = None
 
-    async def update_product_rel(self, *, obj_in: ProductRelUpdate) -> None:
-        await self.update(obj_in=obj_in)
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, self.model_class)
 
 
 class ProductCategoryRepository(ProductRelRepository[ProductCategory]):
-    def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session, ProductCategory)
+    model_class = ProductCategory
 
 
 class ProductColorRepository(ProductRelRepository[ProductColor]):
-    def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session, ProductColor)
+    model_class = ProductColor
 
 
 class ProductCoveringRepository(ProductRelRepository[ProductCovering]):
-    def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session, ProductCovering)
+    model_class = ProductCovering
 
 
 class ProductGlassColorRepository(ProductRelRepository[ProductGlassColor]):
-    def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session, ProductGlassColor)
+    model_class = ProductGlassColor

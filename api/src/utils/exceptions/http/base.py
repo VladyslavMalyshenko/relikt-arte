@@ -25,18 +25,21 @@ class ContentNoChangeException(HTTPException):
 class IdNotFoundException(HTTPException, Generic[ModelType]):
     def __init__(
         self,
-        model: type[ModelType],
         id: int | UUID,
+        model: Optional[type[ModelType]] = None,
+        model_name: Optional[str] = None,
         headers: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"{model.__label__} with id {id} not found",
+            detail=f"{model.__label__ if model else model_name} with id {id} not found",
             headers=headers,
         )
 
 
 class ObjectCreateException(HTTPException):
+    _operation: str = "create"
+
     def __init__(
         self,
         object_name: str,
@@ -44,6 +47,10 @@ class ObjectCreateException(HTTPException):
     ) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to create {object_name}",
+            detail=f"Failed to {self._operation} {object_name}",
             headers=headers,
         )
+
+
+class ObjectUpdateException(ObjectCreateException):
+    _operation: str = "update"

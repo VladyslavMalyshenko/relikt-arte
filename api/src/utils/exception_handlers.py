@@ -34,7 +34,7 @@ def fastapi_request_validation_exception_handler(
             "msg": error_dict["msg"],
             "type": error_dict["type"],
         }
-        if error_dict.get("ctx"):
+        if error_dict.get("ctx") and error_dict["ctx"].get("expected"):
             error_data["expected"] = error_dict["ctx"]["expected"]
         errors_list.append(error_data)
     return exception_json_response_constructor({"errors": errors_list})
