@@ -2,9 +2,13 @@ export type Category = {
     icon: JSX.Element;
     label: string;
     link: string;
+    addUrl: string;
     getUrl: string;
     editUrl: string;
     deleteUrl: string;
+    getItemUrl: string;
+    fields?: string[];
+    addItemFields: any[];
 };
 
 export const categoriesData: Category[] = [
@@ -22,9 +26,21 @@ export const categoriesData: Category[] = [
         ),
         label: "Дешборд",
         link: "/",
+        addUrl: "/api/v1/dashboard",
         getUrl: "/api/v1/dashboard",
         editUrl: "/api/v1/dashboard",
         deleteUrl: "/api/v1/dashboard",
+        getItemUrl: "/api/v1/dashboard",
+        addItemFields: [
+            {
+                name: "name",
+                type: "text",
+            },
+            {
+                name: "active",
+                type: "boolean",
+            },
+        ],
     },
     {
         icon: (
@@ -40,9 +56,21 @@ export const categoriesData: Category[] = [
         ),
         label: "Категория 1",
         link: "/category1",
+        addUrl: "/api/v1/category1",
         getUrl: "/api/v1/category1",
         editUrl: "/api/v1/category1",
         deleteUrl: "/api/v1/category1",
+        getItemUrl: "/api/v1/category1",
+        addItemFields: [
+            {
+                name: "name",
+                type: "text",
+            },
+            {
+                name: "active",
+                type: "boolean",
+            },
+        ],
     },
     {
         icon: (
@@ -58,8 +86,54 @@ export const categoriesData: Category[] = [
         ),
         label: "Категория 2",
         link: "/category2",
+        addUrl: "/api/v1/category2",
         getUrl: "/api/v1/category2",
         editUrl: "/api/v1/category2",
         deleteUrl: "/api/v1/category2",
+        getItemUrl: "/api/v1/category2",
+        addItemFields: [
+            {
+                name: "name",
+                type: "text",
+            },
+            {
+                name: "active",
+                type: "boolean",
+            },
+        ],
+    },
+    {
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                version="1.1"
+                fill="currentColor"
+                viewBox="0 0 458.178 458.178"
+                xmlSpace="preserve"
+            >
+                <path d="M130.415,277.741C95.083,313.074,45.038,324.723,0,312.697c5.918,22.164,17.568,43.116,34.956,60.504   c52.721,52.721,138.198,52.721,190.919,0c26.361-26.36,26.36-69.099,0-95.459C199.514,251.38,156.776,251.38,130.415,277.741z" />
+                <path d="M212.771,234.276c12.728,4.827,24.403,12.338,34.317,22.252c10.077,10.077,17.456,21.838,22.19,34.378l53.47-53.47   l-56.568-56.569C245.886,201.161,226.908,220.139,212.771,234.276z" />
+                <path d="M446.462,57.153c-15.621-15.621-40.948-15.621-56.568,0c-5.887,5.887-54.496,54.496-102.501,102.501l56.568,56.569   l102.501-102.501C462.083,98.101,462.083,72.774,446.462,57.153z" />
+            </svg>
+        ),
+        label: "Кольори",
+        link: "/product_colors",
+        addUrl: "/api/v1/product/related/product_color/create/",
+        getUrl: "/api/v1/product/related/product_color/list/",
+        editUrl: "/api/v1/product/related/product_color/$id/update/",
+        deleteUrl: "/api/v1/product/related/product_color/$id/delete/",
+        getItemUrl: "/api/v1/product/related/product_color/$id/",
+        fields: ["id", "name", "active"],
+        addItemFields: [
+            {
+                name: "name",
+                type: "text",
+            },
+            {
+                name: "active",
+                type: "checkbox",
+            },
+        ],
     },
 ];
