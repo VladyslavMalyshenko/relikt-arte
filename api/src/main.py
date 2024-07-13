@@ -14,6 +14,8 @@ from .core.db.session import (
 
 from .admin.model_views import get_model_views
 
+from .product.router import router as product_router
+
 
 # Lifespan events
 @asynccontextmanager
@@ -39,7 +41,9 @@ app.add_middleware(
 )
 
 # Include routers
-routers: list[APIRouter] = []
+routers: list[APIRouter] = [
+    product_router,
+]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")
 

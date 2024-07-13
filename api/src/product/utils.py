@@ -1,6 +1,3 @@
-import json
-
-
 def _default_product_description_json() -> dict:
     """
     Default JSON for product description.
