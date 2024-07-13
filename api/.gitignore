@@ -165,3 +165,6 @@ env/
 
 # supervisor
 *.pid
+
+# Markdown files with info
+INFO.md
