@@ -36,7 +36,7 @@ class ProductSize(BaseModelMixin, Base):
     )
 
     @hybrid_property
-    async def dimensions(self) -> str:
+    def dimensions(self) -> str:
         return f"{self.height}x{self.width}x{self.thickness}"
 
     def __str__(self) -> str:
@@ -95,7 +95,7 @@ class Product(BaseModelMixin, Base):
     price: Mapped[int] = mapped_column(nullable=False, index=True, doc="Price")
     description: Mapped[dict] = mapped_column(
         JSONB,
-        default=text(f"{_default_product_description_json()}"),
+        default=_default_product_description_json,
         doc="Description",
     )
     have_glass: Mapped[bool] = mapped_column(

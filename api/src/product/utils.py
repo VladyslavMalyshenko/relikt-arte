@@ -1,7 +1,7 @@
 import json
 
 
-def _default_product_description_json() -> str:
+def _default_product_description_json() -> dict:
     """
     Default JSON for product description.
     Example:
@@ -34,4 +34,4 @@ def _default_product_description_json() -> str:
         },
         "text": None,
     }
-    return json.dumps(default_dict)
+    return default_dict
