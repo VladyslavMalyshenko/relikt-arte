@@ -25,7 +25,7 @@ class ContentNoChangeException(HTTPException):
 class IdNotFoundException(HTTPException, Generic[ModelType]):
     def __init__(
         self,
-        model: type[ModelType],
+        model: type[ModelType] | str,
         id: int | UUID,
         headers: Optional[dict[str, Any]] = None,
     ) -> None:

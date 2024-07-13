@@ -4,8 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .generic import GenericRepository
 
-from ..product.models import ProductColor, ProductCovering, ProductGlassColor
+from ..product.models import (
+    ProductSize,
+    ProductColor,
+    ProductCovering,
+    ProductGlassColor,
+)
 from ..product.schemas import (
+    ProductSizeCreate,
+    ProductSizeUpdate,
     ProductRelCreate,
     ProductRelUpdate,
 )
@@ -16,6 +23,13 @@ ProductRel = TypeVar(
     ProductCovering,
     ProductGlassColor,
 )
+
+
+class ProductSizeRepository(
+    GenericRepository[ProductSize, ProductSizeCreate, ProductSizeUpdate]
+):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, ProductSize)
 
 
 class ProductRelRepository(

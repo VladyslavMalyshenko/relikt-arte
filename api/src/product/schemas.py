@@ -1,13 +1,35 @@
 from typing import Optional
 
+from pydantic import BaseModel
+
 from ..core.schemas import MainSchema
 
 
-class ProductRelCreate(MainSchema):
+class ProductSizeCreate(BaseModel):
+    height: int
+    width: int
+    thickness: int
+
+
+class ProductSizeUpdate(BaseModel):
+    height: Optional[int] = None
+    width: Optional[int] = None
+    thickness: Optional[int] = None
+
+
+class ProductSizeShow(MainSchema):
+    id: int
+    height: int
+    width: int
+    thickness: int
+    dimensions: str
+
+
+class ProductRelCreate(BaseModel):
     name: str
 
 
-class ProductRelUpdate(MainSchema):
+class ProductRelUpdate(BaseModel):
     name: Optional[str] = None
     active: Optional[bool] = None
 

@@ -1,6 +1,6 @@
 from enum import Enum as PyEnum
 
-from sqlalchemy import ForeignKey, text
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -26,6 +26,7 @@ class CategorySizeAssociation(Base):
 
 class ProductSize(BaseModelMixin, Base):
     __tablename__ = "product_size"
+    __label__ = "Product size"
 
     height: Mapped[int] = mapped_column(
         nullable=False, index=True, doc="Height"
@@ -44,6 +45,8 @@ class ProductSize(BaseModelMixin, Base):
 
 
 class Category(BaseModelMixin, Base):
+    __label__ = "Category"
+
     name: Mapped[str] = mapped_column(nullable=False, index=True, doc="Name")
     is_glass_available: Mapped[bool] = mapped_column(
         nullable=False,
@@ -92,6 +95,8 @@ class ProductGlassColor(BaseProductRelMixin, Base):
 
 
 class Product(BaseModelMixin, Base):
+    __label__ = "Product"
+
     price: Mapped[int] = mapped_column(nullable=False, index=True, doc="Price")
     description: Mapped[dict] = mapped_column(
         JSONB,
@@ -147,6 +152,7 @@ class Product(BaseModelMixin, Base):
 
 class ProductPhoto(BaseModelMixin, Base):
     __tablename__ = "product_photo"
+    __label__ = "Product photo"
 
     product_id: Mapped[int] = mapped_column(
         ForeignKey(

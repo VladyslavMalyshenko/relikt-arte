@@ -2,26 +2,34 @@ from fastapi import APIRouter, status
 
 from ..core.db.dependencies import uowDEP
 
-from .service import ProductRelService
-from .schemas import ProductRelCreate, ProductRelUpdate
+from .service import ProductSizeService, ProductRelService
+from .schemas import (
+    ProductSizeCreate,
+    ProductSizeUpdate,
+    ProductSizeShow,
+    ProductRelCreate,
+    ProductRelUpdate,
+    ProductRelShow,
+)
 from .enums import ProductRelModelEnum
 
 
 router = APIRouter(
     prefix="/product",
-    tags=["Product"],
 )
 
 
 @router.post(
     "/related/{rel_model}/create/",
     status_code=status.HTTP_201_CREATED,
+    response_model=ProductRelShow,
+    tags=["Product related"],
 )
 async def create_product_rel_object(
     uow: uowDEP,
     data: ProductRelCreate,
     rel_model: ProductRelModelEnum,
-):
+) -> ProductRelShow:
     return await ProductRelService(uow).create_product_rel(
         data=data,
         rel_model=rel_model,
@@ -31,6 +39,7 @@ async def create_product_rel_object(
 @router.put(
     "/related/{rel_model}/{rel_obj_id}/update/",
     status_code=status.HTTP_200_OK,
+    tags=["Product related"],
 )
 async def update_product_rel_object(
     uow: uowDEP,
@@ -48,6 +57,7 @@ async def update_product_rel_object(
 @router.delete(
     "/related/{rel_model}/{rel_obj_id}/delete/",
     status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Product related"],
 )
 async def delete_product_rel_object(
     uow: uowDEP,
@@ -63,11 +73,13 @@ async def delete_product_rel_object(
 @router.get(
     "/related/{rel_model}/list/",
     status_code=status.HTTP_200_OK,
+    response_model=list[ProductRelShow],
+    tags=["Product related"],
 )
 async def get_all_product_rel_objects(
     uow: uowDEP,
     rel_model: ProductRelModelEnum,
-):
+) -> list[ProductRelShow]:
     return await ProductRelService(uow).get_product_rel_list(
         rel_model=rel_model,
     )
@@ -76,6 +88,7 @@ async def get_all_product_rel_objects(
 @router.get(
     "/related/{rel_model}/{rel_obj_id}/",
     status_code=status.HTTP_200_OK,
+    tags=["Product related"],
 )
 async def get_product_rel_object(
     uow: uowDEP,
@@ -85,4 +98,77 @@ async def get_product_rel_object(
     return await ProductRelService(uow).get_product_rel_obj(
         rel_model=rel_model,
         rel_obj_id=rel_obj_id,
+    )
+
+
+@router.post(
+    "/size/create/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ProductSizeShow,
+    tags=["Product size"],
+)
+async def create_product_size(
+    uow: uowDEP,
+    data: ProductSizeCreate,
+) -> ProductSizeShow:
+    return await ProductSizeService(uow).create_product_size(
+        data=data,
+    )
+
+
+@router.put(
+    "/size/{size_id}/update/",
+    status_code=status.HTTP_200_OK,
+    response_model=ProductSizeShow,
+    tags=["Product size"],
+)
+async def update_product_size(
+    uow: uowDEP,
+    data: ProductSizeUpdate,
+    size_id: int,
+) -> ProductSizeShow:
+    return await ProductSizeService(uow).update_product_size(
+        data=data,
+        product_size_id=size_id,
+    )
+
+
+@router.delete(
+    "/size/{size_id}/delete/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Product size"],
+)
+async def delete_product_size(
+    uow: uowDEP,
+    size_id: int,
+):
+    return await ProductSizeService(uow).delete_product_size(
+        product_size_id=size_id,
+    )
+
+
+@router.get(
+    "/size/list/",
+    status_code=status.HTTP_200_OK,
+    response_model=list[ProductSizeShow],
+    tags=["Product size"],
+)
+async def get_all_product_sizes(
+    uow: uowDEP,
+) -> list[ProductSizeShow]:
+    return await ProductSizeService(uow).get_product_size_list()
+
+
+@router.get(
+    "/size/{size_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=ProductSizeShow,
+    tags=["Product size"],
+)
+async def get_product_size(
+    uow: uowDEP,
+    size_id: int,
+) -> ProductSizeShow:
+    return await ProductSizeService(uow).get_product_size_obj(
+        product_size_id=size_id,
     )
