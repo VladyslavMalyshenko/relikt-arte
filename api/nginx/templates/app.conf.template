@@ -16,5 +16,6 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 		proxy_set_header X-Forwarded-Proto ${NGINX_FORWARDED_PROTO};
 		proxy_set_header X-Forwarded-Scheme ${NGINX_FORWARDED_SCHEME};
+        client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
     }
 }
