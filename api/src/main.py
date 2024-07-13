@@ -3,8 +3,18 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
+from sqladmin import Admin
+
 from .core.config import settings
 from .core.caching import init_caching
+from .core.db.session import (
+    get_async_engine,
+    create_async_session_maker,
+)
+
+from .admin.model_views import get_model_views
+
+from .product.router import router as product_router
 
 
 # Lifespan events
@@ -31,6 +41,19 @@ app.add_middleware(
 )
 
 # Include routers
-routers: list[APIRouter] = []
+routers: list[APIRouter] = [
+    product_router,
+]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")
+
+
+# Admin panel
+admin = Admin(
+    app,
+    engine=get_async_engine(),
+    session_maker=create_async_session_maker(),
+    title=settings.app_name,
+)
+for model_view in get_model_views():
+    admin.add_view(model_view)
