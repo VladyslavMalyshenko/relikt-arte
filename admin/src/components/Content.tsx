@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { categoriesData, Category, MainCategory } from "../data/categories";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
+import { SetCurrentCategory } from "../redux/actions/currentCategoryActions";
 import "../styles/components/Content.scss";
 import { getItems } from "../utils/getItems";
 import ActionModal from "./ActionModal";
@@ -24,7 +26,9 @@ const Content = () => {
     };
 
     useEffect(() => {
-        setUpTable();
+        if (!category.main) {
+            setUpTable();
+        }
     }, [category, params.category]);
 
     return (
@@ -53,55 +57,117 @@ const Content = () => {
                             </svg>
                         </button>
                     </p>
-                    <table>
-                        <thead>
-                            <tr>
-                                {fields?.length > 0 &&
-                                    fields.map((field, index) => (
-                                        <th key={index}>
-                                            <div>
-                                                <span>{field}</span>
-                                            </div>
-                                        </th>
-                                    ))}
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products?.length > 0 &&
-                                products.map((product: any, index: number) => (
-                                    <React.Fragment key={index}>
-                                        <tr>
-                                            {fields?.length > 0 &&
-                                                fields.map(
-                                                    (field, fieldIndex) => (
-                                                        <td key={fieldIndex}>
-                                                            {typeof product[
-                                                                field
-                                                            ] === "boolean" ? (
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
+                    {category.main ? (
+                        <div className="dashboard-container">
+                            <div className="dashboard-list">
+                                {categoriesData.map(
+                                    (
+                                        categoryObject: Category | MainCategory,
+                                        index: number
+                                    ) => (
+                                        <React.Fragment key={index}>
+                                            {categoryObject.link !== "/" && (
+                                                <li
+                                                    key={index}
+                                                    className={`category${
+                                                        category.link ===
+                                                        categoryObject.link
+                                                            ? " active"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    <Link
+                                                        to={categoryObject.link}
+                                                        onClick={() =>
+                                                            dispatch(
+                                                                SetCurrentCategory(
+                                                                    categoryObject
+                                                                )
+                                                            )
+                                                        }
+                                                    >
+                                                        {categoryObject.icon ? (
+                                                            <span className="icon">
+                                                                {
+                                                                    categoryObject.icon
+                                                                }
+                                                            </span>
+                                                        ) : null}
+
+                                                        {categoryObject.label}
+                                                    </Link>
+                                                </li>
+                                            )}
+                                        </React.Fragment>
+                                    )
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    {fields?.length > 0 &&
+                                        fields.map((field, index) => (
+                                            <th key={index}>
+                                                <div>
+                                                    <span>{field}</span>
+                                                </div>
+                                            </th>
+                                        ))}
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {products?.length > 0 &&
+                                    products.map(
+                                        (product: any, index: number) => (
+                                            <React.Fragment key={index}>
+                                                <tr>
+                                                    {fields?.length > 0 &&
+                                                        fields.map(
+                                                            (
+                                                                field,
+                                                                fieldIndex
+                                                            ) => (
+                                                                <td
+                                                                    key={
+                                                                        fieldIndex
+                                                                    }
+                                                                >
+                                                                    {typeof product[
+                                                                        field
+                                                                    ] ===
+                                                                    "boolean" ? (
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                product[
+                                                                                    field
+                                                                                ]
+                                                                            }
+                                                                            readOnly={
+                                                                                true
+                                                                            }
+                                                                        />
+                                                                    ) : (
                                                                         product[
                                                                             field
                                                                         ]
-                                                                    }
-                                                                    readOnly={
-                                                                        true
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                product[field]
-                                                            )}
-                                                        </td>
-                                                    )
-                                                )}
-                                            <ItemActions id={product.id} />
-                                        </tr>
-                                    </React.Fragment>
-                                ))}
-                        </tbody>
-                    </table>
+                                                                    )}
+                                                                </td>
+                                                            )
+                                                        )}
+                                                    <ItemActions
+                                                        id={product.id}
+                                                    />
+                                                </tr>
+                                            </React.Fragment>
+                                        )
+                                    )}
+                            </tbody>
+                        </table>
+                    )}
                 </>
             )}
         </div>

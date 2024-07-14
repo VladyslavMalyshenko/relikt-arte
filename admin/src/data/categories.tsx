@@ -12,7 +12,14 @@ export type Category = {
     inputFields: any[];
 };
 
-export const categoriesData: Category[] = [
+export type MainCategory = {
+    icon: JSX.Element;
+    label: string;
+    link: string;
+    main: boolean;
+};
+
+export const categoriesData: (MainCategory | Category)[] = [
     {
         icon: (
             <svg
@@ -27,35 +34,7 @@ export const categoriesData: Category[] = [
         ),
         label: "Дешборд",
         link: "/",
-        addUrl: "/api/v1/dashboard",
-        getUrl: "/api/v1/dashboard",
-        editUrl: "/api/v1/dashboard",
-        deleteUrl: "/api/v1/dashboard",
-        getItemUrl: "/api/v1/dashboard",
-        addItemFields: [
-            {
-                name: "name",
-                type: "text",
-            },
-            {
-                name: "active",
-                type: "boolean",
-            },
-        ],
-        inputFields: [
-            {
-                name: "id",
-                type: "text",
-            },
-            {
-                name: "name",
-                type: "text",
-            },
-            {
-                name: "active",
-                type: "checkbox",
-            },
-        ],
+        main: true,
     },
 
     {

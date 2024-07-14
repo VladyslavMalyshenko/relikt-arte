@@ -118,7 +118,8 @@ const ActionModal = () => {
                                                                           item[
                                                                               fieldObject.field_name ||
                                                                                   fieldObject.name
-                                                                          ],
+                                                                          ] ||
+                                                                          false,
                                                                       onChange:
                                                                           (e) =>
                                                                               dispatch(
@@ -149,10 +150,12 @@ const ActionModal = () => {
                                                                                       }
                                                                                   )
                                                                               ),
-                                                                      value: item[
-                                                                          fieldObject.field_name ||
-                                                                              fieldObject.name
-                                                                      ],
+                                                                      value:
+                                                                          item[
+                                                                              fieldObject.field_name ||
+                                                                                  fieldObject.name
+                                                                          ] ||
+                                                                          "",
                                                                   })}
                                                         />
                                                     </label>
