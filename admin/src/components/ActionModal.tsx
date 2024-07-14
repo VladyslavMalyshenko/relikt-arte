@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetCurrentItem } from "../redux/actions/currentItemActions";
@@ -14,17 +13,12 @@ const ActionModal = () => {
         (state: any) => state.categoryReducer.category
     );
     const item = useSelector((state: any) => state.itemReducer.item);
-    const [itemKeys, setItemKeys] = useState<any>({});
     const dispatch = useDispatch();
 
     const closeModal = () => {
         dispatch(SetCurrentAction(""));
+        dispatch(SetCurrentItem({}));
     };
-
-    useEffect(() => {
-        console.log(item, action);
-        setItemKeys(Object.keys(item));
-    }, [item, action]);
 
     return (
         <>
@@ -37,81 +31,110 @@ const ActionModal = () => {
                         <div className="action-modal-content">
                             {action !== "add" ? (
                                 <>
-                                    {itemKeys.length > 0 ? (
+                                    {category.inputFields.length > 0 ? (
                                         <>
-                                            {itemKeys.map((key: any) => (
-                                                <label htmlFor={key}>
-                                                    {key}
-                                                    <input
-                                                        name={key}
-                                                        key={key}
-                                                        readOnly={
-                                                            ((action ===
-                                                                "show" ||
-                                                                action ===
-                                                                    "delete") &&
+                                            {category.inputFields.map(
+                                                (fieldObject: any) => (
+                                                    <label
+                                                        key={`field[${fieldObject.name}]`}
+                                                        htmlFor={`field[${
+                                                            fieldObject.field_name ||
+                                                            fieldObject.name
+                                                        }]`}
+                                                    >
+                                                        {fieldObject.name}
+                                                        <input
+                                                            name={`field[${
+                                                                fieldObject.field_name ||
+                                                                fieldObject.name
+                                                            }]`}
+                                                            readOnly={
+                                                                ((action ===
+                                                                    "show" ||
+                                                                    action ===
+                                                                        "delete") &&
+                                                                    typeof item[
+                                                                        fieldObject.field_name ||
+                                                                            fieldObject.name
+                                                                    ] !==
+                                                                        "boolean") ||
+                                                                (fieldObject.field_name ||
+                                                                    fieldObject.name) ===
+                                                                    "id" ||
+                                                                fieldObject.locked
+                                                            }
+                                                            disabled={
+                                                                ((action ===
+                                                                    "show" ||
+                                                                    action ===
+                                                                        "delete") &&
+                                                                    typeof item[
+                                                                        fieldObject.field_name ||
+                                                                            fieldObject.name
+                                                                    ] ===
+                                                                        "boolean") ||
+                                                                fieldObject.locked
+                                                            }
+                                                            type={
                                                                 typeof item[
-                                                                    key
-                                                                ] !==
-                                                                    "boolean") ||
-                                                            key === "id"
-                                                        }
-                                                        disabled={
-                                                            (action ===
-                                                                "show" ||
-                                                                action ===
-                                                                    "delete") &&
-                                                            typeof item[key] ===
-                                                                "boolean"
-                                                        }
-                                                        type={
-                                                            typeof item[key] ===
-                                                            "boolean"
-                                                                ? "checkbox"
-                                                                : "text"
-                                                        }
-                                                        placeholder={key}
-                                                        {...(typeof item[
-                                                            key
-                                                        ] === "boolean"
-                                                            ? {
-                                                                  checked:
-                                                                      item[key],
-                                                                  onChange: (
-                                                                      e
-                                                                  ) =>
-                                                                      dispatch(
-                                                                          SetCurrentItem(
-                                                                              {
-                                                                                  ...item,
-                                                                                  [key]: e
-                                                                                      .target
-                                                                                      .checked,
-                                                                              }
-                                                                          )
-                                                                      ),
-                                                              }
-                                                            : {
-                                                                  onChange: (
-                                                                      e
-                                                                  ) =>
-                                                                      dispatch(
-                                                                          SetCurrentItem(
-                                                                              {
-                                                                                  ...item,
-                                                                                  [key]: e
-                                                                                      .target
-                                                                                      .value,
-                                                                              }
-                                                                          )
-                                                                      ),
-                                                                  value: item[
-                                                                      key
-                                                                  ],
-                                                              })}
-                                                    />
-                                                </label>
-                                            ))}
+                                                                    fieldObject.field_name ||
+                                                                        fieldObject.name
+                                                                ] === "boolean"
+                                                                    ? "checkbox"
+                                                                    : "text"
+                                                            }
+                                                            placeholder={
+                                                                fieldObject.name
+                                                            }
+                                                            {...(typeof item[
+                                                                fieldObject.field_name ||
+                                                                    fieldObject.name
+                                                            ] === "boolean"
+                                                                ? {
+                                                                      checked:
+                                                                          item[
+                                                                              fieldObject.field_name ||
+                                                                                  fieldObject.name
+                                                                          ],
+                                                                      onChange:
+                                                                          (e) =>
+                                                                              dispatch(
+                                                                                  SetCurrentItem(
+                                                                                      {
+                                                                                          ...item,
+                                                                                          [fieldObject.field_name ||
+                                                                                          fieldObject.name]:
+                                                                                              e
+                                                                                                  .target
+                                                                                                  .checked,
+                                                                                      }
+                                                                                  )
+                                                                              ),
+                                                                  }
+                                                                : {
+                                                                      onChange:
+                                                                          (e) =>
+                                                                              dispatch(
+                                                                                  SetCurrentItem(
+                                                                                      {
+                                                                                          ...item,
+                                                                                          [fieldObject.field_name ||
+                                                                                          fieldObject.name]:
+                                                                                              e
+                                                                                                  .target
+                                                                                                  .value,
+                                                                                      }
+                                                                                  )
+                                                                              ),
+                                                                      value: item[
+                                                                          fieldObject.field_name ||
+                                                                              fieldObject.name
+                                                                      ],
+                                                                  })}
+                                                        />
+                                                    </label>
+                                                )
+                                            )}
 
                                             <div className="action-modal-buttons">
                                                 {action !== "show" && (
@@ -164,60 +187,68 @@ const ActionModal = () => {
                                 </>
                             ) : (
                                 <>
-                                    {category.addItemFields.map(
-                                        (itemField: any) => (
-                                            <label
-                                                htmlFor={
-                                                    itemField.field_name ||
-                                                    itemField.name
-                                                }
-                                            >
-                                                {itemField.name}
-                                                <input
-                                                    name={
+                                    {category &&
+                                        category.addItemFields.map(
+                                            (itemField: any) => (
+                                                <label
+                                                    htmlFor={
                                                         itemField.field_name ||
                                                         itemField.name
                                                     }
-                                                    placeholder={itemField.name}
-                                                    type={
-                                                        itemField.type || "text"
-                                                    }
-                                                    {...(itemField.type ===
-                                                    "boolean"
-                                                        ? {
-                                                              onChange: (e) =>
-                                                                  dispatch(
-                                                                      SetCurrentItem(
-                                                                          {
-                                                                              ...item,
-                                                                              [itemField.field_name ||
-                                                                              itemField.name]:
-                                                                                  e
-                                                                                      .target
-                                                                                      .checked,
-                                                                          }
-                                                                      )
-                                                                  ),
-                                                          }
-                                                        : {
-                                                              onChange: (e) =>
-                                                                  dispatch(
-                                                                      SetCurrentItem(
-                                                                          {
-                                                                              ...item,
-                                                                              [itemField.field_name ||
-                                                                              itemField.name]:
-                                                                                  e
-                                                                                      .target
-                                                                                      .value,
-                                                                          }
-                                                                      )
-                                                                  ),
-                                                          })}
-                                                />
-                                            </label>
-                                        )
-                                    )}
+                                                >
+                                                    {itemField.name}
+                                                    <input
+                                                        name={
+                                                            itemField.field_name ||
+                                                            itemField.name
+                                                        }
+                                                        placeholder={
+                                                            itemField.name
+                                                        }
+                                                        type={
+                                                            itemField.type ||
+                                                            "text"
+                                                        }
+                                                        {...(itemField.type ===
+                                                        "boolean"
+                                                            ? {
+                                                                  onChange: (
+                                                                      e
+                                                                  ) =>
+                                                                      dispatch(
+                                                                          SetCurrentItem(
+                                                                              {
+                                                                                  ...item,
+                                                                                  [itemField.field_name ||
+                                                                                  itemField.name]:
+                                                                                      e
+                                                                                          .target
+                                                                                          .checked,
+                                                                              }
+                                                                          )
+                                                                      ),
+                                                              }
+                                                            : {
+                                                                  onChange: (
+                                                                      e
+                                                                  ) =>
+                                                                      dispatch(
+                                                                          SetCurrentItem(
+                                                                              {
+                                                                                  ...item,
+                                                                                  [itemField.field_name ||
+                                                                                  itemField.name]:
+                                                                                      e
+                                                                                          .target
+                                                                                          .value,
+                                                                              }
+                                                                          )
+                                                                      ),
+                                                              })}
+                                                    />
+                                                </label>
+                                            )
+                                        )}
                                     <div className="action-modal-buttons">
                                         <button
                                             onClick={() => {

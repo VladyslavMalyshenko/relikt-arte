@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import "../styles/components/Content.scss";
 import { getItems } from "../utils/getItems";
@@ -13,16 +14,18 @@ const Content = () => {
     const [fields, setFields] = useState(["id", "name", "category", "price"]);
     const [products, setProducts] = useState<any>([]);
     const dispatch = useDispatch();
+    const params = useParams();
 
     const setUpTable = async () => {
         const items = await getItems(category.getUrl);
+
         setProducts(items || []);
         setFields(category.fields);
     };
 
     useEffect(() => {
         setUpTable();
-    }, [category]);
+    }, [category, params.category]);
 
     return (
         <div className="content">
@@ -53,37 +56,46 @@ const Content = () => {
                     <table>
                         <thead>
                             <tr>
-                                {fields.map((field, index) => (
-                                    <th key={index}>
-                                        <div>
-                                            <span>{field}</span>
-                                        </div>
-                                    </th>
-                                ))}
+                                {fields?.length > 0 &&
+                                    fields.map((field, index) => (
+                                        <th key={index}>
+                                            <div>
+                                                <span>{field}</span>
+                                            </div>
+                                        </th>
+                                    ))}
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {products.length > 0 &&
+                            {products?.length > 0 &&
                                 products.map((product: any, index: number) => (
                                     <React.Fragment key={index}>
                                         <tr>
-                                            {fields.map((field, fieldIndex) => (
-                                                <td key={fieldIndex}>
-                                                    {typeof product[field] ===
-                                                    "boolean" ? (
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={
+                                            {fields?.length > 0 &&
+                                                fields.map(
+                                                    (field, fieldIndex) => (
+                                                        <td key={fieldIndex}>
+                                                            {typeof product[
+                                                                field
+                                                            ] === "boolean" ? (
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={
+                                                                        product[
+                                                                            field
+                                                                        ]
+                                                                    }
+                                                                    readOnly={
+                                                                        true
+                                                                    }
+                                                                />
+                                                            ) : (
                                                                 product[field]
-                                                            }
-                                                            readOnly={true}
-                                                        />
-                                                    ) : (
-                                                        product[field]
-                                                    )}
-                                                </td>
-                                            ))}
+                                                            )}
+                                                        </td>
+                                                    )
+                                                )}
                                             <ItemActions id={product.id} />
                                         </tr>
                                     </React.Fragment>

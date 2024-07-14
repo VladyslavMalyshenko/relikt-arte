@@ -19,7 +19,7 @@ const Sidebar = () => {
                     <li
                         key={index}
                         className={`category${
-                            (category.link || {}) === categoryObject.link
+                            category.link === categoryObject.link
                                 ? " active"
                                 : ""
                         }`}
