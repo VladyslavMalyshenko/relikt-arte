@@ -11,15 +11,65 @@
     box-sizing: border-box;
     border-radius: 6px;
 
+    &.delete {
+        max-width: 400px;
+        max-height: 300px;
+        border-top: 3px solid var(--red);
+
+        svg {
+            width: 50px;
+            height: 50px;
+            color: var(--red);
+        }
+
+        & .action-modal-content {
+            align-items: center;
+            text-align: center;
+        }
+    }
+
     label {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
+        gap: 10px;
         text-transform: capitalize;
+        padding-left: 0.8em;
+        box-sizing: border-box;
 
-        input::placeholder {
-            text-transform: capitalize;
+        input:not([type="checkbox"]) {
+            border: 2px solid transparent;
+            width: 15em;
+            height: 2.5em;
+            outline: none;
+            overflow: hidden;
+            background-color: var(--background-color-muted);
+            border-radius: 10px;
+            transition: all 0.5s;
+
+            &:not(:read-only):not(:disabled) {
+                &:hover,
+                &:focus {
+                    border: 2px solid var(--active-color);
+                    box-shadow: 0px 0px 0px 7px var(--active-background);
+                    background-color: var(var(--background-color));
+                }
+            }
+
+            &:read-only,
+            &:disabled {
+                cursor: not-allowed;
+            }
+
+            &::placeholder {
+                text-transform: capitalize;
+            }
+        }
+
+        input[type="checkbox"] {
+            &:disabled {
+                cursor: not-allowed;
+            }
         }
     }
 
@@ -72,7 +122,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 22.5px;
         overflow-y: auto;
         overflow-x: hidden;
     }
