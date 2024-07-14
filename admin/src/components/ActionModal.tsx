@@ -172,6 +172,10 @@ const ActionModal = () => {
                                         category.addItemFields.map(
                                             (itemField: any) => (
                                                 <label
+                                                    key={`addField[${
+                                                        itemField.field_name ||
+                                                        itemField.name
+                                                    }]`}
                                                     htmlFor={
                                                         itemField.field_name ||
                                                         itemField.name
