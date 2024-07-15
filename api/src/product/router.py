@@ -2,8 +2,11 @@ from fastapi import APIRouter, status
 
 from ..core.db.dependencies import uowDEP
 
-from .service import ProductSizeService, ProductRelService
+from .service import CategoryService, ProductSizeService, ProductRelService
 from .schemas import (
+    CategoryCreate,
+    CategoryUpdate,
+    CategoryShow,
     ProductSizeCreate,
     ProductSizeUpdate,
     ProductSizeShow,
@@ -171,4 +174,77 @@ async def get_product_size(
 ) -> ProductSizeShow:
     return await ProductSizeService(uow).get_product_size_obj(
         product_size_id=size_id,
+    )
+
+
+@router.post(
+    "/category/create/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=CategoryShow,
+    tags=["Category"],
+)
+async def create_category(
+    uow: uowDEP,
+    data: CategoryCreate,
+) -> CategoryShow:
+    return await CategoryService(uow).create_category(
+        data=data,
+    )
+
+
+@router.put(
+    "/category/{category_id}/update/",
+    status_code=status.HTTP_200_OK,
+    response_model=CategoryShow,
+    tags=["Category"],
+)
+async def update_category(
+    uow: uowDEP,
+    data: CategoryUpdate,
+    category_id: int,
+) -> CategoryShow:
+    return await CategoryService(uow).update_category(
+        data=data,
+        category_id=category_id,
+    )
+
+
+@router.delete(
+    "/category/{category_id}/delete/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Category"],
+)
+async def delete_category(
+    uow: uowDEP,
+    category_id: int,
+):
+    return await CategoryService(uow).delete_category(
+        category_id=category_id,
+    )
+
+
+@router.get(
+    "/category/list/",
+    status_code=status.HTTP_200_OK,
+    response_model=list[CategoryShow],
+    tags=["Category"],
+)
+async def get_all_categories(
+    uow: uowDEP,
+) -> list[CategoryShow]:
+    return await CategoryService(uow).get_category_list()
+
+
+@router.get(
+    "/category/{category_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=CategoryShow,
+    tags=["Category"],
+)
+async def get_category(
+    uow: uowDEP,
+    category_id: int,
+) -> CategoryShow:
+    return await CategoryService(uow).get_category_obj(
+        category_id=category_id,
     )
