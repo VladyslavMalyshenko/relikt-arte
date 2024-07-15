@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db.session import create_async_session_maker
 
 from ...repositories.product import (
+    CategoryRepository,
     ProductSizeRepository,
     ProductColorRepository,
     ProductCoveringRepository,
@@ -14,6 +15,7 @@ from ...repositories.product import (
 
 
 class AbstractUnitOfWork(ABC):
+    category: CategoryRepository
     product_size: ProductSizeRepository
     product_color: ProductColorRepository
     product_covering: ProductCoveringRepository
@@ -46,6 +48,8 @@ class UnitOfWork(AbstractUnitOfWork):
 
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
+
+        self.category = CategoryRepository(self.session)
 
         self.product_size = ProductSizeRepository(self.session)
         self.product_color = ProductColorRepository(self.session)
