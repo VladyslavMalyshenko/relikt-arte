@@ -135,6 +135,226 @@ const ActionModal = () => {
         reset();
     };
 
+    const getDeleteWindow = () => (
+        <>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                fill="currentColor"
+                version="1.1"
+                id="Layer_1"
+                viewBox="0 0 511.999 511.999"
+                xmlSpace="preserve"
+            >
+                <path d="M506.43,421.536L291.573,49.394c-15.814-27.391-55.327-27.401-71.147,0L5.568,421.536    c-15.814,27.391,3.934,61.616,35.574,61.616h429.714C502.485,483.153,522.25,448.938,506.43,421.536z M274.821,385.034    c0,10.394-8.427,18.821-18.821,18.821s-18.821-8.427-18.821-18.821v-11.239c0-10.394,8.427-18.821,18.821-18.821    s18.821,8.427,18.821,18.821V385.034z M274.821,311.702c0,10.394-8.427,18.821-18.821,18.821s-18.821-8.427-18.821-18.821v-107.89    c0-10.394,8.427-18.821,18.821-18.821s18.821,8.427,18.821,18.821V311.702z" />
+            </svg>
+
+            <p>
+                При видаленні об'єкту з номером {item.id}, його не можна буде
+                повернути. Ці дії НЕ ЗВОРОТНІ!
+            </p>
+            <p>Ви дійсно хочете видалити {item.id}?</p>
+        </>
+    );
+
+    const getInput = (fieldObject: any) => {
+        return fieldObject.type === "list" && fieldObject.getUrl ? (
+            <ul className="list-input">
+                {selectOptions[fieldObject.field_name || fieldObject.name]
+                    ?.length > 0 &&
+                    selectOptions[
+                        fieldObject.field_name || fieldObject.name
+                    ].map((option: any) => (
+                        <li
+                            key={option.id}
+                            id={`${
+                                fieldObject.field_name || fieldObject.name
+                            }[${option.id}]`}
+                        >
+                            <input
+                                type="checkbox"
+                                {...(action !== "add"
+                                    ? {
+                                          disabled:
+                                              action === "show" ||
+                                              action === "delete" ||
+                                              fieldObject.locked,
+                                      }
+                                    : {})}
+                                onChange={(e) => {
+                                    const fieldName =
+                                        fieldObject.field_name ||
+                                        fieldObject.name;
+                                    setSelectedItems((prev: any) => {
+                                        const updated = {
+                                            ...prev,
+                                        };
+                                        if (!updated[fieldName]) {
+                                            updated[fieldName] = [];
+                                        }
+                                        if (e.target.checked) {
+                                            updated[fieldName].push(option.id);
+                                        } else {
+                                            updated[fieldName] = updated[
+                                                fieldName
+                                            ].filter(
+                                                (id: any) => id !== option.id
+                                            );
+                                        }
+                                        setValue(fieldName, updated[fieldName]);
+                                        return updated;
+                                    });
+                                }}
+                            />
+                            {option[fieldObject.labelField]}
+                        </li>
+                    ))}
+            </ul>
+        ) : (
+            <input
+                {...register(fieldObject.field_name || fieldObject.name, {
+                    required: fieldObject.required || false,
+                })}
+                {...(action !== "add"
+                    ? {
+                          readOnly:
+                              ((action === "show" || action === "delete") &&
+                                  typeof item[
+                                      fieldObject.field_name || fieldObject.name
+                                  ] !== "boolean") ||
+                              (fieldObject.field_name || fieldObject.name) ===
+                                  "id" ||
+                              fieldObject.locked,
+                          disabled:
+                              ((action === "show" || action === "delete") &&
+                                  typeof item[
+                                      fieldObject.field_name || fieldObject.name
+                                  ] === "boolean") ||
+                              fieldObject.locked,
+                      }
+                    : {})}
+                type={
+                    typeof item[fieldObject.field_name || fieldObject.name] ===
+                    "boolean"
+                        ? "checkbox"
+                        : fieldObject.type || "text"
+                }
+                placeholder={fieldObject.name}
+            />
+        );
+    };
+
+    const getButtons = () => {
+        const handleSuccess = (data: any) => {
+            delete data.field;
+
+            if (action === "show") {
+                closeModal();
+            } else if (action === "edit") {
+                let newItem = { ...data };
+
+                Object.keys(newItem).forEach((itemKey) => {
+                    if (
+                        (newItem[itemKey] &&
+                            !category.addItemFields.some(
+                                (field: any) =>
+                                    (field.field_name || field.name) === itemKey
+                            )) ||
+                        newItem[itemKey] === item[itemKey] ||
+                        !newItem[itemKey]
+                    ) {
+                        delete newItem[itemKey];
+                    }
+                });
+
+                editItem(category.editUrl, newItem, {
+                    id: item.id,
+                });
+            } else if (action === "delete") {
+                deleteItem(category.deleteUrl, {
+                    id: item.id,
+                });
+            } else if (action === "add") {
+                let newItem = { ...data };
+
+                category.addItemFields.forEach((fieldObject: any) => {
+                    const itemKey = fieldObject.field_name || fieldObject.name;
+
+                    if (!newItem[itemKey]) {
+                        const fieldType = category.addItemFields.find(
+                            (field: any) =>
+                                (field.field_name || field.name) === itemKey
+                        ).type;
+                        newItem[itemKey] =
+                            fieldType === "checkbox" || fieldType === "radio"
+                                ? false
+                                : fieldType === "list"
+                                ? []
+                                : "";
+                    } else if (
+                        newItem[itemKey] &&
+                        !category.addItemFields.some(
+                            (field: any) =>
+                                (field.field_name || field.name) === itemKey
+                        )
+                    ) {
+                        delete newItem[itemKey];
+                    }
+                });
+
+                addItem(category.addUrl, newItem);
+            }
+        };
+
+        const handleError = (invalidFields: any) => {
+            const invalidFieldsNames = Object.keys(invalidFields);
+            const existingFields = category.inputFields;
+
+            existingFields.forEach((fieldObject: any) => {
+                const fieldName = fieldObject.field_name || fieldObject.name;
+
+                const field = document.querySelector(
+                    `input[name="${fieldName}"]`
+                );
+
+                if (field) {
+                    if (invalidFieldsNames.includes(fieldName)) {
+                        field.classList.add("invalid");
+                    } else {
+                        field.classList.remove("invalid");
+                    }
+                }
+            });
+        };
+
+        return (
+            <div className="action-modal-buttons">
+                {action !== "show" && (
+                    <button
+                        onClick={() => {
+                            closeModal();
+                        }}
+                    >
+                        Close
+                    </button>
+                )}
+
+                <button
+                    className={action}
+                    onClick={handleSubmit(handleSuccess, handleError)}
+                >
+                    {action === "edit"
+                        ? "Save"
+                        : action === "show"
+                        ? "Close"
+                        : action === "delete"
+                        ? "Delete"
+                        : "Add"}
+                </button>
+            </div>
+        );
+    };
+
     return (
         <>
             {action !== "" && (
@@ -147,26 +367,7 @@ const ActionModal = () => {
                     >
                         <div className="action-modal-content">
                             {action === "delete" ? (
-                                <>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                                        fill="currentColor"
-                                        version="1.1"
-                                        id="Layer_1"
-                                        viewBox="0 0 511.999 511.999"
-                                        xmlSpace="preserve"
-                                    >
-                                        <path d="M506.43,421.536L291.573,49.394c-15.814-27.391-55.327-27.401-71.147,0L5.568,421.536    c-15.814,27.391,3.934,61.616,35.574,61.616h429.714C502.485,483.153,522.25,448.938,506.43,421.536z M274.821,385.034    c0,10.394-8.427,18.821-18.821,18.821s-18.821-8.427-18.821-18.821v-11.239c0-10.394,8.427-18.821,18.821-18.821    s18.821,8.427,18.821,18.821V385.034z M274.821,311.702c0,10.394-8.427,18.821-18.821,18.821s-18.821-8.427-18.821-18.821v-107.89    c0-10.394,8.427-18.821,18.821-18.821s18.821,8.427,18.821,18.821V311.702z" />
-                                    </svg>
-
-                                    <p>
-                                        При видаленні об'єкту з номером{" "}
-                                        {item.id}, його не можна буде повернути.
-                                        Ці дії НЕ ЗВОРОТНІ!
-                                    </p>
-                                    <p>Ви дійсно хочете видалити {item.id}?</p>
-                                </>
+                                getDeleteWindow()
                             ) : action !== "add" ? (
                                 <>
                                     {category.inputFields.length > 0 ? (
@@ -182,162 +383,7 @@ const ActionModal = () => {
                                                     >
                                                         {fieldObject.name}
 
-                                                        {fieldObject.type ===
-                                                            "list" &&
-                                                        fieldObject.getUrl ? (
-                                                            <ul className="list-input">
-                                                                {selectOptions[
-                                                                    fieldObject.field_name ||
-                                                                        fieldObject.name
-                                                                ]?.length > 0 &&
-                                                                    selectOptions[
-                                                                        fieldObject.field_name ||
-                                                                            fieldObject.name
-                                                                    ].map(
-                                                                        (
-                                                                            option: any
-                                                                        ) => (
-                                                                            <li
-                                                                                key={
-                                                                                    option.id
-                                                                                }
-                                                                                id={`${
-                                                                                    fieldObject.field_name ||
-                                                                                    fieldObject.name
-                                                                                }[${
-                                                                                    option.id
-                                                                                }]`}
-                                                                            >
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    disabled={
-                                                                                        action ===
-                                                                                            "show" ||
-                                                                                        action ===
-                                                                                            "delete" ||
-                                                                                        fieldObject.locked
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        e
-                                                                                    ) => {
-                                                                                        const fieldName =
-                                                                                            fieldObject.field_name ||
-                                                                                            fieldObject.name;
-                                                                                        setSelectedItems(
-                                                                                            (
-                                                                                                prev: any
-                                                                                            ) => {
-                                                                                                const updated =
-                                                                                                    {
-                                                                                                        ...prev,
-                                                                                                    };
-                                                                                                if (
-                                                                                                    !updated[
-                                                                                                        fieldName
-                                                                                                    ]
-                                                                                                ) {
-                                                                                                    updated[
-                                                                                                        fieldName
-                                                                                                    ] =
-                                                                                                        [];
-                                                                                                }
-                                                                                                if (
-                                                                                                    e
-                                                                                                        .target
-                                                                                                        .checked
-                                                                                                ) {
-                                                                                                    updated[
-                                                                                                        fieldName
-                                                                                                    ].push(
-                                                                                                        option.id
-                                                                                                    );
-                                                                                                } else {
-                                                                                                    updated[
-                                                                                                        fieldName
-                                                                                                    ] =
-                                                                                                        updated[
-                                                                                                            fieldName
-                                                                                                        ].filter(
-                                                                                                            (
-                                                                                                                id: any
-                                                                                                            ) =>
-                                                                                                                id !==
-                                                                                                                option.id
-                                                                                                        );
-                                                                                                }
-                                                                                                setValue(
-                                                                                                    fieldName,
-                                                                                                    updated[
-                                                                                                        fieldName
-                                                                                                    ]
-                                                                                                );
-                                                                                                return updated;
-                                                                                            }
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                                {
-                                                                                    option[
-                                                                                        fieldObject
-                                                                                            .labelField
-                                                                                    ]
-                                                                                }
-                                                                            </li>
-                                                                        )
-                                                                    )}
-                                                            </ul>
-                                                        ) : (
-                                                            <input
-                                                                {...register(
-                                                                    fieldObject.field_name ||
-                                                                        fieldObject.name,
-                                                                    {
-                                                                        required:
-                                                                            fieldObject.required ||
-                                                                            false,
-                                                                    }
-                                                                )}
-                                                                readOnly={
-                                                                    ((action ===
-                                                                        "show" ||
-                                                                        action ===
-                                                                            "delete") &&
-                                                                        typeof item[
-                                                                            fieldObject.field_name ||
-                                                                                fieldObject.name
-                                                                        ] !==
-                                                                            "boolean") ||
-                                                                    (fieldObject.field_name ||
-                                                                        fieldObject.name) ===
-                                                                        "id" ||
-                                                                    fieldObject.locked
-                                                                }
-                                                                disabled={
-                                                                    ((action ===
-                                                                        "show" ||
-                                                                        action ===
-                                                                            "delete") &&
-                                                                        typeof item[
-                                                                            fieldObject.field_name ||
-                                                                                fieldObject.name
-                                                                        ] ===
-                                                                            "boolean") ||
-                                                                    fieldObject.locked
-                                                                }
-                                                                type={
-                                                                    typeof item[
-                                                                        fieldObject.field_name ||
-                                                                            fieldObject.name
-                                                                    ] ===
-                                                                    "boolean"
-                                                                        ? "checkbox"
-                                                                        : "text"
-                                                                }
-                                                                placeholder={
-                                                                    fieldObject.name
-                                                                }
-                                                            />
-                                                        )}
+                                                        {getInput(fieldObject)}
                                                     </label>
                                                 )
                                             )}
@@ -362,270 +408,14 @@ const ActionModal = () => {
                                                     }
                                                 >
                                                     {itemField.name}
-                                                    {itemField.type ===
-                                                        "list" &&
-                                                    itemField.getUrl ? (
-                                                        <ul className="list-input">
-                                                            {selectOptions[
-                                                                itemField.field_name ||
-                                                                    itemField.name
-                                                            ]?.length > 0 &&
-                                                                selectOptions[
-                                                                    itemField.field_name ||
-                                                                        itemField.name
-                                                                ].map(
-                                                                    (
-                                                                        option: any
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                option.id
-                                                                            }
-                                                                        >
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    const fieldName =
-                                                                                        itemField.field_name ||
-                                                                                        itemField.name;
-                                                                                    setSelectedItems(
-                                                                                        (
-                                                                                            prev: any
-                                                                                        ) => {
-                                                                                            const updated =
-                                                                                                {
-                                                                                                    ...prev,
-                                                                                                };
-                                                                                            if (
-                                                                                                !updated[
-                                                                                                    fieldName
-                                                                                                ]
-                                                                                            ) {
-                                                                                                updated[
-                                                                                                    fieldName
-                                                                                                ] =
-                                                                                                    [];
-                                                                                            }
-                                                                                            if (
-                                                                                                e
-                                                                                                    .target
-                                                                                                    .checked
-                                                                                            ) {
-                                                                                                updated[
-                                                                                                    fieldName
-                                                                                                ].push(
-                                                                                                    option.id
-                                                                                                );
-                                                                                            } else {
-                                                                                                updated[
-                                                                                                    fieldName
-                                                                                                ] =
-                                                                                                    updated[
-                                                                                                        fieldName
-                                                                                                    ].filter(
-                                                                                                        (
-                                                                                                            id: any
-                                                                                                        ) =>
-                                                                                                            id !==
-                                                                                                            option.id
-                                                                                                    );
-                                                                                            }
-                                                                                            setValue(
-                                                                                                fieldName,
-                                                                                                updated[
-                                                                                                    fieldName
-                                                                                                ]
-                                                                                            );
-                                                                                            return updated;
-                                                                                        }
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                            {
-                                                                                option[
-                                                                                    itemField
-                                                                                        .labelField
-                                                                                ]
-                                                                            }
-                                                                        </li>
-                                                                    )
-                                                                )}
-                                                        </ul>
-                                                    ) : (
-                                                        <input
-                                                            {...register(
-                                                                itemField.field_name ||
-                                                                    itemField.name,
-                                                                {
-                                                                    required:
-                                                                        itemField.required ||
-                                                                        false,
-                                                                }
-                                                            )}
-                                                            placeholder={
-                                                                itemField.name
-                                                            }
-                                                            type={
-                                                                itemField.type ||
-                                                                "text"
-                                                            }
-                                                        />
-                                                    )}
+                                                    {getInput(itemField)}
                                                 </label>
                                             )
                                         )}
                                 </>
                             )}
 
-                            <div className="action-modal-buttons">
-                                {action !== "show" && (
-                                    <button
-                                        onClick={() => {
-                                            closeModal();
-                                        }}
-                                    >
-                                        Close
-                                    </button>
-                                )}
-
-                                <button
-                                    className={action}
-                                    onClick={handleSubmit(
-                                        (data) => {
-                                            delete data.field;
-
-                                            if (action === "show") {
-                                                closeModal();
-                                            } else if (action === "edit") {
-                                                let newItem = { ...data };
-
-                                                Object.keys(newItem).forEach(
-                                                    (itemKey) => {
-                                                        if (
-                                                            (newItem[itemKey] &&
-                                                                !category.addItemFields.some(
-                                                                    (
-                                                                        field: any
-                                                                    ) =>
-                                                                        (field.field_name ||
-                                                                            field.name) ===
-                                                                        itemKey
-                                                                )) ||
-                                                            newItem[itemKey] ===
-                                                                item[itemKey] ||
-                                                            !newItem[itemKey]
-                                                        ) {
-                                                            delete newItem[
-                                                                itemKey
-                                                            ];
-                                                        }
-                                                    }
-                                                );
-
-                                                editItem(
-                                                    category.editUrl,
-                                                    newItem,
-                                                    { id: item.id }
-                                                );
-                                            } else if (action === "delete") {
-                                                deleteItem(category.deleteUrl, {
-                                                    id: item.id,
-                                                });
-                                            } else if (action === "add") {
-                                                let newItem = { ...data };
-
-                                                Object.keys(newItem).forEach(
-                                                    (itemKey) => {
-                                                        if (!newItem[itemKey]) {
-                                                            const fieldType =
-                                                                category.addItemFields.find(
-                                                                    (
-                                                                        field: any
-                                                                    ) =>
-                                                                        (field.field_name ||
-                                                                            field.name) ===
-                                                                        itemKey
-                                                                ).type;
-                                                            newItem[itemKey] =
-                                                                fieldType ===
-                                                                    "checkbox" ||
-                                                                fieldType ===
-                                                                    "radio"
-                                                                    ? false
-                                                                    : fieldType ===
-                                                                      "list"
-                                                                    ? []
-                                                                    : "";
-                                                        } else if (
-                                                            newItem[itemKey] &&
-                                                            !category.addItemFields.some(
-                                                                (field: any) =>
-                                                                    (field.field_name ||
-                                                                        field.name) ===
-                                                                    itemKey
-                                                            )
-                                                        ) {
-                                                            delete newItem[
-                                                                itemKey
-                                                            ];
-                                                        }
-                                                    }
-                                                );
-
-                                                addItem(
-                                                    category.addUrl,
-                                                    newItem
-                                                );
-                                            }
-                                        },
-                                        (invalidFields) => {
-                                            const invalidFieldsNames =
-                                                Object.keys(invalidFields);
-                                            const existingFields =
-                                                category.inputFields;
-
-                                            existingFields.forEach(
-                                                (fieldObject: any) => {
-                                                    const fieldName =
-                                                        fieldObject.field_name ||
-                                                        fieldObject.name;
-
-                                                    const field =
-                                                        document.querySelector(
-                                                            `input[name="${fieldName}"]`
-                                                        );
-
-                                                    if (field) {
-                                                        if (
-                                                            invalidFieldsNames.includes(
-                                                                fieldName
-                                                            )
-                                                        ) {
-                                                            field.classList.add(
-                                                                "invalid"
-                                                            );
-                                                        } else {
-                                                            field.classList.remove(
-                                                                "invalid"
-                                                            );
-                                                        }
-                                                    }
-                                                }
-                                            );
-                                        }
-                                    )}
-                                >
-                                    {action === "edit"
-                                        ? "Save"
-                                        : action === "show"
-                                        ? "Close"
-                                        : action === "delete"
-                                        ? "Delete"
-                                        : "Add"}
-                                </button>
-                            </div>
+                            {getButtons()}
                         </div>
                     </div>
                 </div>

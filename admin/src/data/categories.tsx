@@ -222,7 +222,7 @@ export const categoriesData: (MainCategory | Category)[] = [
             },
         ],
         addItemFields: [
-            { name: "назва", field_name: "name", type: "text" },
+            { name: "назва", field_name: "name", type: "text", required: true },
             {
                 name: "наявність скла",
                 field_name: "is_glass_available",
@@ -256,7 +256,7 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "id",
                 type: "text",
             },
-            { name: "назва", field_name: "name", type: "text" },
+            { name: "назва", field_name: "name", type: "text", required: true },
             {
                 name: "наявність скла",
                 field_name: "is_glass_available",
