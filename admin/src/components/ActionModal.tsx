@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetCurrentItem } from "../redux/actions/currentItemActions";
@@ -15,9 +17,73 @@ const ActionModal = () => {
     const item = useSelector((state: any) => state.itemReducer.item);
     const dispatch = useDispatch();
 
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        setValue,
+    } = useForm();
+
+    useEffect(() => {
+        if (action !== "add") {
+            if (category.inputFields) {
+                category.inputFields.forEach((fieldObject: any) => {
+                    const fieldName =
+                        fieldObject.field_name || fieldObject.name;
+                    const value =
+                        typeof item[
+                            fieldObject.field_name || fieldObject.name
+                        ] === "boolean"
+                            ? item[fieldObject.field_name || fieldObject.name]
+                            : item[
+                                  fieldObject.field_name || fieldObject.name
+                              ] || "";
+                    setValue(fieldName, value);
+                });
+            }
+
+            if (category.addItemFields) {
+                category.addItemFields.forEach((itemField: any) => {
+                    const fieldName = itemField.field_name || itemField.name;
+                    const value =
+                        itemField.type === "boolean"
+                            ? item[fieldName]
+                            : item[fieldName] || "";
+                    setValue(fieldName, value);
+                });
+            }
+        } else {
+            if (category.inputFields) {
+                category.inputFields.forEach((fieldObject: any) => {
+                    const fieldName =
+                        fieldObject.field_name || fieldObject.name;
+                    const value =
+                        typeof item[
+                            fieldObject.field_name || fieldObject.name
+                        ] === "boolean"
+                            ? false
+                            : "";
+                    setValue(fieldName, value);
+                });
+            }
+
+            if (category.addItemFields) {
+                category.addItemFields.forEach((itemField: any) => {
+                    const fieldName = itemField.field_name || itemField.name;
+                    const value = itemField.type === "boolean" ? false : "";
+                    setValue(fieldName, value);
+                });
+            }
+
+            reset();
+        }
+    }, [item, action, category, setValue]);
+
     const closeModal = () => {
         dispatch(SetCurrentAction(""));
         dispatch(SetCurrentItem({}));
+        reset();
     };
 
     return (
@@ -60,17 +126,22 @@ const ActionModal = () => {
                                                 (fieldObject: any) => (
                                                     <label
                                                         key={`field[${fieldObject.name}]`}
-                                                        htmlFor={`field[${
+                                                        htmlFor={
                                                             fieldObject.field_name ||
                                                             fieldObject.name
-                                                        }]`}
+                                                        }
                                                     >
                                                         {fieldObject.name}
                                                         <input
-                                                            name={`field[${
+                                                            {...register(
                                                                 fieldObject.field_name ||
-                                                                fieldObject.name
-                                                            }]`}
+                                                                    fieldObject.name,
+                                                                {
+                                                                    required:
+                                                                        fieldObject.required ||
+                                                                        false,
+                                                                }
+                                                            )}
                                                             readOnly={
                                                                 ((action ===
                                                                     "show" ||
@@ -109,54 +180,6 @@ const ActionModal = () => {
                                                             placeholder={
                                                                 fieldObject.name
                                                             }
-                                                            {...(typeof item[
-                                                                fieldObject.field_name ||
-                                                                    fieldObject.name
-                                                            ] === "boolean"
-                                                                ? {
-                                                                      checked:
-                                                                          item[
-                                                                              fieldObject.field_name ||
-                                                                                  fieldObject.name
-                                                                          ] ||
-                                                                          false,
-                                                                      onChange:
-                                                                          (e) =>
-                                                                              dispatch(
-                                                                                  SetCurrentItem(
-                                                                                      {
-                                                                                          ...item,
-                                                                                          [fieldObject.field_name ||
-                                                                                          fieldObject.name]:
-                                                                                              e
-                                                                                                  .target
-                                                                                                  .checked,
-                                                                                      }
-                                                                                  )
-                                                                              ),
-                                                                  }
-                                                                : {
-                                                                      onChange:
-                                                                          (e) =>
-                                                                              dispatch(
-                                                                                  SetCurrentItem(
-                                                                                      {
-                                                                                          ...item,
-                                                                                          [fieldObject.field_name ||
-                                                                                          fieldObject.name]:
-                                                                                              e
-                                                                                                  .target
-                                                                                                  .value,
-                                                                                      }
-                                                                                  )
-                                                                              ),
-                                                                      value:
-                                                                          item[
-                                                                              fieldObject.field_name ||
-                                                                                  fieldObject.name
-                                                                          ] ||
-                                                                          "",
-                                                                  })}
                                                         />
                                                     </label>
                                                 )
@@ -183,10 +206,15 @@ const ActionModal = () => {
                                                 >
                                                     {itemField.name}
                                                     <input
-                                                        name={
+                                                        {...register(
                                                             itemField.field_name ||
-                                                            itemField.name
-                                                        }
+                                                                itemField.name,
+                                                            {
+                                                                required:
+                                                                    itemField.required ||
+                                                                    false,
+                                                            }
+                                                        )}
                                                         placeholder={
                                                             itemField.name
                                                         }
@@ -194,42 +222,6 @@ const ActionModal = () => {
                                                             itemField.type ||
                                                             "text"
                                                         }
-                                                        {...(itemField.type ===
-                                                        "boolean"
-                                                            ? {
-                                                                  onChange: (
-                                                                      e
-                                                                  ) =>
-                                                                      dispatch(
-                                                                          SetCurrentItem(
-                                                                              {
-                                                                                  ...item,
-                                                                                  [itemField.field_name ||
-                                                                                  itemField.name]:
-                                                                                      e
-                                                                                          .target
-                                                                                          .checked,
-                                                                              }
-                                                                          )
-                                                                      ),
-                                                              }
-                                                            : {
-                                                                  onChange: (
-                                                                      e
-                                                                  ) =>
-                                                                      dispatch(
-                                                                          SetCurrentItem(
-                                                                              {
-                                                                                  ...item,
-                                                                                  [itemField.field_name ||
-                                                                                  itemField.name]:
-                                                                                      e
-                                                                                          .target
-                                                                                          .value,
-                                                                              }
-                                                                          )
-                                                                      ),
-                                                              })}
                                                     />
                                                 </label>
                                             )
@@ -250,74 +242,127 @@ const ActionModal = () => {
 
                                 <button
                                     className={action}
-                                    onClick={() => {
-                                        if (action === "show") {
-                                            closeModal();
-                                        } else if (action === "edit") {
-                                            let newItem = { ...item };
+                                    onClick={handleSubmit(
+                                        (data) => {
+                                            delete data.field;
 
-                                            Object.keys(newItem).forEach(
-                                                (itemKey) => {
-                                                    if (
-                                                        newItem[itemKey] &&
-                                                        !category.addItemFields.some(
-                                                            (field: any) =>
-                                                                (field.field_name ||
-                                                                    field.name) ===
+                                            if (action === "show") {
+                                                closeModal();
+                                            } else if (action === "edit") {
+                                                let newItem = { ...data };
+
+                                                Object.keys(newItem).forEach(
+                                                    (itemKey) => {
+                                                        if (
+                                                            (newItem[itemKey] &&
+                                                                !category.addItemFields.some(
+                                                                    (
+                                                                        field: any
+                                                                    ) =>
+                                                                        (field.field_name ||
+                                                                            field.name) ===
+                                                                        itemKey
+                                                                )) ||
+                                                            newItem[itemKey] ===
+                                                                item[itemKey] ||
+                                                            !newItem[itemKey]
+                                                        ) {
+                                                            delete newItem[
                                                                 itemKey
-                                                        )
-                                                    ) {
-                                                        delete newItem[itemKey];
+                                                            ];
+                                                        }
                                                     }
-                                                }
-                                            );
+                                                );
 
-                                            editItem(
-                                                category.editUrl,
-                                                newItem,
-                                                { id: item.id }
-                                            );
-                                        } else if (action === "delete") {
-                                            deleteItem(category.deleteUrl, {
-                                                id: item.id,
-                                            });
-                                        } else if (action === "add") {
-                                            let newItem = { ...item };
+                                                editItem(
+                                                    category.editUrl,
+                                                    newItem,
+                                                    { id: item.id }
+                                                );
+                                            } else if (action === "delete") {
+                                                deleteItem(category.deleteUrl, {
+                                                    id: item.id,
+                                                });
+                                            } else if (action === "add") {
+                                                let newItem = { ...data };
 
-                                            Object.keys(newItem).forEach(
-                                                (itemKey) => {
-                                                    if (!newItem[itemKey]) {
-                                                        const fieldType =
-                                                            category.addItemFields.find(
+                                                Object.keys(newItem).forEach(
+                                                    (itemKey) => {
+                                                        if (!newItem[itemKey]) {
+                                                            const fieldType =
+                                                                category.addItemFields.find(
+                                                                    (
+                                                                        field: any
+                                                                    ) =>
+                                                                        (field.field_name ||
+                                                                            field.name) ===
+                                                                        itemKey
+                                                                ).type;
+                                                            newItem[itemKey] =
+                                                                fieldType ===
+                                                                    "checkbox" ||
+                                                                fieldType ===
+                                                                    "radio"
+                                                                    ? false
+                                                                    : "";
+                                                        } else if (
+                                                            newItem[itemKey] &&
+                                                            !category.addItemFields.some(
                                                                 (field: any) =>
                                                                     (field.field_name ||
                                                                         field.name) ===
                                                                     itemKey
-                                                            ).type;
-                                                        newItem[itemKey] =
-                                                            fieldType ===
-                                                                "checkbox" ||
-                                                            fieldType ===
-                                                                "radio"
-                                                                ? false
-                                                                : "";
-                                                    } else if (
-                                                        newItem[itemKey] &&
-                                                        !category.addItemFields.some(
-                                                            (field: any) =>
-                                                                (field.field_name ||
-                                                                    field.name) ===
+                                                            )
+                                                        ) {
+                                                            delete newItem[
                                                                 itemKey
-                                                        )
-                                                    ) {
-                                                        delete newItem[itemKey];
+                                                            ];
+                                                        }
+                                                    }
+                                                );
+
+                                                addItem(
+                                                    category.addUrl,
+                                                    newItem
+                                                );
+                                            }
+                                        },
+                                        (invalidFields) => {
+                                            const invalidFieldsNames =
+                                                Object.keys(invalidFields);
+                                            const existingFields =
+                                                category.inputFields;
+
+                                            existingFields.forEach(
+                                                (fieldObject: any) => {
+                                                    const fieldName =
+                                                        fieldObject.field_name ||
+                                                        fieldObject.name;
+
+                                                    const field =
+                                                        document.querySelector(
+                                                            `input[name="${fieldName}"]`
+                                                        );
+
+                                                    if (field) {
+                                                        if (
+                                                            invalidFieldsNames.includes(
+                                                                fieldName
+                                                            )
+                                                        ) {
+                                                            field.classList.add(
+                                                                "invalid"
+                                                            );
+                                                        } else {
+                                                            field.classList.remove(
+                                                                "invalid"
+                                                            );
+                                                        }
                                                     }
                                                 }
                                             );
-
-                                            addItem(category.addUrl, newItem);
                                         }
-                                    }}
+                                    )}
                                 >
                                     {action === "edit"
                                         ? "Save"

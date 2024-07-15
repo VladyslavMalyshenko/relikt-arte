@@ -45,7 +45,11 @@
             overflow: hidden;
             background-color: var(--background-color-muted);
             border-radius: 10px;
-            transition: all 0.5s;
+            transition: all 0.3s;
+
+            &.invalid {
+                border: 2px solid var(--red);
+            }
 
             &:not(:read-only):not(:disabled) {
                 &:hover,
@@ -67,8 +71,14 @@
         }
 
         input[type="checkbox"] {
+            transition: 0.3s;
+
             &:disabled {
                 cursor: not-allowed;
+            }
+
+            &.invalid {
+                box-shadow: 0px 0px 12px var(--red);
             }
         }
     }

@@ -64,6 +64,7 @@ export const categoriesData: (MainCategory | Category)[] = [
             {
                 name: "name",
                 type: "text",
+                required: true,
             },
             {
                 name: "active",
@@ -109,16 +110,19 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "висота",
                 field_name: "height",
                 type: "number",
+                required: true,
             },
             {
                 name: "довжина",
                 field_name: "width",
                 type: "number",
+                required: true,
             },
             {
                 name: "ширина",
                 field_name: "thickness",
                 type: "number",
+                required: true,
             },
         ],
         inputFields: [
