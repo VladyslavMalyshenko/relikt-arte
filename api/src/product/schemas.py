@@ -55,6 +55,7 @@ class ProductSizeShow(MainSchema):
 
 class ProductRelCreate(BaseModel):
     name: str
+    active: bool
 
 
 class ProductRelUpdate(BaseModel):
