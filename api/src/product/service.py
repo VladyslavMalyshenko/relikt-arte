@@ -1,6 +1,7 @@
 import logging
 
 from pydantic import BaseModel
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
@@ -12,7 +13,6 @@ from ..utils.exceptions.http.base import (
 from ..utils.exceptions.uow import GetRepoByAttrNameException
 from ..utils.exceptions.http.base import IdNotFoundException
 
-from .models import ProductSize, Category
 from .schemas import (
     CategoryCreate,
     CategoryUpdate,
