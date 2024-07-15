@@ -106,10 +106,12 @@ const Content = () => {
                             <thead>
                                 <tr>
                                     {fields?.length > 0 &&
-                                        fields.map((field, index) => (
+                                        fields.map((field: any, index) => (
                                             <th key={index}>
                                                 <div>
-                                                    <span>{field}</span>
+                                                    <span>
+                                                        {field.name || field}
+                                                    </span>
                                                 </div>
                                             </th>
                                         ))}
@@ -125,7 +127,7 @@ const Content = () => {
                                                     {fields?.length > 0 &&
                                                         fields.map(
                                                             (
-                                                                field,
+                                                                field: any,
                                                                 fieldIndex
                                                             ) => (
                                                                 <td
@@ -134,14 +136,16 @@ const Content = () => {
                                                                     }
                                                                 >
                                                                     {typeof product[
-                                                                        field
+                                                                        field.field ||
+                                                                            field
                                                                     ] ===
                                                                     "boolean" ? (
                                                                         <input
                                                                             type="checkbox"
                                                                             checked={
                                                                                 product[
-                                                                                    field
+                                                                                    field.field ||
+                                                                                        field
                                                                                 ]
                                                                             }
                                                                             readOnly={
@@ -150,7 +154,8 @@ const Content = () => {
                                                                         />
                                                                     ) : (
                                                                         product[
-                                                                            field
+                                                                            field.field ||
+                                                                                field
                                                                         ]
                                                                     )}
                                                                 </td>

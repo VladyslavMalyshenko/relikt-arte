@@ -14,8 +14,6 @@ const initialState = {
         ) || categoriesData[0],
 };
 
-console.log(initialState);
-
 export const currentCategoryReducer = (state = initialState, action: any) => {
     switch (action.type) {
         case SET_CURRENT_CATEGORY:

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
@@ -7,6 +7,7 @@ import "../styles/components/ActionModal.scss";
 import { addItem } from "../utils/addItem";
 import { deleteItem } from "../utils/deleteItem";
 import { editItem } from "../utils/editItem";
+import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
 
 const ActionModal = () => {
@@ -16,6 +17,8 @@ const ActionModal = () => {
     );
     const item = useSelector((state: any) => state.itemReducer.item);
     const dispatch = useDispatch();
+    const [selectOptions, setSelectOptions] = useState<any>({});
+    const [selectedItems, setSelectedItems] = useState<any>({});
 
     const {
         register,
@@ -26,57 +29,103 @@ const ActionModal = () => {
     } = useForm();
 
     useEffect(() => {
-        if (action !== "add") {
-            if (category.inputFields) {
-                category.inputFields.forEach((fieldObject: any) => {
-                    const fieldName =
-                        fieldObject.field_name || fieldObject.name;
-                    const value =
-                        typeof item[
-                            fieldObject.field_name || fieldObject.name
-                        ] === "boolean"
-                            ? item[fieldObject.field_name || fieldObject.name]
-                            : item[
-                                  fieldObject.field_name || fieldObject.name
-                              ] || "";
-                    setValue(fieldName, value);
-                });
-            }
+        if (!category.main && action !== "" && action !== "delete") {
+            const lists = category.addItemFields.filter(
+                (field: any) => field.type === "list" && field.getUrl
+            );
 
-            if (category.addItemFields) {
-                category.addItemFields.forEach((itemField: any) => {
-                    const fieldName = itemField.field_name || itemField.name;
-                    const value =
-                        itemField.type === "boolean"
-                            ? item[fieldName]
-                            : item[fieldName] || "";
-                    setValue(fieldName, value);
-                });
-            }
-        } else {
-            if (category.inputFields) {
-                category.inputFields.forEach((fieldObject: any) => {
-                    const fieldName =
-                        fieldObject.field_name || fieldObject.name;
-                    const value =
-                        typeof item[
-                            fieldObject.field_name || fieldObject.name
-                        ] === "boolean"
-                            ? false
-                            : "";
-                    setValue(fieldName, value);
-                });
-            }
+            lists.forEach(async (list: any) => {
+                const options = await getItems(list.getUrl);
 
-            if (category.addItemFields) {
-                category.addItemFields.forEach((itemField: any) => {
-                    const fieldName = itemField.field_name || itemField.name;
-                    const value = itemField.type === "boolean" ? false : "";
-                    setValue(fieldName, value);
-                });
-            }
+                setSelectOptions((prev: any) => ({
+                    ...prev,
+                    [list.field_name || list.name]: [...options],
+                }));
+            });
 
-            reset();
+            if (action !== "add") {
+                if (category.inputFields) {
+                    category.inputFields.forEach((fieldObject: any) => {
+                        const fieldName =
+                            fieldObject.field_name || fieldObject.name;
+                        const value =
+                            typeof item[
+                                fieldObject.field_name || fieldObject.name
+                            ] === "boolean"
+                                ? item[
+                                      fieldObject.field_name || fieldObject.name
+                                  ]
+                                : item[
+                                      fieldObject.field_name || fieldObject.name
+                                  ] || "";
+                        setValue(fieldName, value);
+                    });
+                }
+
+                if (category.addItemFields) {
+                    category.addItemFields.forEach((itemField: any) => {
+                        const fieldName =
+                            itemField.field_name || itemField.name;
+                        const value =
+                            itemField.type === "boolean" ||
+                            itemField.type === "list"
+                                ? item[fieldName]
+                                : item[fieldName] || "";
+
+                        if (
+                            itemField.type === "list" &&
+                            item[fieldName]?.length > 0
+                        ) {
+                            item[fieldName].forEach((id: any) => {
+                                setTimeout(() => {
+                                    const chosenOption =
+                                        document.getElementById(
+                                            `${fieldName}[${id}]`
+                                        );
+
+                                    if (chosenOption) {
+                                        const checkbox =
+                                            chosenOption?.querySelector(
+                                                'input[type="checkbox"]'
+                                            );
+
+                                        if (checkbox) {
+                                            (checkbox as any).checked = true;
+                                        }
+                                    }
+                                }, 100);
+                            });
+                        }
+
+                        setValue(fieldName, value);
+                    });
+                }
+            } else {
+                if (category.inputFields) {
+                    category.inputFields.forEach((fieldObject: any) => {
+                        const fieldName =
+                            fieldObject.field_name || fieldObject.name;
+                        const value =
+                            typeof item[
+                                fieldObject.field_name || fieldObject.name
+                            ] === "boolean"
+                                ? false
+                                : "";
+                        setValue(fieldName, value);
+                    });
+                }
+
+                if (category.addItemFields) {
+                    category.addItemFields.forEach((itemField: any) => {
+                        const fieldName =
+                            itemField.field_name || itemField.name;
+                        const value = itemField.type === "boolean" ? false : "";
+                        setValue(fieldName, value);
+                    });
+                }
+
+                reset();
+            }
         }
     }, [item, action, category, setValue]);
 
@@ -132,55 +181,163 @@ const ActionModal = () => {
                                                         }
                                                     >
                                                         {fieldObject.name}
-                                                        <input
-                                                            {...register(
-                                                                fieldObject.field_name ||
-                                                                    fieldObject.name,
-                                                                {
-                                                                    required:
-                                                                        fieldObject.required ||
-                                                                        false,
-                                                                }
-                                                            )}
-                                                            readOnly={
-                                                                ((action ===
-                                                                    "show" ||
-                                                                    action ===
-                                                                        "delete") &&
-                                                                    typeof item[
+
+                                                        {fieldObject.type ===
+                                                            "list" &&
+                                                        fieldObject.getUrl ? (
+                                                            <ul className="list-input">
+                                                                {selectOptions[
+                                                                    fieldObject.field_name ||
+                                                                        fieldObject.name
+                                                                ]?.length > 0 &&
+                                                                    selectOptions[
                                                                         fieldObject.field_name ||
                                                                             fieldObject.name
-                                                                    ] !==
-                                                                        "boolean") ||
-                                                                (fieldObject.field_name ||
-                                                                    fieldObject.name) ===
-                                                                    "id" ||
-                                                                fieldObject.locked
-                                                            }
-                                                            disabled={
-                                                                ((action ===
-                                                                    "show" ||
-                                                                    action ===
-                                                                        "delete") &&
+                                                                    ].map(
+                                                                        (
+                                                                            option: any
+                                                                        ) => (
+                                                                            <li
+                                                                                key={
+                                                                                    option.id
+                                                                                }
+                                                                                id={`${
+                                                                                    fieldObject.field_name ||
+                                                                                    fieldObject.name
+                                                                                }[${
+                                                                                    option.id
+                                                                                }]`}
+                                                                            >
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    disabled={
+                                                                                        action ===
+                                                                                            "show" ||
+                                                                                        action ===
+                                                                                            "delete" ||
+                                                                                        fieldObject.locked
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        const fieldName =
+                                                                                            fieldObject.field_name ||
+                                                                                            fieldObject.name;
+                                                                                        setSelectedItems(
+                                                                                            (
+                                                                                                prev: any
+                                                                                            ) => {
+                                                                                                const updated =
+                                                                                                    {
+                                                                                                        ...prev,
+                                                                                                    };
+                                                                                                if (
+                                                                                                    !updated[
+                                                                                                        fieldName
+                                                                                                    ]
+                                                                                                ) {
+                                                                                                    updated[
+                                                                                                        fieldName
+                                                                                                    ] =
+                                                                                                        [];
+                                                                                                }
+                                                                                                if (
+                                                                                                    e
+                                                                                                        .target
+                                                                                                        .checked
+                                                                                                ) {
+                                                                                                    updated[
+                                                                                                        fieldName
+                                                                                                    ].push(
+                                                                                                        option.id
+                                                                                                    );
+                                                                                                } else {
+                                                                                                    updated[
+                                                                                                        fieldName
+                                                                                                    ] =
+                                                                                                        updated[
+                                                                                                            fieldName
+                                                                                                        ].filter(
+                                                                                                            (
+                                                                                                                id: any
+                                                                                                            ) =>
+                                                                                                                id !==
+                                                                                                                option.id
+                                                                                                        );
+                                                                                                }
+                                                                                                setValue(
+                                                                                                    fieldName,
+                                                                                                    updated[
+                                                                                                        fieldName
+                                                                                                    ]
+                                                                                                );
+                                                                                                return updated;
+                                                                                            }
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                                {
+                                                                                    option[
+                                                                                        fieldObject
+                                                                                            .labelField
+                                                                                    ]
+                                                                                }
+                                                                            </li>
+                                                                        )
+                                                                    )}
+                                                            </ul>
+                                                        ) : (
+                                                            <input
+                                                                {...register(
+                                                                    fieldObject.field_name ||
+                                                                        fieldObject.name,
+                                                                    {
+                                                                        required:
+                                                                            fieldObject.required ||
+                                                                            false,
+                                                                    }
+                                                                )}
+                                                                readOnly={
+                                                                    ((action ===
+                                                                        "show" ||
+                                                                        action ===
+                                                                            "delete") &&
+                                                                        typeof item[
+                                                                            fieldObject.field_name ||
+                                                                                fieldObject.name
+                                                                        ] !==
+                                                                            "boolean") ||
+                                                                    (fieldObject.field_name ||
+                                                                        fieldObject.name) ===
+                                                                        "id" ||
+                                                                    fieldObject.locked
+                                                                }
+                                                                disabled={
+                                                                    ((action ===
+                                                                        "show" ||
+                                                                        action ===
+                                                                            "delete") &&
+                                                                        typeof item[
+                                                                            fieldObject.field_name ||
+                                                                                fieldObject.name
+                                                                        ] ===
+                                                                            "boolean") ||
+                                                                    fieldObject.locked
+                                                                }
+                                                                type={
                                                                     typeof item[
                                                                         fieldObject.field_name ||
                                                                             fieldObject.name
                                                                     ] ===
-                                                                        "boolean") ||
-                                                                fieldObject.locked
-                                                            }
-                                                            type={
-                                                                typeof item[
-                                                                    fieldObject.field_name ||
-                                                                        fieldObject.name
-                                                                ] === "boolean"
-                                                                    ? "checkbox"
-                                                                    : "text"
-                                                            }
-                                                            placeholder={
-                                                                fieldObject.name
-                                                            }
-                                                        />
+                                                                    "boolean"
+                                                                        ? "checkbox"
+                                                                        : "text"
+                                                                }
+                                                                placeholder={
+                                                                    fieldObject.name
+                                                                }
+                                                            />
+                                                        )}
                                                     </label>
                                                 )
                                             )}
@@ -205,24 +362,117 @@ const ActionModal = () => {
                                                     }
                                                 >
                                                     {itemField.name}
-                                                    <input
-                                                        {...register(
-                                                            itemField.field_name ||
-                                                                itemField.name,
-                                                            {
-                                                                required:
-                                                                    itemField.required ||
-                                                                    false,
+                                                    {itemField.type ===
+                                                        "list" &&
+                                                    itemField.getUrl ? (
+                                                        <ul className="list-input">
+                                                            {selectOptions[
+                                                                itemField.field_name ||
+                                                                    itemField.name
+                                                            ]?.length > 0 &&
+                                                                selectOptions[
+                                                                    itemField.field_name ||
+                                                                        itemField.name
+                                                                ].map(
+                                                                    (
+                                                                        option: any
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                option.id
+                                                                            }
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    const fieldName =
+                                                                                        itemField.field_name ||
+                                                                                        itemField.name;
+                                                                                    setSelectedItems(
+                                                                                        (
+                                                                                            prev: any
+                                                                                        ) => {
+                                                                                            const updated =
+                                                                                                {
+                                                                                                    ...prev,
+                                                                                                };
+                                                                                            if (
+                                                                                                !updated[
+                                                                                                    fieldName
+                                                                                                ]
+                                                                                            ) {
+                                                                                                updated[
+                                                                                                    fieldName
+                                                                                                ] =
+                                                                                                    [];
+                                                                                            }
+                                                                                            if (
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .checked
+                                                                                            ) {
+                                                                                                updated[
+                                                                                                    fieldName
+                                                                                                ].push(
+                                                                                                    option.id
+                                                                                                );
+                                                                                            } else {
+                                                                                                updated[
+                                                                                                    fieldName
+                                                                                                ] =
+                                                                                                    updated[
+                                                                                                        fieldName
+                                                                                                    ].filter(
+                                                                                                        (
+                                                                                                            id: any
+                                                                                                        ) =>
+                                                                                                            id !==
+                                                                                                            option.id
+                                                                                                    );
+                                                                                            }
+                                                                                            setValue(
+                                                                                                fieldName,
+                                                                                                updated[
+                                                                                                    fieldName
+                                                                                                ]
+                                                                                            );
+                                                                                            return updated;
+                                                                                        }
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                            {
+                                                                                option[
+                                                                                    itemField
+                                                                                        .labelField
+                                                                                ]
+                                                                            }
+                                                                        </li>
+                                                                    )
+                                                                )}
+                                                        </ul>
+                                                    ) : (
+                                                        <input
+                                                            {...register(
+                                                                itemField.field_name ||
+                                                                    itemField.name,
+                                                                {
+                                                                    required:
+                                                                        itemField.required ||
+                                                                        false,
+                                                                }
+                                                            )}
+                                                            placeholder={
+                                                                itemField.name
                                                             }
-                                                        )}
-                                                        placeholder={
-                                                            itemField.name
-                                                        }
-                                                        type={
-                                                            itemField.type ||
-                                                            "text"
-                                                        }
-                                                    />
+                                                            type={
+                                                                itemField.type ||
+                                                                "text"
+                                                            }
+                                                        />
+                                                    )}
                                                 </label>
                                             )
                                         )}
@@ -304,6 +554,9 @@ const ActionModal = () => {
                                                                 fieldType ===
                                                                     "radio"
                                                                     ? false
+                                                                    : fieldType ===
+                                                                      "list"
+                                                                    ? []
                                                                     : "";
                                                         } else if (
                                                             newItem[itemKey] &&

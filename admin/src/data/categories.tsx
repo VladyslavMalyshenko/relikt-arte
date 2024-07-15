@@ -7,7 +7,7 @@ export type Category = {
     editUrl: string;
     deleteUrl: string;
     getItemUrl: string;
-    fields?: string[];
+    fields?: any[];
     addItemFields: any[];
     inputFields: any[];
 };
@@ -59,7 +59,11 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/related/product_color/$id/update/",
         deleteUrl: "/api/v1/product/related/product_color/$id/delete/",
         getItemUrl: "/api/v1/product/related/product_color/$id/",
-        fields: ["id", "name", "active"],
+        fields: [
+            "id",
+            { name: "назва", field: "name" },
+            { name: "активний", field: "active" },
+        ],
         addItemFields: [
             {
                 name: "name",
@@ -104,7 +108,21 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/size/$id/update/",
         deleteUrl: "/api/v1/product/size/$id/delete/",
         getItemUrl: "/api/v1/product/size/$id/",
-        fields: ["id", "height", "width", "thickness"],
+        fields: [
+            "id",
+            {
+                name: "висота",
+                field: "height",
+            },
+            {
+                name: "довжина",
+                field: "width",
+            },
+            {
+                name: "ширина",
+                field: "thickness",
+            },
+        ],
         addItemFields: [
             {
                 name: "висота",
@@ -144,6 +162,127 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "ширина",
                 field_name: "thickness",
                 type: "number",
+            },
+        ],
+    },
+    {
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+            >
+                <path
+                    d="M3 6C3 4.34315 4.34315 3 6 3H7C8.65685 3 10 4.34315 10 6V7C10 8.65685 8.65685 10 7 10H6C4.34315 10 3 8.65685 3 7V6Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                />
+                <path
+                    d="M14 6C14 4.34315 15.3431 3 17 3H18C19.6569 3 21 4.34315 21 6V7C21 8.65685 19.6569 10 18 10H17C15.3431 10 14 8.65685 14 7V6Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                />
+                <path
+                    d="M14 17C14 15.3431 15.3431 14 17 14H18C19.6569 14 21 15.3431 21 17V18C21 19.6569 19.6569 21 18 21H17C15.3431 21 14 19.6569 14 18V17Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                />
+                <path
+                    d="M3 17C3 15.3431 4.34315 14 6 14H7C8.65685 14 10 15.3431 10 17V18C10 19.6569 8.65685 21 7 21H6C4.34315 21 3 19.6569 3 18V17Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                />
+            </svg>
+        ),
+        label: "Категорії",
+        link: "/categories",
+        addUrl: "/api/v1/product/category/create/",
+        getUrl: "/api/v1/product/category/list/",
+        editUrl: "/api/v1/product/category/$id/update/",
+        deleteUrl: "/api/v1/product/category/$id/delete/",
+        getItemUrl: "/api/v1/product/category/$id/",
+        fields: [
+            "id",
+            { name: "назва", field: "name" },
+            {
+                name: "наявність скла",
+                field: "is_glass_available",
+            },
+            {
+                name: "наявність матеріалу",
+                field: "have_material_choice",
+            },
+            {
+                name: "вибір сторони",
+                field: "have_orientation_choice",
+            },
+            {
+                name: "вибір лиштви",
+                field: "have_type_of_platband_choice",
+            },
+        ],
+        addItemFields: [
+            { name: "назва", field_name: "name", type: "text" },
+            {
+                name: "наявність скла",
+                field_name: "is_glass_available",
+                type: "checkbox",
+            },
+            {
+                name: "наявність матеріалу",
+                field_name: "have_material_choice",
+                type: "checkbox",
+            },
+            {
+                name: "вибір сторони",
+                field_name: "have_orientation_choice",
+                type: "checkbox",
+            },
+            {
+                name: "вибір лиштви",
+                field_name: "have_type_of_platband_choice",
+                type: "checkbox",
+            },
+            {
+                name: "розміри",
+                field_name: "allowed_sizes",
+                type: "list",
+                getUrl: "/api/v1/product/size/list/",
+                labelField: "dimensions",
+            },
+        ],
+        inputFields: [
+            {
+                name: "id",
+                type: "text",
+            },
+            { name: "назва", field_name: "name", type: "text" },
+            {
+                name: "наявність скла",
+                field_name: "is_glass_available",
+                type: "checkbox",
+            },
+            {
+                name: "наявність матеріалу",
+                field_name: "have_material_choice",
+                type: "checkbox",
+            },
+            {
+                name: "вибір сторони",
+                field_name: "have_orientation_choice",
+                type: "checkbox",
+            },
+            {
+                name: "вибір лиштви",
+                field_name: "have_type_of_platband_choice",
+                type: "checkbox",
+            },
+            {
+                name: "розміри",
+                field_name: "allowed_sizes",
+                type: "list",
+                getUrl: "/api/v1/product/size/list/",
+                labelField: "dimensions",
             },
         ],
     },
