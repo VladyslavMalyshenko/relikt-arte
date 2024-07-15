@@ -76,7 +76,7 @@ class CategoryService(BaseService):
                     raise IdNotFoundException(
                         self.uow.category.model, category_id
                     )
-                if data.allowed_sizes:
+                if data.allowed_sizes is not None:
                     allowed_sizes = await self.uow.product_size.get_by_ids(
                         obj_ids=data.allowed_sizes
                     )
