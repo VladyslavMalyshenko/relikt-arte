@@ -1,5 +1,6 @@
 import logging
 
+from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
@@ -11,8 +12,11 @@ from ..utils.exceptions.http.base import (
 from ..utils.exceptions.uow import GetRepoByAttrNameException
 from ..utils.exceptions.http.base import IdNotFoundException
 
-from .models import ProductSize
+from .models import ProductSize, Category
 from .schemas import (
+    CategoryCreate,
+    CategoryUpdate,
+    CategoryShow,
     ProductSizeCreate,
     ProductSizeUpdate,
     ProductSizeShow,
@@ -30,26 +34,120 @@ class ProductService(BaseService):
     pass
 
 
+class CategoryService(BaseService):
+    async def get_show_scheme(self, obj) -> CategoryShow:
+        return CategoryShow(
+            id=obj.id,
+            name=obj.name,
+            is_glass_available=obj.is_glass_available,
+            have_material_choice=obj.have_material_choice,
+            have_orientation_choice=obj.have_orientation_choice,
+            have_type_of_platband_choice=obj.have_type_of_platband_choice,
+            allowed_sizes=[size.id for size in obj.allowed_sizes],
+        )
+
+    async def create_category(self, data: CategoryCreate) -> CategoryShow:
+        try:
+            async with self.uow:
+                sizes = await self.uow.product_size.get_by_ids(
+                    obj_ids=data.allowed_sizes
+                )
+                category = await self.uow.category.create(
+                    obj_in=data, allowed_sizes=sizes
+                )
+                await self.uow.add(category)
+                await self.uow.commit()
+                return await self.get_show_scheme(category)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectCreateException("Category")
+
+    async def update_category(
+        self, data: CategoryUpdate, category_id: int
+    ) -> CategoryShow:
+        try:
+            async with self.uow:
+                category_obj = (
+                    await self.uow.category.get_by_id_with_allowed_sizes(
+                        obj_id=category_id
+                    )
+                )
+                if not category_obj:
+                    raise IdNotFoundException(
+                        self.uow.category.model, category_id
+                    )
+                if data.allowed_sizes:
+                    allowed_sizes = await self.uow.product_size.get_by_ids(
+                        obj_ids=data.allowed_sizes
+                    )
+                else:
+                    allowed_sizes = None
+                category = await self.uow.category.update(
+                    obj_in=data,
+                    category=category_obj,
+                    allowed_sizes=allowed_sizes,
+                )
+                await self.uow.add(category)
+                await self.uow.commit()
+                return await self.get_show_scheme(category)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Category")
+
+    async def delete_category(self, category_id: int) -> None:
+        try:
+            async with self.uow:
+                await self.uow.category.delete_by_id(obj_id=category_id)
+                await self.uow.commit()
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Category")
+
+    async def get_category_obj(self, category_id: int) -> CategoryShow:
+        try:
+            async with self.uow:
+                category = (
+                    await self.uow.category.get_by_id_with_allowed_sizes(
+                        obj_id=category_id
+                    )
+                )
+                if not category:
+                    raise IdNotFoundException(
+                        self.uow.category.model, category_id
+                    )
+                return await self.get_show_scheme(category)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Category")
+
+    async def get_category_list(self) -> list[CategoryShow]:
+        try:
+            async with self.uow:
+                return [
+                    await self.get_show_scheme(category)
+                    for category in await self.uow.category.get_all_with_allowed_sizes()
+                ]
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Category")
+
+
 class ProductSizeService(BaseService):
+    async def get_show_scheme(self, obj) -> ProductSizeShow:
+        return ProductSizeShow(
+            id=obj.id,
+            height=obj.height,
+            width=obj.width,
+            thickness=obj.thickness,
+            dimensions=obj.dimensions,
+        )
+
     async def create_product_size(
         self, data: ProductSizeCreate
     ) -> ProductSizeShow:
         try:
             async with self.uow:
-                product_size_id = await self.uow.product_size.create(
-                    obj_in=data
-                )
-                await self.uow.commit()
-                product_size = await self.uow.product_size.get_by_id(
-                    obj_id=product_size_id
-                )
-                return ProductSizeShow(
-                    id=product_size.id,
-                    height=product_size.height,
-                    width=product_size.width,
-                    thickness=product_size.thickness,
-                    dimensions=product_size.dimensions,
-                )
+                return await self.create_obj(self.uow.product_size, data)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectCreateException("ProductSize")
@@ -61,24 +159,8 @@ class ProductSizeService(BaseService):
     ) -> ProductSizeShow:
         try:
             async with self.uow:
-                if not await self.uow.product_size.exists_by_id(
-                    obj_id=product_size_id
-                ):
-                    raise IdNotFoundException(
-                        model=ProductSize,
-                        id=product_size_id,
-                    )
-                await self.uow.product_size.update(obj_in=data)
-                await self.uow.commit()
-                product_size = await self.uow.product_size.get_by_id(
-                    obj_id=product_size_id
-                )
-                return ProductSizeShow(
-                    id=product_size.id,
-                    height=product_size.height,
-                    width=product_size.width,
-                    thickness=product_size.thickness,
-                    dimensions=product_size.dimensions,
+                return await self.update_obj(
+                    self.uow.product_size, data, product_size_id
                 )
         except SQLAlchemyError as e:
             log.exception(e)
@@ -100,20 +182,8 @@ class ProductSizeService(BaseService):
     ) -> ProductSizeShow:
         try:
             async with self.uow:
-                product_size = await self.uow.product_size.get_by_id(
-                    obj_id=product_size_id
-                )
-                if not product_size:
-                    raise IdNotFoundException(
-                        model=ProductSize,
-                        id=product_size_id,
-                    )
-                return ProductSizeShow(
-                    id=product_size.id,
-                    height=product_size.height,
-                    width=product_size.width,
-                    thickness=product_size.thickness,
-                    dimensions=product_size.dimensions,
+                return await self.get_obj(
+                    self.uow.product_size, product_size_id
                 )
         except SQLAlchemyError as e:
             log.exception(e)
@@ -122,23 +192,20 @@ class ProductSizeService(BaseService):
     async def get_product_size_list(self) -> list[ProductSizeShow]:
         try:
             async with self.uow:
-                product_sizes = await self.uow.product_size.get_all()
-                return [
-                    ProductSizeShow(
-                        id=product_size.id,
-                        height=product_size.height,
-                        width=product_size.width,
-                        thickness=product_size.thickness,
-                        dimensions=product_size.dimensions,
-                    )
-                    for product_size in product_sizes
-                ]
+                return await self.get_obj_list(self.uow.product_size)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("ProductSize")
 
 
 class ProductRelService(BaseService):
+    async def get_show_scheme(self, obj) -> BaseModel:
+        return ProductRelShow(
+            id=obj.id,
+            name=obj.name,
+            active=obj.active,
+        )
+
     async def get_repo(
         self, rel_model: ProductRelModelEnum
     ) -> ProductRelRepository:
@@ -152,14 +219,7 @@ class ProductRelService(BaseService):
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                rel_obj_id = await repo.create(obj_in=data)
-                await self.uow.commit()
-                rel_obj = await repo.get_by_id(obj_id=rel_obj_id)
-                return ProductRelShow(
-                    id=rel_obj.id,
-                    name=rel_obj.name,
-                    active=rel_obj.active,
-                )
+                return await self.create_obj(repo, data)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectCreateException(rel_model)
@@ -173,19 +233,7 @@ class ProductRelService(BaseService):
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                if not await repo.exists_by_id(obj_id=rel_obj_id):
-                    raise IdNotFoundException(
-                        id=rel_obj_id,
-                        model_name=rel_model.get_name().capitalize(),
-                    )
-                await repo.update(obj_in=data)
-                await self.uow.commit()
-                rel_obj = await repo.get_by_id(obj_id=rel_obj_id)
-                return ProductRelShow(
-                    id=rel_obj.id,
-                    name=rel_obj.name,
-                    active=rel_obj.active,
-                )
+                return await self.update_obj(repo, data, rel_obj_id)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException(rel_model)
@@ -208,17 +256,7 @@ class ProductRelService(BaseService):
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                rel_obj = await repo.get_by_id(obj_id=rel_obj_id)
-                if not rel_obj:
-                    raise IdNotFoundException(
-                        id=rel_obj_id,
-                        model=rel_obj,
-                    )
-                return ProductRelShow(
-                    id=rel_obj.id,
-                    name=rel_obj.name,
-                    active=rel_obj.active,
-                )
+                return await self.get_obj(repo, rel_obj_id)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException(rel_model)
@@ -229,16 +267,7 @@ class ProductRelService(BaseService):
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                rel_objs = await repo.get_all()
-                print(rel_objs)
-                return [
-                    ProductRelShow(
-                        id=rel_obj.id,
-                        name=rel_obj.name,
-                        active=rel_obj.active,
-                    )
-                    for rel_obj in rel_objs
-                ]
+                return await self.get_obj_list(repo)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException(rel_model)

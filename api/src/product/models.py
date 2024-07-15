@@ -17,10 +17,20 @@ class CategorySizeAssociation(Base):
     __tablename__ = "category_size_association"
 
     product_size_id: Mapped[int] = mapped_column(
-        ForeignKey("product_size.id"), primary_key=True
+        ForeignKey(
+            "product_size.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+        primary_key=True,
     )
     category_id: Mapped[int] = mapped_column(
-        ForeignKey("category.id"), primary_key=True
+        ForeignKey(
+            "category.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+        primary_key=True,
     )
 
 
@@ -81,17 +91,19 @@ class Category(BaseModelMixin, Base):
 class ProductColor(BaseProductRelMixin, Base):
     instance_name = "Color"
     __tablename__ = "product_color"
-    __label__ = "product_color"
+    __label__ = "Product color"
 
 
 class ProductCovering(BaseProductRelMixin, Base):
     instance_name = "Covering"
     __tablename__ = "product_covering"
+    __label__ = "Product covering"
 
 
 class ProductGlassColor(BaseProductRelMixin, Base):
     instance_name = "Glass color"
     __tablename__ = "product_glass_color"
+    __label__ = "Product glass color"
 
 
 class Product(BaseModelMixin, Base):

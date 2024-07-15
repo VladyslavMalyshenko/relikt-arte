@@ -1,6 +1,6 @@
 import uuid
 
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 
 from pydantic import BaseModel
 
@@ -21,7 +21,14 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         self.session = session
         self.model = model
 
-    async def create(self, *, obj_in: CreateScheme) -> int | uuid.UUID:
+    async def _add_options_to_query(self, query, options: list) -> None:
+        for option in options:
+            query = query.options(option)
+        return query
+
+    async def create(
+        self, *, obj_in: CreateScheme, **kwargs
+    ) -> int | uuid.UUID:
         stmt = (
             insert(self.model)
             .values(**clean_dict(dict(obj_in)))
@@ -30,22 +37,53 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         res = await self.session.execute(stmt)
         return res.scalar()
 
-    async def update(self, *, obj_in: UpdateScheme) -> int | uuid.UUID:
+    async def update(
+        self,
+        *,
+        obj_in: UpdateScheme,
+        obj_id: int | uuid.UUID,
+        **kwargs,
+    ) -> int | uuid.UUID:
         stmt = (
             update(self.model)
+            .where(self.model.id == obj_id)
             .values(**clean_dict(dict(obj_in)))
             .returning(self.model.id)
         )
         res = await self.session.execute(stmt)
         return res.scalar()
 
-    async def get_by_id(self, *, obj_id: int | uuid.UUID) -> T:
+    async def get_by_id(
+        self,
+        *,
+        obj_id: int | uuid.UUID,
+        options: Optional[list] = None,
+    ) -> T:
         query = select(self.model).where(self.model.id == obj_id)
+        if options:
+            query = await self._add_options_to_query(query, options)
         res = await self.session.execute(query)
         return res.scalar()
 
-    async def get_all(self) -> list[T]:
+    async def get_by_ids(
+        self,
+        *,
+        obj_ids: list[int | uuid.UUID],
+        options: Optional[list] = None,
+    ) -> list[T]:
+        query = select(self.model).where(self.model.id.in_(obj_ids))
+        if options:
+            query = await self._add_options_to_query(query, options)
+        res = await self.session.execute(query)
+        return res.scalars().all()
+
+    async def get_all(
+        self,
+        options: Optional[list] = None,
+    ) -> list[T]:
         query = select(self.model)
+        if options:
+            query = await self._add_options_to_query(query, options)
         res = await self.session.execute(query)
         return res.scalars().all()
 

@@ -1,6 +1,7 @@
 from sqladmin import ModelView
 
 from ...product.models import (
+    Category,
     Product,
     ProductSize,
     ProductColor,
@@ -12,6 +13,17 @@ from ...product.models import (
 
 class ProductModelView(ModelView, model=Product):
     name_plural = "Products"
+    page_size = 100
+    form_excluded_columns = [
+        "created_at",
+        "updated_at",
+    ]
+    can_create = True
+    can_edit = True
+
+
+class CategoryModelView(ModelView, model=Category):
+    name_plural = "Categories"
     page_size = 100
     form_excluded_columns = [
         "created_at",
@@ -79,6 +91,7 @@ class ProductPhotoModelView(ModelView, model=ProductPhoto):
 def get_product_model_views() -> list[ModelView]:
     return [
         ProductModelView,
+        CategoryModelView,
         ProductSizeModelView,
         ProductColorModelView,
         ProductCoveringModelView,
