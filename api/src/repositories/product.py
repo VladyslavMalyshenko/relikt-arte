@@ -2,7 +2,7 @@ from typing import TypeVar, Iterable, Optional
 
 from uuid import UUID
 
-from sqlalchemy.orm import joinedload, selectinload, contains_eager
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .generic import GenericRepository
