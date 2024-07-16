@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Children, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
@@ -42,14 +42,63 @@ const ActionModal = () => {
       });
 
       if (action !== "add") {
+
+        const setCheckboxes = (fieldObject: any) => {
+          const fieldName = fieldObject.field_name || fieldObject.name;
+
+          let listChildren: any = document.getElementById(fieldName)?.children;
+
+          if (listChildren) {
+            listChildren = Array.from(listChildren).filter(function(item, pos) {
+              return Array.from(listChildren).indexOf(item) == pos;
+          })
+
+          listChildren.forEach((child: any) => {
+            const checkbox = child.querySelector('input[type="checkbox"]');
+
+            if (checkbox) {
+              const id = +checkbox.parentNode.id.split('[')[1].split(']')[0]
+
+              const isIdSelected = item[fieldName].includes(id);
+
+              setSelectedItems((prev: any) => {
+                const updated = {
+                  ...prev,
+                };
+
+                if (!updated[fieldName]) {
+                  updated[fieldName] = [];
+                }
+
+                if (isIdSelected) {
+                  updated[fieldName].push(id);
+                } else {
+                  updated[fieldName] = updated[fieldName].filter(
+                    (id: any) => id !== id
+                  );
+                }
+
+                setValue(fieldName, updated[fieldName]);
+                return updated;
+              });
+
+              checkbox.checked = isIdSelected
+             }})
+          }
+        }
+
         if (category.inputFields) {
           category.inputFields.forEach((fieldObject: any) => {
             const fieldName = fieldObject.field_name || fieldObject.name;
             const value =
-              typeof item[fieldObject.field_name || fieldObject.name] ===
-              "boolean"
-                ? item[fieldObject.field_name || fieldObject.name]
-                : item[fieldObject.field_name || fieldObject.name] || "";
+            fieldObject.type === "boolean" || fieldObject.type === "list"
+                ? item[fieldName]
+                : item[fieldName] || "";
+
+                if (fieldObject.type === "list") {
+                  setCheckboxes(fieldObject);
+                }
+
             setValue(fieldName, value);
           });
         }
@@ -62,39 +111,9 @@ const ActionModal = () => {
                 ? item[fieldName]
                 : item[fieldName] || "";
 
-            if (itemField.type === "list" && item[fieldName]?.length > 0) {
-              item[fieldName].forEach((id: any) => {
-                setTimeout(() => {
-                  const chosenOption = document.getElementById(
-                    `${fieldName}[${id}]`
-                  );
-
-                  if (chosenOption) {
-                    const checkbox = chosenOption?.querySelector(
-                      'input[type="checkbox"]'
-                    );
-
-                    if (checkbox) {
-                      setSelectedItems((prev: any) => {
-                        const updated = {
-                          ...prev,
-                        };
-
-                        if (!updated[fieldName]) {
-                          updated[fieldName] = [];
-                        }
-
-                        updated[fieldName].push(id);
-
-                        setValue(fieldName, updated[fieldName]);
-                        return updated;
-                      });
-                      (checkbox as any).checked = true;
-                    }
-                  }
-                }, 100);
-              });
-            }
+                if (itemField.type === "list") {
+                  setCheckboxes(itemField);
+                }
 
             setValue(fieldName, value);
           });
@@ -128,6 +147,8 @@ const ActionModal = () => {
   const closeModal = () => {
     dispatch(SetCurrentAction(""));
     dispatch(SetCurrentItem({}));
+    setSelectedItems({})
+    setSelectOptions({});
     reset();
   };
 
@@ -155,7 +176,7 @@ const ActionModal = () => {
 
   const getInput = (fieldObject: any) => {
     return fieldObject.type === "list" && fieldObject.getUrl ? (
-      <ul className="list-input">
+      <ul className="list-input" id={`${fieldObject.field_name || fieldObject.name}`}>
         {selectOptions[fieldObject.field_name || fieldObject.name]?.length >
           0 &&
           selectOptions[fieldObject.field_name || fieldObject.name].map(
