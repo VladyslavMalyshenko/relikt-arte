@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request
 
 from ..core.db.dependencies import uowDEP
 
@@ -259,7 +259,8 @@ async def get_category(
 )
 async def product_create(
     uow: uowDEP,
-    data: product_create_dep,
+    request: Request,
 ):
-    print(data.photos_data)
+    form_data = request.form()
+    print(form_data)
     return {}
