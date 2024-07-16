@@ -9,9 +9,12 @@ import "../styles/components/Content.scss";
 import { getItems } from "../utils/getItems";
 import ActionModal from "./ActionModal";
 import ItemActions from "./ItemActions";
+import { access } from "fs";
 
 const Content = () => {
   const category = useSelector((state: any) => state.categoryReducer.category);
+  const action = useSelector((state: any) => state.actionReducer.action);
+  const [previousAction, setPreviousAction] = useState(action || "");
   const [fields, setFields] = useState(["id", "name", "category", "price"]);
   const [products, setProducts] = useState<any>([]);
   const dispatch = useDispatch();
@@ -25,10 +28,18 @@ const Content = () => {
   };
 
   useEffect(() => {
-    if (!category.main) {
+    if (
+      !category.main ||
+      (action === "" &&
+        (previousAction === "add" ||
+          previousAction === "edit" ||
+          previousAction === "delete"))
+    ) {
       setUpTable();
     }
-  }, [category, params.category]);
+
+    setPreviousAction(action);
+  }, [category, params.category, action]);
 
   return (
     <div className="content">
@@ -100,7 +111,7 @@ const Content = () => {
                         </div>
                       </th>
                     ))}
-                  <th>Actions</th>
+                  <th>Дії</th>
                 </tr>
               </thead>
               <tbody>
