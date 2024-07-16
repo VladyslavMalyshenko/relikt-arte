@@ -46,10 +46,11 @@ const ActionModal = () => {
         const setCheckboxes = (fieldObject: any) => {
           const fieldName = fieldObject.field_name || fieldObject.name;
 
-          let listChildren: any = document.getElementById(fieldName)?.children;
+          setTimeout(() => {
+            let listChildren: any = document.getElementById(fieldName)?.children;
 
           if (listChildren) {
-            listChildren = Array.from(listChildren).filter(function(item, pos) {
+            listChildren = Array.from(listChildren).filter((item, pos) => {
               return Array.from(listChildren).indexOf(item) == pos;
           })
 
@@ -59,7 +60,7 @@ const ActionModal = () => {
             if (checkbox) {
               const id = +checkbox.parentNode.id.split('[')[1].split(']')[0]
 
-              const isIdSelected = item[fieldName].includes(id);
+              const isIdSelected = item[fieldName]?.includes(id);
 
               setSelectedItems((prev: any) => {
                 const updated = {
@@ -74,17 +75,18 @@ const ActionModal = () => {
                   updated[fieldName].push(id);
                 } else {
                   updated[fieldName] = updated[fieldName].filter(
-                    (id: any) => id !== id
+                    (objectId: number) => objectId !== id
                   );
                 }
 
+                checkbox.checked = isIdSelected
                 setValue(fieldName, updated[fieldName]);
                 return updated;
               });
-
-              checkbox.checked = isIdSelected
              }})
           }
+          }, 100)
+
         }
 
         if (category.inputFields) {
