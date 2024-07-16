@@ -261,6 +261,6 @@ async def product_create(
     uow: uowDEP,
     request: Request,
 ):
-    form_data = request.form()
+    form_data = await request.form()
     print(form_data)
     return {}
