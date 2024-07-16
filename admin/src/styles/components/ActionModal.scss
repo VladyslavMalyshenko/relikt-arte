@@ -11,6 +11,10 @@
     box-sizing: border-box;
     border-radius: 6px;
 
+    .category-action {
+        margin-bottom: 20px;
+    }
+
     &.delete {
         max-width: 400px;
         max-height: 300px;
@@ -125,13 +129,12 @@
 
         button {
             background: var(--background-color);
-            width: 60px;
-            height: 30px;
             color: var(--text-color);
             border: 1px solid transparent;
             cursor: pointer;
             background: transparent;
             border-radius: 8px;
+            aspect-ratio: 2 / 1;
             transition: 0.3s;
 
             &:hover {

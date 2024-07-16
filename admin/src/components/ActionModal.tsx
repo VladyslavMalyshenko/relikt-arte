@@ -335,7 +335,7 @@ const ActionModal = () => {
                             closeModal();
                         }}
                     >
-                        Close
+                        Закрити
                     </button>
                 )}
 
@@ -344,12 +344,12 @@ const ActionModal = () => {
                     onClick={handleSubmit(handleSuccess, handleError)}
                 >
                     {action === "edit"
-                        ? "Save"
+                        ? "Зберегти"
                         : action === "show"
-                        ? "Close"
+                        ? "Закрити"
                         : action === "delete"
-                        ? "Delete"
-                        : "Add"}
+                        ? "Видалити"
+                        : "Додати"}
                 </button>
             </div>
         );
@@ -358,13 +358,27 @@ const ActionModal = () => {
     return (
         <>
             {action !== "" && (
-                <div className="action-modal-container" onClick={closeModal}>
+                <div
+                    className="action-modal-container"
+                    onMouseDown={closeModal}
+                >
                     <div
                         className={`action-modal${
                             action === "delete" ? " delete" : ""
                         }`}
                         onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
                     >
+                        {action !== "delete" && (
+                            <p className="category-action">
+                                {category.label} |{" "}
+                                {action === "edit"
+                                    ? "Редагування"
+                                    : action === "show"
+                                    ? "Показ"
+                                    : "Додавання"}
+                            </p>
+                        )}
                         <div className="action-modal-content">
                             {action === "delete" ? (
                                 getDeleteWindow()
