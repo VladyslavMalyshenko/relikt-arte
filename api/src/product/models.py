@@ -8,7 +8,11 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from ..core.db.base import Base
 from ..core.db.mixins import BaseModelMixin
 
-from .enums import ProductPhotoDepEnum
+from .enums import (
+    ProductPhotoDepEnum,
+    ProductOrientationEnum,
+    ProductTypeOfPlatbandEnum,
+)
 from .utils import _default_product_description_json
 from .mixins import BaseProductRelMixin
 
@@ -166,16 +170,6 @@ class ProductPhoto(BaseModelMixin, Base):
     __tablename__ = "product_photo"
     __label__ = "Product photo"
 
-    product_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product.id",
-            ondelete="CASCADE",
-            onupdate="CASCADE",
-        ),
-        nullable=False,
-        index=True,
-        doc="Product ID",
-    )
     photo: Mapped[str] = mapped_column(nullable=False, doc="Photo")
     dependency: Mapped[PyEnum] = mapped_column(
         ENUM(
@@ -186,6 +180,69 @@ class ProductPhoto(BaseModelMixin, Base):
         nullable=False,
         default=ProductPhotoDepEnum.COLOR,
         doc="Dependency",
+    )
+    with_glass: Mapped[bool] = mapped_column(
+        nullable=True,
+        doc="Is product photo with glass",
+    )
+    orientation: Mapped[PyEnum] = mapped_column(
+        ENUM(
+            ProductOrientationEnum,
+            name="product_orientation_enum",
+            create_type=True,
+        ),
+        nullable=True,
+        doc="Orientation",
+    )
+    type_of_platband: Mapped[PyEnum] = mapped_column(
+        ENUM(
+            ProductTypeOfPlatbandEnum,
+            name="product_type_of_platband_enum",
+            create_type=True
+        ),
+        nullable=True,
+        doc="Type of platband",
+    )
+
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+        nullable=False,
+        index=True,
+        doc="Product ID",
+    )
+    color_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_color.id",
+            onupdate="CASCADE",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+        index=True,
+        doc="Color ID",
+    )
+    size_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_size.id",
+            onupdate="CASCADE",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+        index=True,
+        doc="Size ID",
+    )
+    glass_color_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_glass_color.id",
+            onupdate="CASCADE",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+        index=True,
+        doc="Glass color ID",
     )
 
     def __str__(self) -> str:
