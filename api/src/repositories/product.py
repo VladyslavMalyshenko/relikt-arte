@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .generic import GenericRepository
 
 from ..product.models import (
+    Product,
     Category,
     ProductSize,
     ProductColor,
@@ -15,6 +16,8 @@ from ..product.models import (
     ProductGlassColor,
 )
 from ..product.schemas import (
+    ProductCreate,
+    ProductUpdate,
     CategoryCreate,
     CategoryUpdate,
     ProductSizeCreate,
@@ -31,6 +34,13 @@ ProductRel = TypeVar(
     ProductCovering,
     ProductGlassColor,
 )
+
+
+class ProductRepository(
+    GenericRepository[Product, ProductCreate, ProductUpdate]
+):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, Product)
 
 
 class CategoryRepository(

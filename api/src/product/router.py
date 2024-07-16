@@ -16,7 +16,6 @@ from .schemas import (
     ProductRelShow,
 )
 from .enums import ProductRelModelEnum
-from .dependencies import product_create_dep
 
 
 router = APIRouter(
@@ -259,8 +258,31 @@ async def get_category(
 )
 async def product_create(
     uow: uowDEP,
-    request: Request,
+    data: ProductCreate,
 ):
-    form_data = request.form()
-    print(form_data)
     return {}
+
+
+# @router.post(
+#     "/create/",
+#     status_code=status.HTTP_201_CREATED,
+#     tags=["Product"],
+# )
+# async def product_create(
+#     uow: uowDEP,
+#     request: Request,
+# ):
+#     form_data = await request.form()
+
+#     photo_keys_count = int(len(form_data.items()) / 2)
+#     photos_data = {}
+#     for file_num in range(1, photo_keys_count + 1):
+#         photos_data[f"file_{file_num}"] = {}
+#         photos_data[f"file_{file_num}"]["photo"] = form_data[
+#             f"file_{file_num}"
+#         ]
+#         dependency_data = json.loads(form_data[f"file_{file_num}_dep"])
+#         photos_data[f"file_{file_num}"].update(dependency_data)
+
+#     print(photos_data)
+#     return {}
