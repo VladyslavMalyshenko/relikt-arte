@@ -1,8 +1,39 @@
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel
 
 from ..core.schemas import MainSchema
+
+
+class ProductDescriptionConstruction(BaseModel):
+    main_text: Optional[str] = None
+    additional_text: Optional[str] = None
+
+
+class ProductDescriptionFinishingCovering(BaseModel):
+    text: Optional[str] = None
+    advantages: list[str] = []
+
+
+class ProductDescriptionFinishing(BaseModel):
+    covering: ProductDescriptionFinishingCovering
+
+
+class ProductDescription(BaseModel):
+    construction: Optional[ProductDescriptionConstruction] = None
+    advantages: list[str] = []
+    finishing: Optional[ProductDescriptionFinishing] = None
+    text: Optional[str] = None
+
+
+class ProductCreate(BaseModel):
+    price: int
+    description: Optional[ProductDescription] = None
+    have_glass: bool
+    orientation_choice: bool
+    category_id: int
+    covering_id: Optional[int] = None
+    photos_data: Any
 
 
 class CategoryCreate(BaseModel):

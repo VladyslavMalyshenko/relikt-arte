@@ -4,6 +4,7 @@ from ..core.db.dependencies import uowDEP
 
 from .service import CategoryService, ProductSizeService, ProductRelService
 from .schemas import (
+    ProductCreate,
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
@@ -15,6 +16,7 @@ from .schemas import (
     ProductRelShow,
 )
 from .enums import ProductRelModelEnum
+from .dependencies import product_create_dep
 
 
 router = APIRouter(
@@ -248,3 +250,16 @@ async def get_category(
     return await CategoryService(uow).get_category_obj(
         category_id=category_id,
     )
+
+
+@router.post(
+    "/create/",
+    status_code=status.HTTP_201_CREATED,
+    tags=["Product"],
+)
+async def product_create(
+    uow: uowDEP,
+    data: product_create_dep,
+):
+    print(data.photos_data)
+    return {}

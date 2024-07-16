@@ -14,6 +14,11 @@ class ProductOrientationEnum(BaseEnum):
     RIGHT = "right"
 
 
+class ProductTypeOfPlatbandEnum(BaseEnum):
+    DEFAULT = "default"
+    L_SHAPED = "L-shaped"
+
+
 class ProductRelModelEnum(BaseEnum):
     COLOR = "product_color"
     COVERING = "product_covering"
