@@ -55,6 +55,11 @@ class ProductRepository(
             clean_dict_ignore_keys=["description"],
         )
 
+    async def get_all_by_category(self, category_id: int) -> list[Product]:
+        return await self.get_all(
+            filters=[self.model.category_id == category_id],
+        )
+
 
 class CategoryRepository(
     GenericRepository[Category, CategoryCreate, CategoryUpdate]
