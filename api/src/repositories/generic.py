@@ -26,6 +26,11 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
             query = query.options(option)
         return query
 
+    async def _add_filters_to_query(self, query, filters: list) -> None:
+        for filter in filters:
+            query = query.filter(filter)
+        return query
+
     async def create(
         self,
         *,
@@ -95,10 +100,13 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
     async def get_all(
         self,
         options: Optional[list] = None,
+        filters: Optional[list] = None,
     ) -> list[T]:
         query = select(self.model)
         if options:
             query = await self._add_options_to_query(query, options)
+        if filters:
+            query = await self._add_filters_to_query(query, filters)
         res = await self.session.execute(query)
         return res.scalars().all()
 

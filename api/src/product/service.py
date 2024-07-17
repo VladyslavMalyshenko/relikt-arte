@@ -181,6 +181,27 @@ class ProductService(BaseService):
             log.exception(e)
             raise ObjectUpdateException("Product")
 
+    async def get_products_by_category(
+        self, category_id: int
+    ) -> list[ProductShow]:
+        try:
+            async with self.uow:
+                if not await self.uow.category.exists_by_id(
+                    obj_id=category_id
+                ):
+                    raise IdNotFoundException(
+                        self.uow.category.model, category_id
+                    )
+                return [
+                    await self.get_show_scheme(product)
+                    for product in await self.uow.product.get_all_by_category(
+                        category_id=category_id
+                    )
+                ]
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Product")
+
 
 class CategoryService(BaseService):
     async def get_show_scheme(self, obj) -> CategoryShow:
