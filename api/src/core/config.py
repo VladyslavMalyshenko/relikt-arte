@@ -62,6 +62,17 @@ class CacheSettings(BaseSettings):
     redis_url: str
 
 
+class StaticFilesSettings(BaseSettings):
+    directory: str = Field(alias="static_dir")
+    max_file_size: int = Field(alias="static_max_file_size")
+    allowed_extensions: str = Field(alias="static_upload_allowed_extensions")
+
+    @field_validator("allowed_extensions")
+    @classmethod
+    def assemble_allowed_extensions(cls, v: str) -> list[str]:
+        return DotenvListHelper.get_list_from_value(v)
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -82,6 +93,11 @@ class Settings(BaseSettings):
 
     # Cache
     cache: CacheSettings = Field(default_factory=CacheSettings)
+
+    # Static files
+    static: StaticFilesSettings = Field(
+        default_factory=StaticFilesSettings
+    )
 
 
 @lru_cache

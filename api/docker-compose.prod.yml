@@ -34,6 +34,7 @@ services:
       - ${APP_PORT}
     volumes:
       - .:/app/api
+      - ./${STATIC_DIR}:/app/api/${STATIC_DIR}
 
   rabbitmq:
     image: "rabbitmq:3-management"
