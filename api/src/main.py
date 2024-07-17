@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqladmin import Admin
@@ -46,6 +47,12 @@ routers: list[APIRouter] = [
 ]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")
+
+# Mount static directory
+app.mount(
+    f"/{settings.static.directory}",
+    StaticFiles(directory=settings.static.directory),
+)
 
 
 # Admin panel

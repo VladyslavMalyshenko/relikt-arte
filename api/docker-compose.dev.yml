@@ -33,6 +33,7 @@ services:
       - "8000:${APP_PORT}"
     volumes:
       - .:/app/api
+      - ./${STATIC_DIR}:/app/api/${STATIC_DIR}
 
   pg-admin:
     image: dpage/pgadmin4
