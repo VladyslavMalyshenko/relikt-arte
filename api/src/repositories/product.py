@@ -2,12 +2,14 @@ from typing import TypeVar, Iterable, Optional
 
 from uuid import UUID
 
+from sqlalchemy import insert
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .generic import GenericRepository
 
 from ..product.models import (
+    Product,
     Category,
     ProductSize,
     ProductColor,
@@ -15,6 +17,8 @@ from ..product.models import (
     ProductGlassColor,
 )
 from ..product.schemas import (
+    ProductCreate,
+    ProductUpdate,
     CategoryCreate,
     CategoryUpdate,
     ProductSizeCreate,
@@ -31,6 +35,25 @@ ProductRel = TypeVar(
     ProductCovering,
     ProductGlassColor,
 )
+
+
+class ProductRepository(
+    GenericRepository[Product, ProductCreate, ProductUpdate]
+):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, Product)
+
+    async def create(self, *, obj_in: dict) -> int | UUID:
+        return await super().create(
+            obj_in=obj_in, clean_dict_ignore_keys=["description"]
+        )
+
+    async def update(self, *, obj_in: dict, obj_id: int | UUID) -> int | UUID:
+        return await super().update(
+            obj_in=obj_in,
+            obj_id=obj_id,
+            clean_dict_ignore_keys=["description"],
+        )
 
 
 class CategoryRepository(
