@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -33,7 +33,25 @@ class ProductCreate(BaseModel):
     orientation_choice: bool
     category_id: int
     covering_id: Optional[int] = None
-    photos_data: Any
+
+
+class ProductUpdate(BaseModel):
+    price: Optional[int] = None
+    description: Optional[ProductDescription] = None
+    have_glass: Optional[bool] = None
+    orientation_choice: Optional[bool] = None
+    category_id: Optional[int] = None
+    covering_id: Optional[int] = None
+
+
+class ProductShow(MainSchema):
+    id: int
+    price: int
+    description: Optional[ProductDescription] = None
+    have_glass: bool
+    orientation_choice: bool
+    category_id: int
+    covering_id: Optional[int] = None
 
 
 class CategoryCreate(BaseModel):

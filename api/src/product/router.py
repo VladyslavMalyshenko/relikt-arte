@@ -2,9 +2,16 @@ from fastapi import APIRouter, status, Request
 
 from ..core.db.dependencies import uowDEP
 
-from .service import CategoryService, ProductSizeService, ProductRelService
+from .service import (
+    ProductService,
+    CategoryService,
+    ProductSizeService,
+    ProductRelService,
+)
 from .schemas import (
     ProductCreate,
+    ProductUpdate,
+    ProductShow,
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
@@ -16,7 +23,6 @@ from .schemas import (
     ProductRelShow,
 )
 from .enums import ProductRelModelEnum
-from .dependencies import product_create_dep
 
 
 router = APIRouter(
@@ -255,12 +261,94 @@ async def get_category(
 @router.post(
     "/create/",
     status_code=status.HTTP_201_CREATED,
+    response_model=ProductShow,
     tags=["Product"],
 )
 async def product_create(
     uow: uowDEP,
-    request: Request,
+    data: ProductCreate,
+) -> ProductShow:
+    return await ProductService(uow).create_product(data)
+
+
+@router.put(
+    "/{product_id}/update/",
+    status_code=status.HTTP_200_OK,
+    response_model=ProductShow,
+    tags=["Product"],
+)
+async def product_update(
+    uow: uowDEP,
+    data: ProductUpdate,
+    product_id: int,
+) -> ProductShow:
+    return await ProductService(uow).update_product(
+        data=data,
+        product_id=product_id,
+    )
+
+
+@router.delete(
+    "/{product_id}/delete/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Product"],
+)
+async def product_delete(
+    uow: uowDEP,
+    product_id: int,
 ):
-    form_data = request.form()
-    print(form_data)
-    return {}
+    return await ProductService(uow).delete_product(
+        product_id=product_id,
+    )
+
+
+@router.get(
+    "/list/",
+    status_code=status.HTTP_200_OK,
+    response_model=list[ProductShow],
+    tags=["Product"],
+)
+async def get_all_products(
+    uow: uowDEP,
+) -> list[ProductShow]:
+    return await ProductService(uow).get_product_list()
+
+
+@router.get(
+    "/{product_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=ProductShow,
+    tags=["Product"],
+)
+async def get_product(
+    uow: uowDEP,
+    product_id: int,
+) -> ProductShow:
+    return await ProductService(uow).get_product_obj(
+        product_id=product_id,
+    )
+
+
+# @router.post(
+#     "/create/",
+#     status_code=status.HTTP_201_CREATED,
+#     tags=["Product"],
+# )
+# async def product_create(
+#     uow: uowDEP,
+#     request: Request,
+# ):
+#     form_data = await request.form()
+
+#     photo_keys_count = int(len(form_data.items()) / 2)
+#     photos_data = {}
+#     for file_num in range(1, photo_keys_count + 1):
+#         photos_data[f"file_{file_num}"] = {}
+#         photos_data[f"file_{file_num}"]["photo"] = form_data[
+#             f"file_{file_num}"
+#         ]
+#         dependency_data = json.loads(form_data[f"file_{file_num}_dep"])
+#         photos_data[f"file_{file_num}"].update(dependency_data)
+
+#     print(photos_data)
+#     return {}
