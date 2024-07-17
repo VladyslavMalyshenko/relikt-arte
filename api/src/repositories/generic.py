@@ -27,11 +27,20 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         return query
 
     async def create(
-        self, *, obj_in: CreateScheme, **kwargs
+        self,
+        *,
+        obj_in: CreateScheme,
+        clean_dict_ignore_keys: Optional[list] = None,
+        **kwargs,
     ) -> int | uuid.UUID:
         stmt = (
             insert(self.model)
-            .values(**clean_dict(dict(obj_in)))
+            .values(
+                **clean_dict(
+                    dict(obj_in),
+                    ignore_keys=clean_dict_ignore_keys,
+                )
+            )
             .returning(self.model.id)
         )
         res = await self.session.execute(stmt)
@@ -42,12 +51,18 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         *,
         obj_in: UpdateScheme,
         obj_id: int | uuid.UUID,
+        clean_dict_ignore_keys: Optional[list] = None,
         **kwargs,
     ) -> int | uuid.UUID:
         stmt = (
             update(self.model)
             .where(self.model.id == obj_id)
-            .values(**clean_dict(dict(obj_in)))
+            .values(
+                **clean_dict(
+                    dict(obj_in),
+                    ignore_keys=clean_dict_ignore_keys,
+                )
+            )
             .returning(self.model.id)
         )
         res = await self.session.execute(stmt)

@@ -12,8 +12,13 @@ from ..utils.exceptions.http.base import (
 )
 from ..utils.exceptions.uow import GetRepoByAttrNameException
 from ..utils.exceptions.http.base import IdNotFoundException
+from ..utils.base import merge_dicts, model_to_dict
 
 from .schemas import (
+    ProductCreate,
+    ProductUpdate,
+    ProductShow,
+    ProductDescription,
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
@@ -25,13 +30,156 @@ from .schemas import (
     ProductRelShow,
 )
 from .enums import ProductRelModelEnum
+from .utils import _default_product_description_json
 
 
 log = logging.getLogger(__name__)
 
 
 class ProductService(BaseService):
-    pass
+    async def get_show_scheme(self, obj) -> BaseModel:
+        return ProductShow(
+            id=obj.id,
+            price=obj.price,
+            description=obj.description,
+            have_glass=obj.have_glass,
+            orientation_choice=obj.orientation_choice,
+            category_id=obj.category_id,
+            covering_id=obj.covering_id,
+        )
+
+    async def _clean_description(
+        self,
+        description: ProductDescription,
+        product_description: dict = None,
+    ) -> dict:
+        """
+        Recursively remove None values and empty lists
+        from the description dictionary. Returns a cleaned
+        description but with saved structure.
+        """
+        default_product_description = (
+            _default_product_description_json()
+            if not product_description
+            else product_description
+        )
+        data_description = dict(description) if description else {}
+        return model_to_dict(
+            merge_dicts(
+                default_product_description,
+                data_description,
+            )
+        )
+
+    async def create_product(self, data: ProductCreate) -> ProductShow:
+        try:
+            async with self.uow:
+                if not await self.uow.category.exists_by_id(
+                    obj_id=data.category_id
+                ):
+                    raise IdNotFoundException(
+                        self.uow.category.model, data.category_id
+                    )
+                if (
+                    data.covering_id is not None
+                    and not await self.uow.product_covering.exists_by_id(
+                        obj_id=data.covering_id
+                    )
+                ):
+                    raise IdNotFoundException(
+                        self.uow.product_covering.model, data.covering_id
+                    )
+                obj_in_data = dict(data)
+                if data.description:
+                    obj_in_data["description"] = await self._clean_description(
+                        data.description
+                    )
+                product_id = await self.uow.product.create(obj_in=obj_in_data)
+                await self.uow.commit()
+                product = await self.uow.product.get_by_id(obj_id=product_id)
+                return await self.get_show_scheme(product)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectCreateException("Product")
+
+    async def update_product(
+        self, data: ProductUpdate, product_id: int
+    ) -> ProductShow:
+        try:
+            async with self.uow:
+                product_obj = await self.uow.product.get_by_id(
+                    obj_id=product_id
+                )
+                if not product_obj:
+                    raise IdNotFoundException(
+                        self.uow.product.model, product_id
+                    )
+                if (
+                    data.category_id is not None
+                    and not await self.uow.category.exists_by_id(
+                        obj_id=data.category_id
+                    )
+                ):
+                    raise IdNotFoundException(
+                        self.uow.category.model, data.category_id
+                    )
+                if (
+                    data.covering_id is not None
+                    and not await self.uow.product_covering.exists_by_id(
+                        obj_id=data.covering_id
+                    )
+                ):
+                    raise IdNotFoundException(
+                        self.uow.product_covering.model, data.covering_id
+                    )
+                obj_in_data = dict(data)
+                if data.description:
+                    obj_in_data["description"] = await self._clean_description(
+                        data.description,
+                        product_description=product_obj.description,
+                    )
+                product_id = await self.uow.product.update(
+                    obj_in=obj_in_data, obj_id=product_id
+                )
+                await self.uow.commit()
+                product = await self.uow.product.get_by_id(obj_id=product_id)
+                return await self.get_show_scheme(product)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Product")
+
+    async def delete_product(self, product_id: int) -> None:
+        try:
+            async with self.uow:
+                await self.uow.product.delete_by_id(obj_id=product_id)
+                await self.uow.commit()
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Product")
+
+    async def get_product_obj(self, product_id: int) -> ProductShow:
+        try:
+            async with self.uow:
+                product = await self.uow.product.get_by_id(obj_id=product_id)
+                if not product:
+                    raise IdNotFoundException(
+                        self.uow.product.model, product_id
+                    )
+                return await self.get_show_scheme(product)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Product")
+
+    async def get_product_list(self) -> list[ProductShow]:
+        try:
+            async with self.uow:
+                return [
+                    await self.get_show_scheme(product)
+                    for product in await self.uow.product.get_all()
+                ]
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("Product")
 
 
 class CategoryService(BaseService):

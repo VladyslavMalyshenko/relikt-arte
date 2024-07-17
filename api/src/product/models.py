@@ -198,7 +198,7 @@ class ProductPhoto(BaseModelMixin, Base):
         ENUM(
             ProductTypeOfPlatbandEnum,
             name="product_type_of_platband_enum",
-            create_type=True
+            create_type=True,
         ),
         nullable=True,
         doc="Type of platband",
