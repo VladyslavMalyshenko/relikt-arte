@@ -568,21 +568,17 @@ const ActionModal = () => {
         }
       });
 
-      let isFirstElementScrolled = false;
-
       invalidFieldsElements.forEach((fieldElement: any) => {
         if (fieldElement) {
           fieldElement.classList.add("invalid");
 
-          if (!isFirstElementScrolled) {
-            const actionModalContent = document.querySelector(
-              ".action-modal-content"
-            );
+          const actionModalContent = document.querySelector(
+            ".action-modal-content"
+          );
 
-            if (actionModalContent) {
-              actionModalContent.scrollTop =
-                fieldElement.offsetTop - fieldElement.parentNode.clientHeight;
-            }
+          if (actionModalContent) {
+            actionModalContent.scrollTop =
+              fieldElement.offsetTop - fieldElement.parentNode.clientHeight;
           }
         }
       });
