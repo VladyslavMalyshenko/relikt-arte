@@ -368,4 +368,3 @@ async def get_product(
 
 #     print(photos_data)
 #     return {}
->>>>>>> main
