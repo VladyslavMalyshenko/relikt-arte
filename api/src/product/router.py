@@ -316,6 +316,21 @@ async def get_all_products(
 
 
 @router.get(
+    "/list/category/{category_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=list[ProductShow],
+    tags=["Product"],
+)
+async def get_all_products_by_category(
+    uow: uowDEP,
+    category_id: int,
+) -> list[ProductShow]:
+    return await ProductService(uow).get_products_by_category(
+        category_id=category_id,
+    )
+
+
+@router.get(
     "/{product_id}/",
     status_code=status.HTTP_200_OK,
     response_model=ProductShow,
@@ -353,4 +368,3 @@ async def get_product(
 
 #     print(photos_data)
 #     return {}
->>>>>>> main

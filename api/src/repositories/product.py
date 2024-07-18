@@ -52,7 +52,21 @@ class ProductRepository(
         return await super().update(
             obj_in=obj_in,
             obj_id=obj_id,
-            clean_dict_ignore_keys=["description"],
+            clean_dict_ignore_keys=(
+                ["description"]
+                if obj_in.get("description") is not None
+                else []
+            ),
+        )
+
+    async def get_all_by_category(self, category_id: int) -> list[Product]:
+        return await self.get_all(
+            filters=[self.model.category_id == category_id],
+        )
+
+    async def get_all_by_category(self, category_id: int) -> list[Product]:
+        return await self.get_all(
+            filters=[self.model.category_id == category_id],
         )
 
 
