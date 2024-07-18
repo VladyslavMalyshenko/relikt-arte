@@ -28,7 +28,11 @@ const ActionModal = () => {
   } = useForm();
 
   useEffect(() => {
-    const initializeFields = async () => {
+    const getNestedValue = (obj: any, path: string): any => {
+      return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+    };
+
+    const initializeFields = async (): Promise<void> => {
       if (!category.main && action !== "" && action !== "delete") {
         const lists = category.addItemFields.filter(
           (field: any) =>
@@ -44,33 +48,46 @@ const ActionModal = () => {
           }));
         }
 
-        const setCheckboxes = (fieldObject: any) => {
+        const setCheckboxes = (fieldObject: any): void => {
           const fieldName = fieldObject.field_name || fieldObject.name;
           setTimeout(() => {
             const listChildren = Array.from(
-              document.getElementById(fieldName)?.children || []
+              document.getElementById(fieldName!)?.children || []
             );
 
             listChildren.forEach((child) => {
-              const checkbox: any = child.querySelector(
-                'input[type="checkbox"]'
-              );
-              if (checkbox) {
-                const id = +checkbox.parentNode.id.split("[")[1].split("]")[0];
-                const isIdSelected = item[fieldName]?.includes(id);
+              const input = child.querySelector("input") as any;
+
+              if (input) {
+                const id = +input.parentNode!.id.split("[")[1].split("]")[0];
+                const isSingleValue = typeof item[fieldName] === "number";
+                const isIdSelected = isSingleValue
+                  ? item[fieldName] !== undefined &&
+                    item[fieldName] !== null &&
+                    item[fieldName] === id
+                  : getNestedValue(item, fieldName)?.includes(id);
+
                 setSelectedItems((prev: any) => {
                   const updated = { ...prev };
                   if (!updated[fieldName]) {
                     updated[fieldName] = [];
                   }
+
                   if (isIdSelected) {
-                    updated[fieldName].push(id);
+                    if (isSingleValue) {
+                      updated[fieldName] = id;
+                    } else {
+                      updated[fieldName].push(id);
+                    }
                   } else {
-                    updated[fieldName] = updated[fieldName].filter(
-                      (objectId: any) => objectId !== id
-                    );
+                    if (!isSingleValue) {
+                      updated[fieldName] = updated[fieldName].filter(
+                        (objectId: any) => objectId !== id
+                      );
+                    }
                   }
-                  checkbox.checked = isIdSelected;
+
+                  input.checked = isIdSelected;
                   setValue(fieldName, updated[fieldName]);
                   return updated;
                 });
@@ -87,31 +104,48 @@ const ActionModal = () => {
                 fieldObject.type === "boolean" ||
                 fieldObject.type === "list" ||
                 fieldObject.type === "list-radio"
-                  ? item[fieldName]
-                  : item[fieldName] || "";
+                  ? getNestedValue(item, fieldName)
+                  : getNestedValue(item, fieldName) || "";
 
-              if (fieldObject.type === "list") {
+              if (
+                fieldObject.type === "list" ||
+                fieldObject.type === "list-radio"
+              ) {
                 setCheckboxes(fieldObject);
               }
 
               if (fieldObject.type === "multiple-field") {
-                const nestedValue = fieldName.includes(".")
-                  ? fieldName
-                      .split(".")
-                      .reduce((acc: any, part: any) => acc && acc[part], item)
-                  : item[fieldName];
+                const nestedValue = getNestedValue(item, fieldName);
 
                 const formattedFields = nestedValue
-                  ? nestedValue.map((val: any, index: any) => ({
+                  ? nestedValue.map((val: any, index: number) => ({
                       id: `${fieldName}[${index}]`,
                       value: val,
                     }))
                   : [{ id: `${fieldName}[0]`, value: "" }];
 
-                setFields((prev: any) => ({
-                  ...prev,
-                  [fieldName]: formattedFields,
-                }));
+                setFields((prev: any) => {
+                  const newFields = {
+                    ...prev,
+                    [fieldName]: formattedFields,
+                  };
+
+                  setSelectedItems((prev: any) => {
+                    const updatedSelected = { ...prev };
+                    if (!updatedSelected[fieldName]) {
+                      updatedSelected[fieldName] = [];
+                    }
+
+                    updatedSelected[fieldName] = newFields[fieldName].map(
+                      (field: any) => field.value
+                    );
+
+                    setValue(fieldName, updatedSelected[fieldName]);
+                    return updatedSelected;
+                  });
+
+                  return newFields;
+                });
               }
 
               setValue(fieldName, value);
@@ -123,31 +157,48 @@ const ActionModal = () => {
               const fieldName = itemField.field_name || itemField.name;
               const value =
                 itemField.type === "boolean" || itemField.type === "list"
-                  ? item[fieldName]
-                  : item[fieldName] || "";
+                  ? getNestedValue(item, fieldName)
+                  : getNestedValue(item, fieldName) || "";
 
-              if (itemField.type === "list") {
+              if (
+                itemField.type === "list" ||
+                itemField.type === "list-radio"
+              ) {
                 setCheckboxes(itemField);
               }
 
               if (itemField.type === "multiple-field") {
-                const nestedValue = fieldName.includes(".")
-                  ? fieldName
-                      .split(".")
-                      .reduce((acc: any, part: any) => acc && acc[part], item)
-                  : item[fieldName];
+                const nestedValue = getNestedValue(item, fieldName);
 
                 const formattedFields = nestedValue
-                  ? nestedValue.map((val: any, index: any) => ({
+                  ? nestedValue.map((val: any, index: number) => ({
                       id: `${fieldName}[${index}]`,
                       value: val,
                     }))
                   : [{ id: `${fieldName}[0]`, value: "" }];
 
-                setFields((prev: any) => ({
-                  ...prev,
-                  [fieldName]: formattedFields,
-                }));
+                setFields((prev: any) => {
+                  const newFields = {
+                    ...prev,
+                    [fieldName]: formattedFields,
+                  };
+
+                  setSelectedItems((prev: any) => {
+                    const updatedSelected = { ...prev };
+                    if (!updatedSelected[fieldName]) {
+                      updatedSelected[fieldName] = [];
+                    }
+
+                    updatedSelected[fieldName] = newFields[fieldName].map(
+                      (field: any) => field.value
+                    );
+
+                    setValue(fieldName, updatedSelected[fieldName]);
+                    return updatedSelected;
+                  });
+
+                  return newFields;
+                });
               }
 
               setValue(fieldName, value);
@@ -158,8 +209,10 @@ const ActionModal = () => {
             category.inputFields.forEach((fieldObject: any) => {
               const fieldName = fieldObject.field_name || fieldObject.name;
               const value =
-                typeof item[fieldObject.field_name || fieldObject.name] ===
-                "boolean"
+                typeof getNestedValue(
+                  item,
+                  fieldObject.field_name || fieldObject.name
+                ) === "boolean"
                   ? false
                   : "";
 
@@ -362,8 +415,6 @@ const ActionModal = () => {
                   ],
                 };
 
-                console.log(data);
-
                 return data;
               });
             }}
@@ -407,7 +458,11 @@ const ActionModal = () => {
       if (action === "show") {
         closeModal();
       } else if (action === "edit") {
-        const prepareItem = (obj: any, categoryFields: any) => {
+        const prepareItem = (
+          obj: any,
+          categoryFields: any,
+          originalItem: any
+        ) => {
           const cleanObj = { ...obj };
 
           const isFieldInCategory = (fieldName: any) =>
@@ -432,12 +487,14 @@ const ActionModal = () => {
                 }
               } else {
                 if (
-                  (value && !isFieldInCategory(fullPath)) ||
-                  item[key] === value ||
+                  !isFieldInCategory(fullPath) ||
+                  value === originalItem?.[fullPath] ||
                   value === undefined ||
                   value === null ||
                   value === "" ||
-                  (typeof value === "object" && Object.keys(value).length === 0)
+                  (typeof value === "object" &&
+                    Object.keys(value).length === 0) ||
+                  (Array.isArray(value) && value.length === 0)
                 ) {
                   delete currentObj[key];
                 }
@@ -449,7 +506,7 @@ const ActionModal = () => {
           return cleanObj;
         };
 
-        const newItem = prepareItem(data, category.addItemFields);
+        const newItem = prepareItem(data, category.addItemFields, item);
 
         editItem(category.editUrl, newItem, {
           id: item.id,
