@@ -297,6 +297,7 @@ async def product_delete(
     uow: uowDEP,
     product_id: int,
 ):
+
     return await ProductService(uow).delete_product(
         product_id=product_id,
     )

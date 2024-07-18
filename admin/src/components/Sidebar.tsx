@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Category, categoriesData } from "../data/categories";
+import { Category, MainCategory, categoriesData } from "../data/categories";
 import { SetCurrentCategory } from "../redux/actions/currentCategoryActions";
 import "../styles/components/Sidebar.scss";
 
@@ -15,31 +15,33 @@ const Sidebar = () => {
     return (
         <div className={`sidebar${!isSidebarFull ? " short" : ""}`}>
             <ul className="categories">
-                {categoriesData.map((categoryObject: Category, index) => (
-                    <li
-                        key={index}
-                        className={`category${
-                            (category.link || {}) === categoryObject.link
-                                ? " active"
-                                : ""
-                        }`}
-                    >
-                        <Link
-                            to={categoryObject.link}
-                            onClick={() =>
-                                dispatch(SetCurrentCategory(categoryObject))
-                            }
+                {categoriesData.map(
+                    (categoryObject: Category | MainCategory, index) => (
+                        <li
+                            key={index}
+                            className={`category${
+                                category.link === categoryObject.link
+                                    ? " active"
+                                    : ""
+                            }`}
                         >
-                            {categoryObject.icon ? (
-                                <span className="icon">
-                                    {categoryObject.icon}
-                                </span>
-                            ) : null}
+                            <Link
+                                to={categoryObject.link}
+                                onClick={() =>
+                                    dispatch(SetCurrentCategory(categoryObject))
+                                }
+                            >
+                                {categoryObject.icon ? (
+                                    <span className="icon">
+                                        {categoryObject.icon}
+                                    </span>
+                                ) : null}
 
-                            {isSidebarFull ? categoryObject.label : null}
-                        </Link>
-                    </li>
-                ))}
+                                {isSidebarFull ? categoryObject.label : null}
+                            </Link>
+                        </li>
+                    )
+                )}
             </ul>
             <button
                 className="toggle"

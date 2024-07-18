@@ -66,3 +66,16 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Notification
+
+Notification object must look like this:
+
+```
+{
+    message: "My message!",
+    type: "success",
+};
+```
+
+To add success notification you need: store.dispatch(AddNotification(notification_object as NotificationBody));
