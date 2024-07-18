@@ -327,7 +327,7 @@ export const categoriesData: (MainCategory | Category)[] = [
       },
     ],
     addItemFields: [
-      { name: "ціна", field_name: "price", type: "number" },
+      { name: "ціна", field_name: "price", type: "number", required: true },
       {
         name: "головний текст конструкції",
         field_name: "description.construction.main_text",
@@ -369,7 +369,19 @@ export const categoriesData: (MainCategory | Category)[] = [
         field_name: "category_id",
         type: "list-radio",
         getUrl: "/api/v1/product/category/list/",
+        getItem: "/api/v1/product/category/$id",
+        dependencies: [
+          {
+            dependOn: "is_glass_available",
+            target: "have_glass",
+          },
+          {
+            dependOn: "have_orientation_choice",
+            target: "orientation_choice",
+          },
+        ],
         labelField: "name",
+        required: true,
       },
       {
         name: "покриття товару",

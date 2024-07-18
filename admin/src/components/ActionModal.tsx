@@ -9,10 +9,13 @@ import { deleteItem } from "../utils/deleteItem";
 import { editItem } from "../utils/editItem";
 import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
+import { getValue } from "@testing-library/user-event/dist/utils";
+import { getItem } from "../utils/getItem";
 
 const ActionModal = () => {
   const action = useSelector((state: any) => state.actionReducer.action);
   const category = useSelector((state: any) => state.categoryReducer.category);
+
   const item = useSelector((state: any) => state.itemReducer.item);
   const dispatch = useDispatch();
   const [selectOptions, setSelectOptions] = useState<any>({});
@@ -21,8 +24,9 @@ const ActionModal = () => {
 
   const {
     register,
-    handleSubmit,
+    trigger,
     formState: { errors },
+    getValues,
     reset,
     setValue,
   } = useForm();
@@ -80,7 +84,7 @@ const ActionModal = () => {
                       updated[fieldName].push(id);
                     }
                   } else {
-                    if (!isSingleValue) {
+                    if (!isSingleValue && Array.isArray(updated[fieldName])) {
                       updated[fieldName] = updated[fieldName].filter(
                         (objectId: any) => objectId !== id
                       );
@@ -301,7 +305,30 @@ const ActionModal = () => {
                         fieldObject.locked,
                     }
                   : {})}
-                onChange={(e) => {
+                onChange={async (e) => {
+                  if (e.target.checked && fieldObject.getItem) {
+                    const currentItem: any = await getItem(
+                      fieldObject.getItem,
+                      {
+                        id: option.id,
+                      }
+                    );
+
+                    fieldObject.dependencies.forEach((dependency: any) => {
+                      const targetLabel: any = document.querySelector(
+                        `label[for="${dependency.target}"]`
+                      );
+
+                      if (targetLabel) {
+                        if (!currentItem[dependency.dependOn]) {
+                          targetLabel.style.setProperty("display", "none");
+                        } else {
+                          targetLabel.style.setProperty("display", "inherit");
+                        }
+                      }
+                    });
+                  }
+
                   setSelectedItems((prev: any) => {
                     const updated = {
                       ...prev,
@@ -343,6 +370,7 @@ const ActionModal = () => {
             <input
               key={field.id}
               value={field.value}
+              name={fieldName}
               readOnly={
                 ((action === "show" || action === "delete") &&
                   typeof item[fieldName] !== "boolean") ||
@@ -452,109 +480,263 @@ const ActionModal = () => {
   };
 
   const getButtons = () => {
-    const handleSuccess = (data: any) => {
-      delete data.field;
+    const handleErrors = async () => {
+      await trigger();
 
-      if (action === "show") {
-        closeModal();
-      } else if (action === "edit") {
-        const prepareItem = (
-          obj: any,
-          categoryFields: any,
-          originalItem: any
-        ) => {
-          const cleanObj = { ...obj };
+      let invalidFieldsElements = [
+        ...category.addItemFields.map((field: any) => {
+          const fieldName = field.field_name || field.name;
+          const labelElement = document.querySelector(
+            `label[for="${fieldName}"]`
+          );
 
-          const isFieldInCategory = (fieldName: any) =>
-            categoryFields.some(
-              (field: any) => (field.field_name || field.name) === fieldName
-            );
+          const fieldElement: any =
+            labelElement?.querySelector(`ul#${fieldName}`) ||
+            labelElement?.querySelector(`input[name="${fieldName}"]`);
 
-          const recursiveClean = (currentObj: any, path = "") => {
-            Object.keys(currentObj).forEach((key) => {
-              const fullPath = path ? `${path}.${key}` : key;
-              const value = currentObj[key];
+          if (fieldElement) {
+            let fieldValue =
+              fieldElement?.value ||
+              (fieldElement.nodeName === "UL" && selectedItems[fieldName]);
 
-              if (
-                typeof value === "object" &&
-                value !== null &&
-                !Array.isArray(value)
-              ) {
-                recursiveClean(value, fullPath);
-
-                if (Object.keys(currentObj[key]).length === 0) {
-                  delete currentObj[key];
-                }
-              } else {
-                if (
-                  !isFieldInCategory(fullPath) ||
-                  value === originalItem?.[fullPath] ||
-                  value === undefined ||
-                  value === null ||
-                  value === "" ||
-                  (typeof value === "object" &&
-                    Object.keys(value).length === 0) ||
-                  (Array.isArray(value) && value.length === 0)
-                ) {
-                  delete currentObj[key];
-                }
-              }
-            });
-          };
-
-          recursiveClean(cleanObj);
-          return cleanObj;
-        };
-
-        const newItem = prepareItem(data, category.addItemFields, item);
-
-        editItem(category.editUrl, newItem, {
-          id: item.id,
-        });
-      } else if (action === "delete") {
-        deleteItem(category.deleteUrl, {
-          id: item.id,
-        });
-      } else if (action === "add") {
-        let newItem = { ...data };
-
-        category.addItemFields.forEach((fieldObject: any) => {
-          const itemKey = fieldObject.field_name || fieldObject.name;
-
-          if (
-            (newItem[itemKey] &&
-              !category.addItemFields.some(
-                (field: any) => (field.field_name || field.name) === itemKey
-              )) ||
-            newItem[itemKey] === undefined ||
-            newItem[itemKey] === null ||
-            newItem[itemKey] === ""
-          ) {
-            delete newItem[itemKey];
+            return field.required &&
+              (fieldValue === undefined ||
+                fieldValue === null ||
+                fieldValue === "" ||
+                fieldValue?.length < 1)
+              ? fieldElement
+              : undefined;
           }
-        });
 
-        addItem(category.addUrl, newItem);
+          return;
+        }),
+      ];
+
+      if (errors && Object.keys(errors).length > 0) {
+        invalidFieldsElements.push(
+          ...category.inputFields.map((fieldObject: any) => {
+            const fieldName = fieldObject.field_name || fieldObject.name;
+
+            const isFieldInCaregoryFields =
+              Object.keys(errors).includes(fieldName);
+
+            if (isFieldInCaregoryFields) {
+              const labelElement = document.querySelector(
+                `label[for="${fieldName}"]`
+              );
+
+              const fieldElement: any =
+                labelElement?.querySelector(`ul#${fieldName}`) ||
+                labelElement?.querySelector(`input[name="${fieldName}"]`);
+
+              return fieldElement;
+            }
+
+            return;
+          })
+        );
       }
-    };
 
-    const handleError = (invalidFields: any) => {
-      const invalidFieldsNames = Object.keys(invalidFields);
-      const existingFields = category.inputFields;
+      invalidFieldsElements = invalidFieldsElements.filter((field) => field);
 
-      existingFields.forEach((fieldObject: any) => {
+      category.inputFields.forEach((fieldObject: any) => {
         const fieldName = fieldObject.field_name || fieldObject.name;
 
-        const field = document.querySelector(`input[name="${fieldName}"]`);
+        const labelElement = document.querySelector(
+          `label[for="${fieldName}"]`
+        );
 
-        if (field) {
-          if (invalidFieldsNames.includes(fieldName)) {
-            field.classList.add("invalid");
-          } else {
-            field.classList.remove("invalid");
+        const fieldElement: any =
+          labelElement?.querySelector(`ul#${fieldName}`) ||
+          labelElement?.querySelector(`input[name="${fieldName}"]`);
+
+        if (
+          fieldElement &&
+          fieldElement.classList.contains("invalid") &&
+          !invalidFieldsElements.includes(fieldElement)
+        ) {
+          fieldElement.classList.remove("invalid");
+        }
+      });
+
+      let isFirstElementScrolled = false;
+
+      invalidFieldsElements.forEach((fieldElement: any) => {
+        if (fieldElement) {
+          fieldElement.classList.add("invalid");
+
+          if (!isFirstElementScrolled) {
+            const actionModalContent = document.querySelector(
+              ".action-modal-content"
+            );
+
+            if (actionModalContent) {
+              actionModalContent.scrollTop =
+                fieldElement.offsetTop - fieldElement.parentNode.clientHeight;
+            }
           }
         }
       });
+
+      return invalidFieldsElements.length > 0;
+    };
+
+    const handleSuccess = async () => {
+      const data = getValues();
+      const isAnyError = await handleErrors();
+
+      if (!isAnyError) {
+        delete data.field;
+
+        if (action === "show") {
+          closeModal();
+        } else if (action === "edit") {
+          const prepareItem = (
+            obj: any,
+            categoryFields: any,
+            originalItem: any
+          ) => {
+            const cleanObj = { ...obj };
+
+            const isFieldInCategory = (fieldName: any) =>
+              categoryFields.some(
+                (field: any) => (field.field_name || field.name) === fieldName
+              );
+
+            const recursiveClean = (currentObj: any, path = "") => {
+              Object.keys(currentObj).forEach((key) => {
+                const fullPath = path ? `${path}.${key}` : key;
+                const value = currentObj[key];
+
+                if (
+                  typeof value === "object" &&
+                  value !== null &&
+                  !Array.isArray(value)
+                ) {
+                  if (Object.keys(currentObj[key]).length === 0) {
+                    delete currentObj[key];
+                  }
+                } else {
+                  if (
+                    !isFieldInCategory(fullPath) ||
+                    value === originalItem?.[fullPath] ||
+                    value === undefined ||
+                    value === null ||
+                    value === "" ||
+                    (typeof value === "object" &&
+                      Object.keys(value).length === 0) ||
+                    (Array.isArray(value) && value.length === 0)
+                  ) {
+                    delete currentObj[key];
+                  }
+                }
+              });
+            };
+
+            recursiveClean(cleanObj);
+            return cleanObj;
+          };
+
+          const newItem = prepareItem(data, category.addItemFields, item);
+
+          editItem(category.editUrl, newItem, {
+            id: item.id,
+          });
+        } else if (action === "delete") {
+          deleteItem(category.deleteUrl, {
+            id: item.id,
+          });
+        } else if (action === "add") {
+          let newItem = { ...data };
+
+          category.addItemFields.forEach((fieldObject: any) => {
+            const itemKey = fieldObject.field_name || fieldObject.name;
+
+            if (
+              (newItem[itemKey] &&
+                !category.addItemFields.some(
+                  (field: any) => (field.field_name || field.name) === itemKey
+                )) ||
+              newItem[itemKey] === undefined ||
+              newItem[itemKey] === null ||
+              newItem[itemKey] === ""
+            ) {
+              const cleanEmptyFields = (obj: any): any => {
+                const isObject = (val: any) =>
+                  val && typeof val === "object" && !Array.isArray(val);
+
+                const cleanedObj = Object.keys(obj).reduce(
+                  (acc: any, key: string) => {
+                    const value = obj[key];
+
+                    if (value === "" || value === null || value === undefined) {
+                      return acc;
+                    }
+
+                    if (isObject(value)) {
+                      const cleanedNestedObj = cleanEmptyFields(value);
+                      if (Object.keys(cleanedNestedObj).length > 0) {
+                        acc[key] = cleanedNestedObj;
+                      }
+                    } else {
+                      acc[key] = value;
+                    }
+
+                    return acc;
+                  },
+                  {}
+                );
+
+                return cleanedObj;
+              };
+
+              const removeEmptyFields = (obj: any, categoryFields: any) => {
+                const isFieldInCategory = (fieldName: any) =>
+                  categoryFields.some(
+                    (field: any) =>
+                      (field.field_name || field.name) === fieldName
+                  );
+
+                const recursiveClean = (currentObj: any, path = "") => {
+                  Object.keys(currentObj).forEach((key) => {
+                    const fullPath = path ? `${path}.${key}` : key;
+                    const value = currentObj[key];
+
+                    if (
+                      typeof value === "object" &&
+                      value !== null &&
+                      !Array.isArray(value)
+                    ) {
+                      recursiveClean(value, fullPath);
+
+                      if (Object.keys(currentObj[key]).length === 0) {
+                        delete currentObj[key];
+                      }
+                    } else {
+                      if (
+                        !isFieldInCategory(fullPath) ||
+                        value === undefined ||
+                        value === null ||
+                        value === "" ||
+                        (Array.isArray(value) && value.length === 0)
+                      ) {
+                        delete currentObj[key];
+                      }
+                    }
+                  });
+                };
+
+                recursiveClean(obj);
+                return cleanEmptyFields(obj);
+              };
+
+              newItem = removeEmptyFields(newItem, category.addItemFields);
+            }
+          });
+
+          addItem(category.addUrl, newItem);
+        }
+      }
     };
 
     return (
@@ -569,10 +751,7 @@ const ActionModal = () => {
           </button>
         )}
 
-        <button
-          className={action}
-          onClick={handleSubmit(handleSuccess, handleError)}
-        >
+        <button className={action} onClick={handleSuccess}>
           {action === "edit"
             ? "Зберегти"
             : action === "show"
