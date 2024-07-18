@@ -1,23 +1,4 @@
-export type Category = {
-  icon: JSX.Element;
-  label: string;
-  link: string;
-  addUrl: string;
-  getUrl: string;
-  editUrl: string;
-  deleteUrl: string;
-  getItemUrl: string;
-  fields?: any[];
-  addItemFields: any[];
-  inputFields: any[];
-};
-
-export type MainCategory = {
-  icon: JSX.Element;
-  label: string;
-  link: string;
-  main: boolean;
-};
+import { Category, MainCategory } from "../types/categoriesTypes";
 
 export const categoriesData: (MainCategory | Category)[] = [
   {

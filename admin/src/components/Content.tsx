@@ -1,21 +1,25 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import { categoriesData, Category, MainCategory } from "../data/categories";
+import { categoriesData } from "../data/categories";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetCurrentCategory } from "../redux/actions/currentCategoryActions";
 import "../styles/components/Content.scss";
 import { getItems } from "../utils/getItems";
 import ActionModal from "./ActionModal";
 import ItemActions from "./ItemActions";
-import { access } from "fs";
+import { Category, MainCategory, TableField } from "../types/categoriesTypes";
 
 const Content = () => {
   const category = useSelector((state: any) => state.categoryReducer.category);
   const action = useSelector((state: any) => state.actionReducer.action);
   const [previousAction, setPreviousAction] = useState(action || "");
-  const [fields, setFields] = useState(["id", "name", "category", "price"]);
+  const [fields, setFields] = useState<(TableField | string)[]>([
+    "id",
+    "name",
+    "category",
+    "price",
+  ]);
   const [products, setProducts] = useState<any>([]);
   const dispatch = useDispatch();
   const params = useParams();
@@ -104,13 +108,19 @@ const Content = () => {
               <thead>
                 <tr>
                   {fields?.length > 0 &&
-                    fields.map((field: any, index) => (
-                      <th key={index}>
-                        <div>
-                          <span>{field.name || field}</span>
-                        </div>
-                      </th>
-                    ))}
+                    fields.map((fieldObject: TableField | string, index) => {
+                      const fieldName =
+                        typeof fieldObject === "string"
+                          ? fieldObject
+                          : fieldObject.name;
+                      return (
+                        <th key={index}>
+                          <div>
+                            <span>{fieldName}</span>
+                          </div>
+                        </th>
+                      );
+                    })}
                   <th>Дії</th>
                 </tr>
               </thead>
@@ -120,20 +130,28 @@ const Content = () => {
                     <React.Fragment key={index}>
                       <tr>
                         {fields?.length > 0 &&
-                          fields.map((field: any, fieldIndex) => (
-                            <td key={fieldIndex}>
-                              {typeof product[field.field || field] ===
-                              "boolean" ? (
-                                <input
-                                  type="checkbox"
-                                  checked={product[field.field || field]}
-                                  readOnly={true}
-                                />
-                              ) : (
-                                product[field.field || field]
-                              )}
-                            </td>
-                          ))}
+                          fields.map(
+                            (fieldObject: TableField | string, fieldIndex) => {
+                              const fieldName =
+                                typeof fieldObject === "string"
+                                  ? fieldObject
+                                  : fieldObject.field;
+
+                              return (
+                                <td key={fieldIndex}>
+                                  {typeof product[fieldName] === "boolean" ? (
+                                    <input
+                                      type="checkbox"
+                                      checked={product[fieldName]}
+                                      readOnly={true}
+                                    />
+                                  ) : (
+                                    product[fieldName]
+                                  )}
+                                </td>
+                              );
+                            }
+                          )}
                         <ItemActions id={product.id} />
                       </tr>
                     </React.Fragment>

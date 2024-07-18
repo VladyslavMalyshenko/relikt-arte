@@ -11,6 +11,7 @@ import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
 import { getValue } from "@testing-library/user-event/dist/utils";
 import { getItem, getItemWithNoDispatch } from "../utils/getItem";
+import { InputField, InputFieldDependency } from "../types/categoriesTypes";
 
 const ActionModal = () => {
   const action = useSelector((state: any) => state.actionReducer.action);
@@ -39,7 +40,7 @@ const ActionModal = () => {
     const initializeFields = async (): Promise<void> => {
       if (!category.main && action !== "" && action !== "delete") {
         const lists = category.addItemFields.filter(
-          (field: any) =>
+          (field: InputField) =>
             (field.type === "list" || field.type === "list-radio") &&
             field.getUrl
         );
@@ -52,7 +53,7 @@ const ActionModal = () => {
           }));
         }
 
-        const setCheckboxes = (fieldObject: any): void => {
+        const setCheckboxes = (fieldObject: InputField): void => {
           const fieldName = fieldObject.field_name || fieldObject.name;
           setTimeout(() => {
             const listChildren = Array.from(
@@ -102,7 +103,7 @@ const ActionModal = () => {
 
         if (action !== "add") {
           if (category.inputFields) {
-            category.inputFields.forEach((fieldObject: any) => {
+            category.inputFields.forEach((fieldObject: InputField) => {
               const fieldName = fieldObject.field_name || fieldObject.name;
               const value =
                 fieldObject.type === "boolean" ||
@@ -157,7 +158,7 @@ const ActionModal = () => {
           }
 
           if (category.addItemFields) {
-            category.addItemFields.forEach((itemField: any) => {
+            category.addItemFields.forEach((itemField: InputField) => {
               const fieldName = itemField.field_name || itemField.name;
               const value =
                 itemField.type === "boolean" || itemField.type === "list"
@@ -210,7 +211,7 @@ const ActionModal = () => {
           }
         } else {
           if (category.inputFields) {
-            category.inputFields.forEach((fieldObject: any) => {
+            category.inputFields.forEach((fieldObject: InputField) => {
               const fieldName = fieldObject.field_name || fieldObject.name;
               const value =
                 typeof getNestedValue(
@@ -232,7 +233,7 @@ const ActionModal = () => {
           }
 
           if (category.addItemFields) {
-            category.addItemFields.forEach((itemField: any) => {
+            category.addItemFields.forEach((itemField: InputField) => {
               const fieldName = itemField.field_name || itemField.name;
               const value = itemField.type === "boolean" ? false : "";
 
@@ -285,7 +286,7 @@ const ActionModal = () => {
     </>
   );
 
-  const getInput = (fieldObject: any) => {
+  const getInput = (fieldObject: InputField) => {
     const fieldName = fieldObject.field_name || fieldObject.name;
 
     return (fieldObject.type === "list" || fieldObject.type === "list-radio") &&
@@ -306,7 +307,11 @@ const ActionModal = () => {
                     }
                   : {})}
                 onChange={async (e) => {
-                  if (e.target.checked && fieldObject.getItem) {
+                  if (
+                    e.target.checked &&
+                    fieldObject.getItem &&
+                    fieldObject.dependencies
+                  ) {
                     const currentItem: any = await getItemWithNoDispatch(
                       fieldObject.getItem,
                       {
@@ -314,19 +319,21 @@ const ActionModal = () => {
                       }
                     );
 
-                    fieldObject.dependencies.forEach((dependency: any) => {
-                      const targetLabel: any = document.querySelector(
-                        `label[for="${dependency.target}"]`
-                      );
+                    fieldObject.dependencies.forEach(
+                      (dependency: InputFieldDependency) => {
+                        const targetLabel: any = document.querySelector(
+                          `label[for="${dependency.target}"]`
+                        );
 
-                      if (targetLabel) {
-                        if (!currentItem[dependency.dependOn]) {
-                          targetLabel.style.setProperty("display", "none");
-                        } else {
-                          targetLabel.style.setProperty("display", "inherit");
+                        if (targetLabel) {
+                          if (!currentItem[dependency.dependOn]) {
+                            targetLabel.style.setProperty("display", "none");
+                          } else {
+                            targetLabel.style.setProperty("display", "inherit");
+                          }
                         }
                       }
-                    });
+                    );
                   }
 
                   setSelectedItems((prev: any) => {
@@ -359,7 +366,9 @@ const ActionModal = () => {
                   });
                 }}
               />
-              {option[fieldObject.labelField]}
+              {fieldObject &&
+                fieldObject.labelField &&
+                option[fieldObject.labelField]}
             </li>
           ))}
       </ul>
@@ -484,7 +493,7 @@ const ActionModal = () => {
       await trigger();
 
       let invalidFieldsElements = [
-        ...category.addItemFields.map((field: any) => {
+        ...category.addItemFields.map((field: InputField) => {
           const fieldName = field.field_name || field.name;
           const labelElement = document.querySelector(
             `label[for="${fieldName}"]`
@@ -514,7 +523,7 @@ const ActionModal = () => {
 
       if (errors && Object.keys(errors).length > 0) {
         invalidFieldsElements.push(
-          ...category.inputFields.map((fieldObject: any) => {
+          ...category.inputFields.map((fieldObject: InputField) => {
             const fieldName = fieldObject.field_name || fieldObject.name;
 
             const isFieldInCaregoryFields =
@@ -539,7 +548,7 @@ const ActionModal = () => {
 
       invalidFieldsElements = invalidFieldsElements.filter((field) => field);
 
-      category.inputFields.forEach((fieldObject: any) => {
+      category.inputFields.forEach((fieldObject: InputField) => {
         const fieldName = fieldObject.field_name || fieldObject.name;
 
         const labelElement = document.querySelector(
@@ -593,14 +602,15 @@ const ActionModal = () => {
         } else if (action === "edit") {
           const prepareItem = (
             obj: any,
-            categoryFields: any,
+            categoryFields: InputField[],
             originalItem: any
           ) => {
             const cleanObj = { ...obj };
 
-            const isFieldInCategory = (fieldName: any) =>
+            const isFieldInCategory = (fieldName: string) =>
               categoryFields.some(
-                (field: any) => (field.field_name || field.name) === fieldName
+                (field: InputField) =>
+                  (field.field_name || field.name) === fieldName
               );
 
             const recursiveClean = (currentObj: any, path = "") => {
@@ -649,13 +659,14 @@ const ActionModal = () => {
         } else if (action === "add") {
           let newItem = { ...data };
 
-          category.addItemFields.forEach((fieldObject: any) => {
+          category.addItemFields.forEach((fieldObject: InputField) => {
             const itemKey = fieldObject.field_name || fieldObject.name;
 
             if (
               (newItem[itemKey] &&
                 !category.addItemFields.some(
-                  (field: any) => (field.field_name || field.name) === itemKey
+                  (field: InputField) =>
+                    (field.field_name || field.name) === itemKey
                 )) ||
               newItem[itemKey] === undefined ||
               newItem[itemKey] === null ||
@@ -690,10 +701,13 @@ const ActionModal = () => {
                 return cleanedObj;
               };
 
-              const removeEmptyFields = (obj: any, categoryFields: any) => {
-                const isFieldInCategory = (fieldName: any) =>
+              const removeEmptyFields = (
+                obj: any,
+                categoryFields: InputField[]
+              ) => {
+                const isFieldInCategory = (fieldName: string) =>
                   categoryFields.some(
-                    (field: any) =>
+                    (field: InputField) =>
                       (field.field_name || field.name) === fieldName
                   );
 
@@ -790,7 +804,7 @@ const ActionModal = () => {
                 <>
                   {category.inputFields.length > 0 ? (
                     <>
-                      {category.inputFields.map((fieldObject: any) => (
+                      {category.inputFields.map((fieldObject: InputField) => (
                         <label
                           key={`field[${fieldObject.name}]`}
                           htmlFor={fieldObject.field_name || fieldObject.name}
@@ -808,7 +822,7 @@ const ActionModal = () => {
               ) : (
                 <>
                   {category &&
-                    category.addItemFields.map((itemField: any) => (
+                    category.addItemFields.map((itemField: InputField) => (
                       <label
                         key={`addField[${
                           itemField.field_name || itemField.name
