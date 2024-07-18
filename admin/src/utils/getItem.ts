@@ -16,10 +16,11 @@ export const getItem = async (url_part: string, data: any) => {
     });
   }
 
-  await axios
+  return await axios
     .get(validUrl)
     .then((res) => {
       store.dispatch(SetCurrentItem(res.data));
+      return res.data;
     })
     .catch(() => {
       const error = {

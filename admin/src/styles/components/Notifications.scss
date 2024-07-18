@@ -1,52 +1,54 @@
 .notifications {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 100%;
-    max-width: 200px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
-    z-index: 100;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 100%;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 100;
 }
 
 .notification {
-    position: relative;
-    width: 100%;
-    height: 75px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    background: var(--background-color);
-    border: 1px solid rgba(72, 48, 24, 0.04);
-    right: -110%;
-    box-sizing: border-box;
-    padding: 0 0 0 50px;
-    border-radius: 6px;
-    animation: notificationAppear forwards;
+  position: relative;
+  width: 100%;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--background-color);
+  border: 1px solid rgba(72, 48, 24, 0.04);
+  right: -110%;
+  box-sizing: border-box;
+  padding: 0 0 0 50px;
+  border-radius: 6px;
+  animation: notificationAppear forwards;
 
-    svg {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        left: 10px;
-    }
+  svg {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 10px;
+  }
 }
 
 @keyframes notificationAppear {
-    0% {
-        transform: translateX(0);
-    }
-    15% {
-        transform: translateX(-110%);
-    }
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-110%);
+  }
 
-    85% {
-        transform: translateX(-110%);
-    }
-    100% {
-        transform: translateX(0);
-    }
+  85% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }

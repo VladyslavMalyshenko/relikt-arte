@@ -96,6 +96,7 @@
       overflow-x: hidden;
       list-style: none;
       border-radius: 10px;
+      background-color: var(--background-color-muted);
       padding: 0;
       margin: 0;
       gap: 20px;
@@ -106,6 +107,10 @@
         align-items: center;
         gap: 5px;
         padding: 5px 0;
+      }
+
+      &.invalid {
+        border: 2px solid var(--red);
       }
 
       &:not(.disabled):hover {
