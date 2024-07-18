@@ -79,7 +79,7 @@ export const categoriesData: (MainCategory | Category)[] = [
         fill="currentColor"
         version="1.1"
         viewBox="0 0 297.006 297.006"
-        enable-background="new 0 0 297.006 297.006"
+        enableBackground="new 0 0 297.006 297.006"
       >
         <path d="m148.503,37.143c-3.866,0-7,3.134-7,7v4.5c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-4.5c0-3.867-3.134-7-7-7z" />
         <path d="m148.503,182.986c-3.866,0-7,3.134-7,7v8.425c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-8.425c0-3.866-3.134-7-7-7z" />
@@ -376,8 +376,8 @@ export const categoriesData: (MainCategory | Category)[] = [
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M7 5H14C15.1046 5 16 5.89543 16 7V14C16 15.1046 15.1046 16 14 16H7C5.89543 16 5 15.1046 5 14V7C5 5.89543 5.89543 5 7 5zM3 11H2C0.89543 11 0 10.1046 0 9V2C0 0.89543 0.89543 0 2 0H9C10.1046 0 11 0.89543 11 2V3H7C4.79086 3 3 4.79086 3 7V11z"
           fill="currentColor"
         />
