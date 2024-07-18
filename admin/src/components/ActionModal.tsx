@@ -10,7 +10,7 @@ import { editItem } from "../utils/editItem";
 import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
 import { getValue } from "@testing-library/user-event/dist/utils";
-import { getItem } from "../utils/getItem";
+import { getItem, getItemWithNoDispatch } from "../utils/getItem";
 
 const ActionModal = () => {
   const action = useSelector((state: any) => state.actionReducer.action);
@@ -307,7 +307,7 @@ const ActionModal = () => {
                   : {})}
                 onChange={async (e) => {
                   if (e.target.checked && fieldObject.getItem) {
-                    const currentItem: any = await getItem(
+                    const currentItem: any = await getItemWithNoDispatch(
                       fieldObject.getItem,
                       {
                         id: option.id,
