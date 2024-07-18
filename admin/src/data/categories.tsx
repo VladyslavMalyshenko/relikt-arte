@@ -94,6 +94,115 @@ export const categoriesData: (MainCategory | Category)[] = [
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        fill="currentColor"
+        version="1.1"
+        viewBox="0 0 297.006 297.006"
+        enable-background="new 0 0 297.006 297.006"
+      >
+        <path d="m148.503,37.143c-3.866,0-7,3.134-7,7v4.5c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-4.5c0-3.867-3.134-7-7-7z" />
+        <path d="m148.503,182.986c-3.866,0-7,3.134-7,7v8.425c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-8.425c0-3.866-3.134-7-7-7z" />
+        <path d="m148.503,145.544c-3.866,0-7,3.134-7,7v8.425c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-8.425c0-3.866-3.134-7-7-7z" />
+        <path d="m148.503,70.66c-3.866,0-7,3.134-7,7v8.425c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-8.425c0-3.866-3.134-7-7-7z" />
+        <path d="m148.503,108.103c-3.866,0-7,3.134-7,7v8.424c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-8.424c0-3.867-3.134-7-7-7z" />
+        <path d="m148.503,220.429c-3.866,0-7,3.134-7,7v4.5c0,3.866 3.134,7 7,7 3.866,0 7-3.134 7-7v-4.5c0-3.866-3.134-7-7-7z" />
+        <path d="m268.003,204.856c-22.726,0-41.214-26.146-41.214-58.285 0-32.139 18.488-58.286 41.214-58.286 3.62,0 6.957-1.956 8.726-5.115 1.768-3.159 1.691-7.026-0.201-10.112l-27.071-44.143c-1.601-2.61-4.309-4.344-7.351-4.703-3.042-0.362-6.078,0.694-8.245,2.859-9.414,9.414-24.73,9.412-34.143,0-4.56-4.559-7.071-10.623-7.072-17.072-0.001-5.522-4.478-9.999-10-9.999h-68.286c-5.522,0-9.999,4.477-10,9.999-0.001,6.449-2.513,12.513-7.072,17.072-9.412,9.414-24.73,9.412-34.143,0-2.167-2.165-5.209-3.221-8.245-2.859-3.041,0.359-5.75,2.093-7.351,4.703l-27.07,44.143c-1.893,3.086-1.97,6.953-0.201,10.112 1.769,3.159 5.106,5.115 8.726,5.115 22.726,0 41.214,26.147 41.214,58.286 0,32.139-18.488,58.285-41.214,58.285-3.41,0-6.585,1.738-8.423,4.61-1.839,2.872-2.086,6.483-0.657,9.58l17.071,36.992c1.861,4.032 6.158,6.359 10.549,5.701 0.709-0.104 71.307-10.089 91.422,29.771 1.685,3.339 5.092,5.459 8.831,5.495 0.032,0 0.064,0 0.097,0 3.702,0 7.105-2.047 8.839-5.323 21.623-40.866 92.279-32.842 92.99-32.756 4.199,0.513 8.263-1.672 10.154-5.455l17.071-34.144c1.55-3.1 1.384-6.781-0.438-9.729-1.822-2.947-5.041-4.742-8.507-4.742zm-22.988,33.619c-18.797-1.097-69.54-0.796-97.039,30.834-21.16-24.353-57.333-28.774-80.819-28.774-5.979,0-11.134,0.287-15.011,0.604l-8.528-18.48c11.223-3.454 21.427-10.904 29.6-21.802 10.963-14.617 17-33.895 17-54.285 0-20.39-6.037-39.668-17-54.285-7.788-10.384-17.417-17.638-28.017-21.287l13.7-22.34c16.773,9.24 38.326,6.756 52.529-7.446 5.927-5.927 9.961-13.243 11.798-21.214h50.549c1.837,7.971 5.871,15.287 11.798,21.214 14.204,14.203 35.756,16.686 52.529,7.446l13.7,22.34c-10.6,3.649-20.229,10.903-28.016,21.286-10.963,14.617-17,33.896-17,54.285 0,20.39 6.037,39.668 17,54.285 8.075,10.767 18.131,18.168 29.195,21.676l-7.968,15.943z" />
+      </svg>
+    ),
+    label: "Покриття",
+    link: "/product_covering",
+    addUrl: "/api/v1/product/related/product_covering/create/",
+    getUrl: "/api/v1/product/related/product_covering/list/",
+    editUrl: "/api/v1/product/related/product_covering/$id/update/",
+    deleteUrl: "/api/v1/product/related/product_covering/$id/delete/",
+    getItemUrl: "/api/v1/product/related/product_covering/$id/",
+    fields: [
+      "id",
+      { name: "назва", field: "name" },
+      { name: "активний", field: "active" },
+    ],
+    addItemFields: [
+      {
+        name: "name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "active",
+        type: "checkbox",
+      },
+    ],
+    inputFields: [
+      {
+        name: "id",
+        type: "text",
+      },
+      {
+        name: "name",
+        type: "text",
+      },
+      {
+        name: "active",
+        type: "checkbox",
+      },
+    ],
+  },
+
+  {
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="-7.82 0 122.88 122.88"
+      >
+        <path
+          style={{ fillRule: "evenodd" }}
+          d="M4.21,0H103a4.22,4.22,0,0,1,4.21,4.21V118.67a4.23,4.23,0,0,1-4.21,4.21H4.21A4.23,4.23,0,0,1,0,118.67V4.21A4.23,4.23,0,0,1,4.21,0ZM69,80.67a1.8,1.8,0,0,1,2.12,2.9l-4.87,3.59a1.8,1.8,0,0,1-2.12-2.9L69,80.67Zm19.12-16a1.8,1.8,0,1,1,2.33,2.74L75.9,79.72A1.8,1.8,0,1,1,73.58,77L88.11,64.65ZM89,78.92A1.79,1.79,0,1,1,91.3,81.7L68.41,100.39a1.79,1.79,0,1,1-2.26-2.78L89,78.92ZM37.18,42.55a1.8,1.8,0,1,1-2.13-2.9l4.87-3.59A1.8,1.8,0,1,1,42,39l-4.86,3.59Zm-19.13,16a1.8,1.8,0,1,1-2.32-2.74L30.26,43.5a1.8,1.8,0,0,1,2.32,2.74L18.05,58.57ZM17.13,44.3a1.79,1.79,0,0,1-2.26-2.78L37.75,22.83A1.79,1.79,0,1,1,40,25.61L17.13,44.3Zm-8.76-36H49.5V114.61H8.37V8.27Zm49.36,0H98.86V114.61H57.73V8.27Z"
+        />
+      </svg>
+    ),
+    label: "Кольори скла",
+    link: "/product_glass_color",
+    addUrl: "/api/v1/product/related/product_glass_color/create/",
+    getUrl: "/api/v1/product/related/product_glass_color/list/",
+    editUrl: "/api/v1/product/related/product_glass_color/$id/update/",
+    deleteUrl: "/api/v1/product/related/product_glass_color/$id/delete/",
+    getItemUrl: "/api/v1/product/related/product_glass_color/$id/",
+    fields: [
+      "id",
+      { name: "назва", field: "name" },
+      { name: "активний", field: "active" },
+    ],
+    addItemFields: [
+      {
+        name: "name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "active",
+        type: "checkbox",
+      },
+    ],
+    inputFields: [
+      {
+        name: "id",
+        type: "text",
+      },
+      {
+        name: "name",
+        type: "text",
+      },
+      {
+        name: "active",
+        type: "checkbox",
+      },
+    ],
+  },
+  {
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 32 32"
         version="1.1"
@@ -284,26 +393,12 @@ export const categoriesData: (MainCategory | Category)[] = [
   },
   {
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
         <path
-          d="M3 6C3 4.34315 4.34315 3 6 3H7C8.65685 3 10 4.34315 10 6V7C10 8.65685 8.65685 10 7 10H6C4.34315 10 3 8.65685 3 7V6Z"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M14 6C14 4.34315 15.3431 3 17 3H18C19.6569 3 21 4.34315 21 6V7C21 8.65685 19.6569 10 18 10H17C15.3431 10 14 8.65685 14 7V6Z"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M14 17C14 15.3431 15.3431 14 17 14H18C19.6569 14 21 15.3431 21 17V18C21 19.6569 19.6569 21 18 21H17C15.3431 21 14 19.6569 14 18V17Z"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <path
-          d="M3 17C3 15.3431 4.34315 14 6 14H7C8.65685 14 10 15.3431 10 17V18C10 19.6569 8.65685 21 7 21H6C4.34315 21 3 19.6569 3 18V17Z"
-          stroke="currentColor"
-          strokeWidth="2"
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M7 5H14C15.1046 5 16 5.89543 16 7V14C16 15.1046 15.1046 16 14 16H7C5.89543 16 5 15.1046 5 14V7C5 5.89543 5.89543 5 7 5zM3 11H2C0.89543 11 0 10.1046 0 9V2C0 0.89543 0.89543 0 2 0H9C10.1046 0 11 0.89543 11 2V3H7C4.79086 3 3 4.79086 3 7V11z"
+          fill="currentColor"
         />
       </svg>
     ),
@@ -387,6 +482,8 @@ export const categoriesData: (MainCategory | Category)[] = [
         name: "покриття товару",
         field_name: "covering_id",
         type: "list-radio",
+        getUrl: "/api/v1/product/related/product_covering/list/",
+        labelField: "name",
       },
     ],
     inputFields: [
@@ -394,7 +491,7 @@ export const categoriesData: (MainCategory | Category)[] = [
         name: "id",
         type: "text",
       },
-      { name: "ціна", field_name: "price", type: "number" },
+      { name: "ціна", field_name: "price", type: "number", required: true },
       {
         name: "головний текст конструкції",
         field_name: "description.construction.main_text",
@@ -436,12 +533,26 @@ export const categoriesData: (MainCategory | Category)[] = [
         field_name: "category_id",
         type: "list-radio",
         getUrl: "/api/v1/product/category/list/",
+        getItem: "/api/v1/product/category/$id",
+        dependencies: [
+          {
+            dependOn: "is_glass_available",
+            target: "have_glass",
+          },
+          {
+            dependOn: "have_orientation_choice",
+            target: "orientation_choice",
+          },
+        ],
         labelField: "name",
+        required: true,
       },
       {
         name: "покриття товару",
         field_name: "covering_id",
         type: "list-radio",
+        getUrl: "/api/v1/product/related/product_covering/list/",
+        labelField: "name",
       },
     ],
   },
