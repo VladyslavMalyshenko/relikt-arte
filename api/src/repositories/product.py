@@ -45,7 +45,12 @@ class ProductRepository(
 
     async def create(self, *, obj_in: dict) -> int | UUID:
         return await super().create(
-            obj_in=obj_in, clean_dict_ignore_keys=["description"]
+            obj_in=obj_in,
+            clean_dict_ignore_keys=(
+                ["description"]
+                if obj_in.get("description") is not None
+                else []
+            ),
         )
 
     async def update(self, *, obj_in: dict, obj_id: int | UUID) -> int | UUID:
@@ -57,11 +62,6 @@ class ProductRepository(
                 if obj_in.get("description") is not None
                 else []
             ),
-        )
-
-    async def get_all_by_category(self, category_id: int) -> list[Product]:
-        return await self.get_all(
-            filters=[self.model.category_id == category_id],
         )
 
     async def get_all_by_category(self, category_id: int) -> list[Product]:

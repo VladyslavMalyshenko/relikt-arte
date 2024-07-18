@@ -27,6 +27,7 @@ class ProductDescription(BaseModel):
 
 
 class ProductCreate(BaseModel):
+    sku: Optional[str] = None
     price: int
     description: Optional[ProductDescription] = None
     have_glass: bool
@@ -36,6 +37,7 @@ class ProductCreate(BaseModel):
 
 
 class ProductUpdate(BaseModel):
+    sku: Optional[str] = None
     price: Optional[int] = None
     description: Optional[ProductDescription] = None
     have_glass: Optional[bool] = None
@@ -46,6 +48,7 @@ class ProductUpdate(BaseModel):
 
 class ProductShow(MainSchema):
     id: int
+    sku: Optional[str] = None
     price: int
     description: Optional[ProductDescription] = None
     have_glass: bool

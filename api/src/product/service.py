@@ -40,6 +40,7 @@ class ProductService(BaseService):
     async def get_show_scheme(self, obj) -> BaseModel:
         return ProductShow(
             id=obj.id,
+            sku=obj.sku,
             price=obj.price,
             description=obj.description,
             have_glass=obj.have_glass,

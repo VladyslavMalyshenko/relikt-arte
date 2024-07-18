@@ -113,6 +113,7 @@ class ProductGlassColor(BaseProductRelMixin, Base):
 class Product(BaseModelMixin, Base):
     __label__ = "Product"
 
+    sku: Mapped[str] = mapped_column(nullable=True, index=True, doc="SKU")
     price: Mapped[int] = mapped_column(nullable=False, index=True, doc="Price")
     description: Mapped[dict] = mapped_column(
         JSONB,
