@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { ProductType } from "../../../data/products";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/checkoutpage/CheckoutSection.scss";
+import { ProductType } from "../../../types/productsRelatedTypes";
+import { getItems } from "../../../utils/getItems";
 import Button from "../../UI/Button";
 import CheckoutProduct from "../../UI/CheckoutProduct";
 import Form from "../../UI/Form";
@@ -35,15 +36,12 @@ const CheckoutSection = () => {
     const [cartProducts, setCartProducts] = useState<ProductType[]>([]);
 
     useEffect(() => {
-        const product = {
-            id: 1,
-            image: "https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png",
-            model: "МілаН с",
-            price: 2321,
-            count: 2,
+        const getCartProducts = async () => {
+            const newCartProducts = await getItems("/api/v1/product/list");
+            setCartProducts(newCartProducts);
         };
 
-        setCartProducts([product]);
+        getCartProducts();
     }, []);
 
     const {

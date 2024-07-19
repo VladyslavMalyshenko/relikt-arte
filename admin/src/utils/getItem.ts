@@ -10,7 +10,7 @@ import { generateUrl } from "./generateUrl";
 export const getItem = async (url_part: string, data: any) => {
   let validUrl = generateUrl(url_part);
 
-  if (data) {
+  if (data) { 
     Object.keys(data).forEach((key) => {
       validUrl = validUrl.replace(`$${key}`, data[key]);
     });

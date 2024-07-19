@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { ProductType } from "../../data/products";
+import ProductStaticImage from "../../assets/staticProductImage.webp";
 import { paths } from "../../router/paths";
 import "../../styles/components/UI/DoorCard.scss";
+import { ProductType } from "../../types/productsRelatedTypes";
 import Button from "./Button";
 
 type DoorCardProps = {
@@ -18,23 +19,26 @@ const DoorCard = ({ product }: DoorCardProps) => {
             className="door-card"
             onClick={() => navigate(paths.buy + `/${product.id}`)}
         >
-            <img src={product.image} alt={product.model} />
+            <img
+                src={ProductStaticImage}
+                alt={`door-${product.price}-${product.id}`}
+            />
             <div className="door-card-inner" onClick={stopPropagation}></div>
-            <p className="pre-small upper model" onClick={stopPropagation}>
-                {product.model}
-            </p>
+            {/* <p className="pre-small upper model" onClick={stopPropagation}>
+        {product.model}
+      </p> */}
             <p className="mid black bold" onClick={stopPropagation}>
                 {product.price} ₴
             </p>
-            {product.tags && (
-                <div className="tags" onClick={stopPropagation}>
-                    {product.tags.map((tag, index) => (
-                        <p key={`tag[${index}]`} className="pre-small gray">
-                            {tag}
-                        </p>
-                    ))}
-                </div>
-            )}
+            {/* {product.tags && (
+        <div className="tags" onClick={stopPropagation}>
+          {product.tags.map((tag, index) => (
+            <p key={`tag[${index}]`} className="pre-small gray">
+              {tag}
+            </p>
+          ))}
+        </div>
+      )} */}
             <Button
                 inversed={true}
                 borderless={false}
