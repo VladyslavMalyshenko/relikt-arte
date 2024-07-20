@@ -113,6 +113,7 @@ class ProductGlassColor(BaseProductRelMixin, Base):
 class Product(BaseModelMixin, Base):
     __label__ = "Product"
 
+    sku: Mapped[str] = mapped_column(nullable=True, index=True, doc="SKU")
     price: Mapped[int] = mapped_column(nullable=False, index=True, doc="Price")
     description: Mapped[dict] = mapped_column(
         JSONB,
@@ -171,6 +172,11 @@ class ProductPhoto(BaseModelMixin, Base):
     __label__ = "Product photo"
 
     photo: Mapped[str] = mapped_column(nullable=False, doc="Photo")
+    is_main: Mapped[bool] = mapped_column(
+        nullable=False,
+        default=False,
+        doc="Is main photo",
+    )
     dependency: Mapped[PyEnum] = mapped_column(
         ENUM(
             ProductPhotoDepEnum,
