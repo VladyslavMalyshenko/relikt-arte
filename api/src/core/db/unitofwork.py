@@ -7,6 +7,7 @@ from ..db.session import create_async_session_maker
 
 from ...repositories.product import (
     ProductRepository,
+    ProductPhotoRepository,
     CategoryRepository,
     ProductSizeRepository,
     ProductColorRepository,
@@ -17,6 +18,7 @@ from ...repositories.product import (
 
 class AbstractUnitOfWork(ABC):
     product: ProductRepository
+    product_photo: ProductPhotoRepository
     category: CategoryRepository
     product_size: ProductSizeRepository
     product_color: ProductColorRepository
@@ -43,6 +45,10 @@ class AbstractUnitOfWork(ABC):
     async def add(self, instance):
         raise NotImplementedError()
 
+    @abstractmethod
+    async def add_all(self, instances):
+        raise NotImplementedError()
+
 
 class UnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
@@ -53,6 +59,7 @@ class UnitOfWork(AbstractUnitOfWork):
 
         # Product and related
         self.product = ProductRepository(self.session)
+        self.product_photo = ProductPhotoRepository(self.session)
         self.product_size = ProductSizeRepository(self.session)
         self.product_color = ProductColorRepository(self.session)
         self.product_covering = ProductCoveringRepository(self.session)
@@ -73,3 +80,6 @@ class UnitOfWork(AbstractUnitOfWork):
 
     async def add(self, instance):
         self.session.add(instance)
+
+    async def add_all(self, instances):
+        self.session.add_all(instances)

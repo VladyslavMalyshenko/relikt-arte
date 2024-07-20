@@ -1,6 +1,10 @@
 import logging
+import json
 
 from pydantic import BaseModel
+
+from fastapi import Request
+from fastapi.datastructures import FormData
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -13,11 +17,15 @@ from ..utils.exceptions.http.base import (
 from ..utils.exceptions.uow import GetRepoByAttrNameException
 from ..utils.exceptions.http.base import IdNotFoundException
 from ..utils.base import merge_dicts, model_to_dict
+from ..utils.processors.static.base import StaticFilesProcessor
 
 from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductPhotoCreate,
+    ProductPhotoUpdate,
+    ProductPhotoShow,
     ProductDescription,
     CategoryCreate,
     CategoryUpdate,
@@ -29,7 +37,7 @@ from .schemas import (
     ProductRelUpdate,
     ProductRelShow,
 )
-from .enums import ProductRelModelEnum
+from .enums import ProductRelModelEnum, ProductPhotoDepEnum
 from .utils import _default_product_description_json
 
 
@@ -202,6 +210,81 @@ class ProductService(BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("Product")
+
+
+class ProductPhotoService(BaseService):
+    async def get_show_scheme(self, obj) -> ProductPhotoShow:
+        return ProductPhotoShow(
+            id=obj.id,
+            product_id=obj.product_id,
+            photo=obj.photo,
+            dependency=obj.dependency,
+            with_glass=obj.with_glass,
+            orientation=obj.orientation,
+            type_of_platband=obj.type_of_platband,
+            color_id=obj.color_id,
+            glass_color_id=obj.glass_color_id,
+            size_id=obj.size_id,
+        )
+
+    async def __prepare_photos_data(
+        self, request: Request, form_data: FormData, product_id: int
+    ) -> list[ProductPhotoCreate]:
+        prepared_photos_data: list[ProductPhotoCreate] = []
+        photos_data: list[dict] = []
+        photo_keys_count = int(len(form_data.items()) / 2)
+
+        for file_num in range(1, photo_keys_count + 1):
+            photo = form_data[f"file_{file_num}"]
+            dependency_data = json.loads(form_data[f"file_{file_num}_dep"])
+            photos_data.append({"photo": photo, **dependency_data})
+
+        for file_data in photos_data:
+            photo_processor = StaticFilesProcessor(
+                base_url=request.base_url,
+                uploaded_file=file_data["photo"],
+            )
+            photo_data = await photo_processor.process()
+            file_data["photo"] = photo_data.link
+            dependency_attr_name = ProductPhotoDepEnum(
+                file_data["dependency"]
+            ).name
+            file_data["dependency"] = getattr(ProductPhotoDepEnum, dependency_attr_name)
+            prepared_photos_data.append(
+                ProductPhotoCreate(
+                    product_id=product_id,
+                    **file_data,
+                )
+            )
+        return prepared_photos_data
+
+    async def add_product_photos(
+        self,
+        request: Request,
+        photos_form_data: FormData,
+        product_id: int,
+    ) -> list[ProductPhotoShow]:
+
+        try:
+            async with self.uow:
+                if not await self.uow.product.exists_by_id(obj_id=product_id):
+                    raise IdNotFoundException(
+                        self.uow.product.model, product_id
+                    )
+                photos_data = await self.__prepare_photos_data(
+                    request=request,
+                    form_data=photos_form_data,
+                    product_id=product_id,
+                )
+                photos = await self.uow.product_photo.bulk_product_photo_save(
+                    photos=photos_data
+                )
+                await self.uow.add_all(photos)
+                await self.uow.commit()
+                return [await self.get_show_scheme(photo) for photo in photos]
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("ProductPhoto")
 
 
 class CategoryService(BaseService):

@@ -4,6 +4,7 @@ from ..core.db.dependencies import uowDEP
 
 from .service import (
     ProductService,
+    ProductPhotoService,
     CategoryService,
     ProductSizeService,
     ProductRelService,
@@ -12,6 +13,7 @@ from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductPhotoShow,
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
@@ -345,26 +347,19 @@ async def get_product(
     )
 
 
-# @router.post(
-#     "/create/",
-#     status_code=status.HTTP_201_CREATED,
-#     tags=["Product"],
-# )
-# async def product_create(
-#     uow: uowDEP,
-#     request: Request,
-# ):
-#     form_data = await request.form()
-
-#     photo_keys_count = int(len(form_data.items()) / 2)
-#     photos_data = {}
-#     for file_num in range(1, photo_keys_count + 1):
-#         photos_data[f"file_{file_num}"] = {}
-#         photos_data[f"file_{file_num}"]["photo"] = form_data[
-#             f"file_{file_num}"
-#         ]
-#         dependency_data = json.loads(form_data[f"file_{file_num}_dep"])
-#         photos_data[f"file_{file_num}"].update(dependency_data)
-
-#     print(photos_data)
-#     return {}
+@router.post(
+    "/add_photo/{product_id}/",
+    status_code=status.HTTP_201_CREATED,
+    tags=["Product"],
+)
+async def product_add_photo(
+    uow: uowDEP,
+    product_id: int,
+    request: Request,
+):
+    form_data = await request.form()
+    return await ProductPhotoService(uow).add_product_photos(
+        request=request,
+        photos_form_data=form_data,
+        product_id=product_id,
+    )

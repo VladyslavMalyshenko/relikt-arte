@@ -10,6 +10,7 @@ from .generic import GenericRepository
 
 from ..product.models import (
     Product,
+    ProductPhoto,
     Category,
     ProductSize,
     ProductColor,
@@ -19,6 +20,8 @@ from ..product.models import (
 from ..product.schemas import (
     ProductCreate,
     ProductUpdate,
+    ProductPhotoCreate,
+    ProductPhotoUpdate,
     CategoryCreate,
     CategoryUpdate,
     ProductSizeCreate,
@@ -68,6 +71,23 @@ class ProductRepository(
         return await self.get_all(
             filters=[self.model.category_id == category_id],
         )
+
+
+class ProductPhotoRepository(
+    GenericRepository[ProductPhoto, ProductPhotoCreate, ProductPhotoUpdate]
+):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, ProductPhoto)
+
+    async def bulk_product_photo_save(
+        self, photos: list[ProductPhotoCreate]
+    ) -> list[ProductPhoto]:
+        instance_list = []
+        photos_data = [clean_dict(dict(photo)) for photo in photos]
+
+        for photo_data in photos_data:
+            instance_list.append(ProductPhoto(**photo_data))
+        return instance_list
 
 
 class CategoryRepository(

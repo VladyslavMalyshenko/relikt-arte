@@ -172,6 +172,11 @@ class ProductPhoto(BaseModelMixin, Base):
     __label__ = "Product photo"
 
     photo: Mapped[str] = mapped_column(nullable=False, doc="Photo")
+    is_main: Mapped[bool] = mapped_column(
+        nullable=False,
+        default=False,
+        doc="Is main photo",
+    )
     dependency: Mapped[PyEnum] = mapped_column(
         ENUM(
             ProductPhotoDepEnum,

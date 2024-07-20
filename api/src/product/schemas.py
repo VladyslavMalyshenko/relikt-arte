@@ -3,6 +3,11 @@ from typing import Optional
 from pydantic import BaseModel
 
 from ..core.schemas import MainSchema
+from .enums import (
+    ProductPhotoDepEnum,
+    ProductOrientationEnum,
+    ProductTypeOfPlatbandEnum,
+)
 
 
 class ProductDescriptionConstruction(BaseModel):
@@ -55,6 +60,44 @@ class ProductShow(MainSchema):
     orientation_choice: bool
     category_id: int
     covering_id: Optional[int] = None
+
+
+class ProductPhotoCreate(BaseModel):
+    product_id: int
+    photo: str
+    is_main: Optional[bool] = False
+    dependency: ProductPhotoDepEnum
+    with_glass: Optional[bool] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+
+
+class ProductPhotoUpdate(BaseModel):
+    photo: Optional[str] = None
+    dependency: Optional[ProductPhotoDepEnum] = None
+    with_glass: Optional[bool] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+
+
+class ProductPhotoShow(MainSchema):
+    id: int
+    product_id: int
+    photo: str
+    dependency: ProductPhotoDepEnum
+    with_glass: Optional[bool] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+
 
 
 class CategoryCreate(BaseModel):
