@@ -154,6 +154,12 @@ class Product(BaseModelMixin, Base):
 
     category: Mapped[Category] = relationship(doc="Category")
     covering: Mapped[ProductCovering | None] = relationship(doc="Covering")
+    photos: Mapped[list["ProductPhoto"]] = relationship(
+        "ProductPhoto",
+        backref="product",
+        cascade="all, delete-orphan",
+        doc="Photos",
+    )
 
     def __str__(self) -> str:
         return f"Product: {self.id}. Category: {self.category.name}"
