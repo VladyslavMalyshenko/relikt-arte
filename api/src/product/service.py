@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from fastapi import Request
 from fastapi.datastructures import FormData
 
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
@@ -55,6 +56,10 @@ class ProductService(BaseService):
             orientation_choice=obj.orientation_choice,
             category_id=obj.category_id,
             covering_id=obj.covering_id,
+            photos=[
+                await ProductPhotoService(self.uow).get_show_scheme(photo)
+                for photo in obj.photos
+            ],
         )
 
     async def _clean_description(
@@ -184,7 +189,9 @@ class ProductService(BaseService):
             async with self.uow:
                 return [
                     await self.get_show_scheme(product)
-                    for product in await self.uow.product.get_all()
+                    for product in await self.uow.product.get_all(
+                        options=[selectinload(self.uow.product.model.photos)]
+                    )
                 ]
         except SQLAlchemyError as e:
             log.exception(e)
@@ -218,6 +225,7 @@ class ProductPhotoService(BaseService):
             id=obj.id,
             product_id=obj.product_id,
             photo=obj.photo,
+            is_main=obj.is_main,
             dependency=obj.dependency,
             with_glass=obj.with_glass,
             orientation=obj.orientation,
@@ -249,7 +257,9 @@ class ProductPhotoService(BaseService):
             dependency_attr_name = ProductPhotoDepEnum(
                 file_data["dependency"]
             ).name
-            file_data["dependency"] = getattr(ProductPhotoDepEnum, dependency_attr_name)
+            file_data["dependency"] = getattr(
+                ProductPhotoDepEnum, dependency_attr_name
+            )
             prepared_photos_data.append(
                 ProductPhotoCreate(
                     product_id=product_id,
