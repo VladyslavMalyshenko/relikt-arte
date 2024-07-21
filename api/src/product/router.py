@@ -348,7 +348,7 @@ async def get_product(
 
 
 @router.post(
-    "/add_photo/{product_id}/",
+    "/add_photos/{product_id}/",
     status_code=status.HTTP_201_CREATED,
     tags=["Product"],
 )
