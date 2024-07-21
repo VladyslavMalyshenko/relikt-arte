@@ -400,6 +400,7 @@ export const categoriesData: (MainCategory | Category)[] = [
         getItemUrl: "/api/v1/product/$id/",
         fields: [
             "id",
+            { name: "артикул", field: "sku" },
             { name: "ціна", field: "price" },
             {
                 name: "наявність скла",
@@ -411,6 +412,8 @@ export const categoriesData: (MainCategory | Category)[] = [
             },
         ],
         addItemFields: [
+            { name: "артикул", field_name: "sku", type: "text" },
+
             {
                 name: "ціна",
                 field_name: "price",
@@ -487,6 +490,8 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "id",
                 type: "text",
             },
+            { name: "артикул", field_name: "sku", type: "text" },
+
             {
                 name: "ціна",
                 field_name: "price",

@@ -764,6 +764,7 @@ const ActionModal = () => {
 
                 return;
             }
+
             if (!isAnyError) {
                 delete data.field;
 
@@ -977,6 +978,11 @@ const ActionModal = () => {
                                                         delete currentObj[key];
                                                     }
                                                 } else {
+                                                    const labelElement =
+                                                        document.querySelector(
+                                                            `label[for='${key}']`
+                                                        ) as any;
+
                                                     if (
                                                         !isFieldInCategory(
                                                             fullPath
@@ -1008,26 +1014,28 @@ const ActionModal = () => {
                                                                     fullPath
                                                             ) as InputField;
 
-                                                        if (
-                                                            (fieldObject.required &&
-                                                                (currentObj[
-                                                                    key
-                                                                ] ===
-                                                                    undefined ||
-                                                                    currentObj[
-                                                                        key
-                                                                    ] ===
-                                                                        null ||
-                                                                    currentObj[
-                                                                        key
-                                                                    ] ===
-                                                                        "")) ||
-                                                            (typeof currentObj[
+                                                        const isBooleanAndTrue =
+                                                            typeof currentObj[
                                                                 key
                                                             ] === "boolean" &&
-                                                                currentObj[
-                                                                    key
-                                                                ] === true)
+                                                            currentObj[key] ===
+                                                                true &&
+                                                            labelElement.style
+                                                                .display ===
+                                                                "none";
+
+                                                        const fieldEmpty =
+                                                            currentObj[key] ===
+                                                                undefined ||
+                                                            currentObj[key] ===
+                                                                null ||
+                                                            currentObj[key] ===
+                                                                "" ||
+                                                            isBooleanAndTrue;
+
+                                                        if (
+                                                            fieldObject.required &&
+                                                            fieldEmpty
                                                         ) {
                                                             currentObj[key] =
                                                                 fieldObject.type ===
@@ -1041,7 +1049,10 @@ const ActionModal = () => {
                                                                           "radio"
                                                                     ? false
                                                                     : [];
-                                                        } else {
+                                                        } else if (
+                                                            !fieldObject.required &&
+                                                            fieldEmpty
+                                                        ) {
                                                             delete currentObj[
                                                                 key
                                                             ];
