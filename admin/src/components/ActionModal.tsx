@@ -11,6 +11,7 @@ import { editItem } from "../utils/editItem";
 import { getItemWithNoDispatch } from "../utils/getItem";
 import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
+import ProductImageInput from "./ProductImageInput";
 
 const ActionModal = () => {
     const action = useSelector((state: any) => state.actionReducer.action);
@@ -23,6 +24,43 @@ const ActionModal = () => {
     const [selectOptions, setSelectOptions] = useState<any>({});
     const [selectedItems, setSelectedItems] = useState<any>({});
     const [fields, setFields] = useState<any>({});
+    const [productImages, setProductImages] = useState<any>([]);
+    const [isProductImageOpened, setIsProductImageOpened] = useState(false);
+
+    const productImageFields = [
+        {
+            name: "колір",
+            field_name: "color",
+            getUrl: "/api/v1/product/related/product_color/list/",
+            target: "color_id",
+        },
+        {
+            name: "розмір",
+            field_name: "size",
+            getUrl: "/api/v1/product/size/list/",
+            target: "size_id",
+        },
+        {
+            name: "орієнтацція",
+            field_name: "orientation",
+            target: "orientation",
+            choices: [
+                { name: "ліва", field_name: "left" },
+                { name: "права", field_name: "right" },
+            ],
+        },
+        {
+            name: "тип лиштви",
+            field_name: "type_of_platband",
+            target: "type_of_platband",
+        },
+        {
+            name: "наявність скла",
+            field_name: "with_glass",
+            target: "glass_color_id",
+        },
+    ];
+    const [productImagesOptions, setProductImagesOptions] = useState<any>({});
 
     const {
         register,
@@ -32,6 +70,25 @@ const ActionModal = () => {
         reset,
         setValue,
     } = useForm();
+
+    useEffect(() => {
+        const isThereAnyProductImage = category.inputFields.some(
+            (field: any) => field.type === "product-image"
+        );
+
+        if (isThereAnyProductImage && isProductImageOpened) {
+            productImageFields.forEach(async (dependencyField: any) => {
+                const newValue = dependencyField.getUrl
+                    ? await getItems(dependencyField.getUrl)
+                    : false;
+
+                setProductImagesOptions((prev: any) => ({
+                    ...prev,
+                    [dependencyField.field_name]: newValue,
+                }));
+            });
+        }
+    }, [productImages, isProductImageOpened]);
 
     useEffect(() => {
         const getNestedValue = (obj: any, path: string): any => {
@@ -220,6 +277,13 @@ const ActionModal = () => {
                                     });
                                 }
 
+                                if (
+                                    fieldObject.type === "product-image" &&
+                                    item.photos
+                                ) {
+                                    setProductImages(item.photos);
+                                }
+
                                 setValue(fieldName, value);
                             }
                         );
@@ -290,6 +354,13 @@ const ActionModal = () => {
 
                                         return newFields;
                                     });
+                                }
+
+                                if (
+                                    itemField.type === "product-image" &&
+                                    item.photos
+                                ) {
+                                    setProductImages(item.photos);
                                 }
 
                                 setValue(fieldName, value);
@@ -601,6 +672,56 @@ const ActionModal = () => {
                     >
                         Add new field!
                     </button>
+                )}
+            </>
+        ) : fieldObject.type === "product-image" ? (
+            <>
+                <button onClick={() => setIsProductImageOpened(true)}>
+                    See files
+                </button>
+
+                {isProductImageOpened && (
+                    <div
+                        onMouseDown={() => setIsProductImageOpened(false)}
+                        className="action-modal-container"
+                    >
+                        <div
+                            className="action-modal"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                        >
+                            <div className="action-modal-content">
+                                {productImages.length > 0 &&
+                                    productImages.map(
+                                        (
+                                            imageObject: any,
+                                            imageIndex: number
+                                        ) => (
+                                            <ProductImageInput
+                                                image={imageObject}
+                                                setImage={(data: any) =>
+                                                    setProductImages(
+                                                        (prev: any) => {
+                                                            prev[imageIndex] =
+                                                                data;
+
+                                                            return prev;
+                                                        }
+                                                    )
+                                                }
+                                            />
+                                        )
+                                    )}
+                                <button
+                                    onClick={() => {
+                                        console.log(productImages);
+                                    }}
+                                >
+                                    Click me!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </>
         ) : (

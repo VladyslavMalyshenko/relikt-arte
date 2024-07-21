@@ -413,7 +413,12 @@ export const categoriesData: (MainCategory | Category)[] = [
         ],
         addItemFields: [
             { name: "артикул", field_name: "sku", type: "text" },
-
+            {
+                name: "Зображення",
+                field_name: "file_",
+                type: "product-image",
+                postUrl: "/api/v1/product/add_photo/$id/",
+            },
             {
                 name: "ціна",
                 field_name: "price",
@@ -491,7 +496,13 @@ export const categoriesData: (MainCategory | Category)[] = [
                 type: "text",
             },
             { name: "артикул", field_name: "sku", type: "text" },
-
+            {
+                name: "Зображення",
+                field_name: "file_",
+                type: "product-image",
+                postUrl: "/api/v1/product/add_photo/$id/",
+                getUrl: "/api/v1/product/$id",
+            },
             {
                 name: "ціна",
                 field_name: "price",
