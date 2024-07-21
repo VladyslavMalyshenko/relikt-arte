@@ -46,6 +46,14 @@ class ProductRepository(
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Product)
 
+    async def _add_default_options(self, options: list | None) -> list:
+        photos_options = selectinload(self.model.photos)
+        if not options:
+            options = [photos_options]
+        else:
+            options.append(photos_options)
+        return options
+
     async def create(self, *, obj_in: dict) -> int | UUID:
         return await super().create(
             obj_in=obj_in,
@@ -67,7 +75,36 @@ class ProductRepository(
             ),
         )
 
-    async def get_all_by_category(self, category_id: int) -> list[Product]:
+    async def get_all(
+        self,
+        options: list | None = None,
+        filters: list | None = None,
+    ) -> list[Product]:
+        options = await self._add_default_options(options)
+        return await super().get_all(
+            options=options,
+            filters=filters,
+        )
+
+    async def get_by_id(
+        self,
+        *,
+        obj_id: int | UUID,
+        options: list | None = None,
+    ) -> Product:
+        options = await self._add_default_options(options)
+        return await super().get_by_id(obj_id=obj_id, options=options)
+
+    async def get_by_ids(
+        self, *, obj_ids: list[int | UUID], options: list | None = None
+    ) -> list[Product]:
+        options = await self._add_default_options(options)
+        return await super().get_by_ids(obj_ids=obj_ids, options=options)
+
+    async def get_all_by_category(
+        self,
+        category_id: int,
+    ) -> list[Product]:
         return await self.get_all(
             filters=[self.model.category_id == category_id],
         )

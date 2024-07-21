@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from fastapi import Request
 from fastapi.datastructures import FormData
 
-from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
@@ -189,9 +188,7 @@ class ProductService(BaseService):
             async with self.uow:
                 return [
                     await self.get_show_scheme(product)
-                    for product in await self.uow.product.get_all(
-                        options=[selectinload(self.uow.product.model.photos)]
-                    )
+                    for product in await self.uow.product.get_all()
                 ]
         except SQLAlchemyError as e:
             log.exception(e)
