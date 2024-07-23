@@ -14,6 +14,8 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
     const [currentDependency, setCurrentDependency] = useState<any>({});
     const [isMain, setIsMain] = useState(image.is_main);
     const [productImageOptions, setProductImageOptions] = useState<any>({});
+    const [choiceChosen, setChoiceChosen] = useState<any>({});
+    const [chosenDependencies, setChosenDependencies] = useState<any>([]);
 
     const productImageFields = [
         {
@@ -68,7 +70,16 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
             target: "with_glass",
 
             choices: [
-                { name: "Присутнє", field: true },
+                {
+                    name: "Присутнє",
+                    field: true,
+                    chosen: {
+                        field: "with_glass",
+                        fieldValue: true,
+                        target: "glass_color_id",
+                        getUrl: "/api/v1/product/related/product_glass_color/list/",
+                    },
+                },
                 { name: "Відсутнє", field: false },
             ],
         },
@@ -95,6 +106,28 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
                         items,
                     },
                 };
+
+                if (optionField.choices) {
+                    const choicesWithChosen = (optionField.choices as any[])
+                        .map((choice: any) => choice.chosen)
+                        .filter((choice: any) => choice);
+
+                    if (choicesWithChosen.length > 0) {
+                        for (const chosen of choicesWithChosen) {
+                            const items = chosen.getUrl
+                                ? await getItems(chosen.getUrl)
+                                : chosen.choices;
+
+                            newOptions = {
+                                ...newOptions,
+                                [chosen.target]: {
+                                    target: chosen.target,
+                                    items,
+                                },
+                            };
+                        }
+                    }
+                }
             }
 
             setProductImageOptions(newOptions);
@@ -109,11 +142,24 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
         );
 
         let currentDependencyItem = { ...currentDependency };
+        let currentChosenDependencies = [...chosenDependencies];
+
+        const tryParseValue = (value: any) => {
+            if (value === "true" || value === "false") {
+                return value === "true";
+            } else if (!isNaN(parseInt(value))) {
+                return parseInt(value);
+            } else {
+                return value;
+            }
+        };
 
         const setDependencyIfNone = () => {
-            const target = (productImageOptionsFields as any).find(
+            const fieldObject = (productImageOptionsFields as any).find(
                 (item: any) => item.field === currentDependencyType
-            ).target;
+            );
+
+            const target = fieldObject.target;
 
             const neededList = document.querySelector(
                 `.product-image-container:nth-child(${
@@ -125,14 +171,79 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
 
             const radios = neededList.querySelectorAll("li input");
 
-            const tryParseValue = (value: any) => {
-                if (value === "true" || value === "false") {
-                    return value === "true";
-                } else if (!isNaN(parseInt(value))) {
-                    return parseInt(value);
+            const setChoiceChosenFunc = (fieldValue: any) => {
+                if (!fieldObject.choices) return;
+
+                let newValue: any[] = [...currentChosenDependencies];
+
+                const choice = fieldObject.choices.find(
+                    (choice: any) => choice.field === fieldValue
+                );
+
+                if (choice.chosen) {
+                    setChoiceChosen(choice.chosen);
+
+                    setTimeout(() => {
+                        const neededList = document.querySelector(
+                            ` .product-image-container:nth-child(${
+                                imageIndex + 1
+                            }) .product-image-fields .product-image-field:nth-child(4) ul.list-input`
+                        ) as any;
+
+                        if (neededList) {
+                            const radios =
+                                neededList.querySelectorAll("li input");
+
+                            if (radios) {
+                                const isRadiosNotChecked = Array.from(radios)
+                                    .map((radio: any) => radio.checked)
+                                    .every((checked: boolean) => !checked);
+
+                                if (isRadiosNotChecked) {
+                                    radios[0].checked = true;
+
+                                    const productOption =
+                                        productImageOptions[
+                                            choice.chosen.target
+                                        ].items[0];
+
+                                    newValue.push({
+                                        field: choice.chosen.target,
+                                        target: choice.chosen.field,
+                                        targetValue: choice.chosen.fieldValue,
+                                        value:
+                                            productOption.id ||
+                                            productOption.field,
+                                    });
+                                }
+                            }
+                        }
+                    }, 100);
                 } else {
-                    return value;
+                    const otherChoices = fieldObject.choices
+                        .filter((choice: any) => choice.field !== fieldValue)
+                        .map((choice: any) => choice.chosen)
+                        .filter((item: any) => item);
+
+                    otherChoices.forEach((choice: any) => {
+                        newValue = newValue.filter(
+                            (choiceObject: any) =>
+                                choiceObject.field !== choice.target
+                        );
+                    });
                 }
+
+                setTimeout(() => {
+                    console.log(newValue);
+
+                    if (
+                        JSON.stringify(newValue) !==
+                        JSON.stringify(chosenDependencies)
+                    ) {
+                        currentChosenDependencies = newValue;
+                        setChosenDependencies(newValue);
+                    }
+                }, 150);
             };
 
             if (JSON.stringify(currentDependency) === "{}") {
@@ -151,17 +262,20 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
                         }
                     });
                 } else {
+                    const fieldValue = tryParseValue(
+                        currentActive.getAttribute("data-type")
+                    );
+
                     const newValue = {
                         field: target,
-                        value: tryParseValue(
-                            currentActive.getAttribute("data-type")
-                        ),
+                        value: fieldValue,
                     };
 
                     const radio = currentActive.querySelector("input");
 
                     if (radio) {
                         radio.checked = true;
+                        setChoiceChosenFunc(fieldValue);
                     }
 
                     currentDependencyItem = newValue;
@@ -174,19 +288,32 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
 
                 if (radiosCheckedState.every((checked: any) => !checked)) {
                     const radio = radios[0];
+                    const fieldValue = tryParseValue(
+                        radio.parentNode.getAttribute("data-type")
+                    );
 
                     const newValue = {
                         field: target,
-                        value: tryParseValue(
-                            radio.parentNode.getAttribute("data-type")
-                        ),
+                        value: fieldValue,
                     };
+
+                    setChoiceChosenFunc(fieldValue);
 
                     radio.checked = true;
                     currentDependencyItem = newValue;
                     setCurrentDependency(newValue);
+                } else {
+                    const checkedRadio = Array.from(radios).find(
+                        (radio: any) => radio.checked
+                    ) as any;
 
-                    return;
+                    if (checkedRadio) {
+                        const fieldValue = tryParseValue(
+                            checkedRadio.parentNode.getAttribute("data-type")
+                        );
+
+                        setChoiceChosenFunc(fieldValue);
+                    }
                 }
             }
         };
@@ -197,8 +324,17 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
             ...image,
             dependency: currentDependencyType,
             [currentDependency.field]: currentDependency.value,
-            is_main: isMain,
+            is_main: isMain || false,
         };
+
+        if (currentChosenDependencies.length > 0) {
+            currentChosenDependencies.forEach((dependency: any) => {
+                newImage[dependency.field] = dependency.value;
+                newImage[dependency.target] = dependency.targetValue;
+            });
+        }
+
+        console.log(newImage);
 
         productImageOptionsFields.forEach((field) => {
             const itemValue = image[newImage.target];
@@ -217,7 +353,7 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
         }
 
         setImage(newImage);
-    }, [currentDependencyType, currentDependency, isMain]);
+    }, [currentDependencyType, currentDependency, isMain, chosenDependencies]);
 
     return (
         <div className="product-image-container">
@@ -274,12 +410,14 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
                             productImageOptions[
                                 currentDependencyType
                             ]?.items.map((item: any, index: number) => {
-                                const target = (
+                                const filterObject = (
                                     productImageOptionsFields as any
                                 ).find(
                                     (item: any) =>
                                         item.field === currentDependencyType
-                                ).target;
+                                );
+
+                                const target = filterObject.target;
 
                                 const isDefaultChecked =
                                     imageObject[target] === item.id;
@@ -311,6 +449,25 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
                                                 : {})}
                                             defaultChecked={isDefaultChecked}
                                             onChange={() => {
+                                                if (filterObject.choices) {
+                                                    const currentChoice =
+                                                        filterObject.choices.find(
+                                                            (choice: any) =>
+                                                                choice.field ===
+                                                                item.field
+                                                        );
+
+                                                    if (!currentChoice.chosen) {
+                                                        setChoiceChosen({});
+                                                    } else {
+                                                        setChoiceChosen(
+                                                            currentChoice.chosen
+                                                        );
+                                                    }
+                                                } else {
+                                                    setChoiceChosen({});
+                                                }
+
                                                 if (target) {
                                                     setCurrentDependency({
                                                         field: target,
@@ -328,6 +485,75 @@ const ProductImageInput = ({ image, imageIndex, setImage }: any) => {
                     </ul>
                     Залежність
                 </div>
+
+                {JSON.stringify(choiceChosen) !== "{}" && (
+                    <div className="product-image-field">
+                        <ul className="list-input">
+                            {productImageOptions[choiceChosen.target]?.items
+                                .length > 0 &&
+                                productImageOptions[
+                                    choiceChosen.target
+                                ]?.items.map((item: any, index: number) => {
+                                    const target = choiceChosen.target;
+                                    const isDefaultChecked =
+                                        imageObject[target] === item.id;
+
+                                    const isCurrentDependencyValueEqualToItemIdOrField =
+                                        currentDependency.value === item.id ||
+                                        item.field;
+
+                                    return (
+                                        <li
+                                            key={`deps[${index}]`}
+                                            data-type={item.id || item.field}
+                                            className={
+                                                isCurrentDependencyValueEqualToItemIdOrField ||
+                                                isDefaultChecked
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                        >
+                                            <input
+                                                name={`file_${image.id}_sub_deps`}
+                                                type="radio"
+                                                {...(action !== "add"
+                                                    ? {
+                                                          disabled:
+                                                              action ===
+                                                                  "show" ||
+                                                              action ===
+                                                                  "delete",
+                                                      }
+                                                    : {})}
+                                                defaultChecked={
+                                                    isDefaultChecked
+                                                }
+                                                onChange={() => {
+                                                    if (target) {
+                                                        setChosenDependencies(
+                                                            (prev: any) => [
+                                                                ...prev,
+                                                                {
+                                                                    field: target,
+                                                                    target: choiceChosen.field,
+                                                                    targetValue:
+                                                                        choiceChosen.fieldValue,
+                                                                    value:
+                                                                        item.id ||
+                                                                        item.field,
+                                                                },
+                                                            ]
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                            {item.name || item.dimensions}
+                                        </li>
+                                    );
+                                })}
+                        </ul>
+                    </div>
+                )}
             </div>
         </div>
     );
