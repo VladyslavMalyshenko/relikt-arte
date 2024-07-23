@@ -45,7 +45,7 @@ class ProductPhotoCreate(BaseModel):
 
 
 class ProductPhotoUpdate(BaseModel):
-    photo: Optional[str] = None
+    is_main: Optional[bool] = None
     dependency: Optional[ProductPhotoDepEnum] = None
     with_glass: Optional[bool] = None
     orientation: Optional[ProductOrientationEnum] = None
