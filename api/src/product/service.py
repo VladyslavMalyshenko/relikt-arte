@@ -293,6 +293,29 @@ class ProductPhotoService(BaseService):
             log.exception(e)
             raise ObjectUpdateException("ProductPhoto")
 
+    async def update_product_photo(
+        self,
+        data: ProductPhotoUpdate,
+        photo_id: int,
+    ) -> ProductPhotoShow:
+        try:
+            async with self.uow:
+                return await self.update_obj(
+                    self.uow.product_photo, data, photo_id
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("ProductPhoto")
+
+    async def delete_product_photo(self, photo_id: int) -> None:
+        try:
+            async with self.uow:
+                await self.uow.product_photo.delete_by_id(obj_id=photo_id)
+                await self.uow.commit()
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("ProductPhoto")
+
 
 class CategoryService(BaseService):
     async def get_show_scheme(self, obj) -> CategoryShow:
