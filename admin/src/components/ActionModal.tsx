@@ -281,7 +281,11 @@ const ActionModal = () => {
                                     fieldObject.type === "product-image" &&
                                     item.photos
                                 ) {
-                                    setProductImages(item.photos);
+                                    setProductImages([
+                                        ...item.photos.map((f: any) =>
+                                            JSON.parse(JSON.stringify(f))
+                                        ),
+                                    ]);
                                 }
 
                                 setValue(fieldName, value);
@@ -360,7 +364,11 @@ const ActionModal = () => {
                                     itemField.type === "product-image" &&
                                     item.photos
                                 ) {
-                                    setProductImages(item.photos);
+                                    setProductImages([
+                                        ...item.photos.map((f: any) =>
+                                            JSON.parse(JSON.stringify(f))
+                                        ),
+                                    ]);
                                 }
 
                                 setValue(fieldName, value);
@@ -699,6 +707,10 @@ const ActionModal = () => {
                                         ) => (
                                             <ProductImageInput
                                                 image={imageObject}
+                                                imageIndex={imageIndex}
+                                                key={`${
+                                                    fieldName + imageObject.id
+                                                }`}
                                                 setImage={(data: any) =>
                                                     setProductImages(
                                                         (prev: any) => {
@@ -897,6 +909,53 @@ const ActionModal = () => {
                     ) => {
                         const cleanObj = { ...obj };
 
+                        const handleProductPhotos = () => {
+                            if (!cleanObj?.photos && originalItem?.photos) {
+                                let newPhotos = productImages.map(
+                                    (item: any) => item
+                                );
+
+                                newPhotos.forEach((newPhoto: any) => {
+                                    const initialPhotoObject =
+                                        originalItem.photos.find(
+                                            (photo: any) =>
+                                                photo.id === newPhoto.id
+                                        );
+
+                                    const photoKeys =
+                                        Object.keys(initialPhotoObject);
+
+                                    photoKeys.forEach((key: string) => {
+                                        if (
+                                            key !== "id" &&
+                                            newPhoto[key] ===
+                                                initialPhotoObject[key]
+                                        ) {
+                                            delete newPhoto[key];
+                                        }
+                                    });
+                                });
+
+                                newPhotos = newPhotos.filter(
+                                    (newPhoto: any) =>
+                                        Object.keys(newPhoto).length > 1
+                                );
+
+                                cleanObj["photos"] = newPhotos;
+
+                                return;
+                            } else if (cleanObj.photos && originalItem.photos) {
+                                if (
+                                    JSON.stringify(originalItem.photos) ===
+                                    JSON.stringify(productImages)
+                                ) {
+                                    delete cleanObj.photos;
+                                }
+                            }
+                        };
+
+                        handleProductPhotos();
+
                         const isFieldInCategory = (fieldName: string) =>
                             categoryFields.some(
                                 (field: InputField) =>
@@ -926,7 +985,8 @@ const ActionModal = () => {
                                     ) as any;
 
                                     if (
-                                        !isFieldInCategory(fullPath) ||
+                                        (!isFieldInCategory(fullPath) &&
+                                            fullPath !== "photos") ||
                                         (value === originalItem?.[fullPath] &&
                                             typeof value !== "boolean" &&
                                             labelElement.style.display !==
@@ -950,12 +1010,13 @@ const ActionModal = () => {
                                                     field.name) === fullPath
                                         ) as InputField;
 
+                                        const isEmpty =
+                                            currentObj[key] === undefined ||
+                                            currentObj[key] === null ||
+                                            currentObj[key] === "";
+
                                         if (
-                                            (fieldObject.required &&
-                                                (currentObj[key] ===
-                                                    undefined ||
-                                                    currentObj[key] === null ||
-                                                    currentObj[key] === "")) ||
+                                            (fieldObject.required && isEmpty) ||
                                             (typeof currentObj[key] ===
                                                 "boolean" &&
                                                 currentObj[key] === true)
@@ -971,7 +1032,7 @@ const ActionModal = () => {
                                                           "radio"
                                                     ? false
                                                     : [];
-                                        } else {
+                                        } else if (!fieldObject.required) {
                                             delete currentObj[key];
                                         }
                                     }
@@ -980,6 +1041,7 @@ const ActionModal = () => {
                         };
 
                         recursiveClean(cleanObj);
+
                         return cleanObj;
                     };
 
