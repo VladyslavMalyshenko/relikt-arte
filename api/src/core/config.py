@@ -73,6 +73,13 @@ class StaticFilesSettings(BaseSettings):
         return DotenvListHelper.get_list_from_value(v)
 
 
+class PaginationSettings(BaseSettings):
+    limit_per_page: int = Field(
+        alias="pagination_limit_per_page",
+        default=30,
+    )
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -95,9 +102,10 @@ class Settings(BaseSettings):
     cache: CacheSettings = Field(default_factory=CacheSettings)
 
     # Static files
-    static: StaticFilesSettings = Field(
-        default_factory=StaticFilesSettings
-    )
+    static: StaticFilesSettings = Field(default_factory=StaticFilesSettings)
+
+    # Pagination
+    pagination: PaginationSettings = Field(default_factory=PaginationSettings)
 
 
 @lru_cache

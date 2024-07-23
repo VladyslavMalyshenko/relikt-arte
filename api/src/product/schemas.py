@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from ..core.schemas import MainSchema
+from ..core.schemas import MainSchema, BaseListSchema
 from .enums import (
     ProductPhotoDepEnum,
     ProductOrientationEnum,
@@ -45,7 +45,7 @@ class ProductPhotoCreate(BaseModel):
 
 
 class ProductPhotoUpdate(BaseModel):
-    photo: Optional[str] = None
+    is_main: Optional[bool] = None
     dependency: Optional[ProductPhotoDepEnum] = None
     with_glass: Optional[bool] = None
     orientation: Optional[ProductOrientationEnum] = None
@@ -163,3 +163,6 @@ class ProductRelShow(MainSchema):
     id: int
     name: str
     active: bool
+
+
+ProductListSchema = BaseListSchema[ProductShow]

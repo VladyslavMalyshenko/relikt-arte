@@ -13,6 +13,7 @@ from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductPhotoUpdate,
     ProductPhotoShow,
     CategoryCreate,
     CategoryUpdate,
@@ -24,6 +25,7 @@ from .schemas import (
     ProductRelUpdate,
     ProductRelShow,
 )
+from .dependencies import pagination_params
 from .enums import ProductRelModelEnum
 
 
@@ -362,4 +364,34 @@ async def product_add_photo(
         request=request,
         photos_form_data=form_data,
         product_id=product_id,
+    )
+
+
+@router.put(
+    "/update_photo/{photo_id}/",
+    status_code=status.HTTP_200_OK,
+    tags=["Product"],
+)
+async def product_update_photo(
+    uow: uowDEP,
+    data: ProductPhotoUpdate,
+    photo_id: int,
+):
+    return await ProductPhotoService(uow).update_product_photo(
+        data=data,
+        photo_id=photo_id,
+    )
+
+
+@router.delete(
+    "/delete_photo/{photo_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Product"],
+)
+async def product_delete_photo(
+    uow: uowDEP,
+    photo_id: int,
+):
+    return await ProductPhotoService(uow).delete_product_photo(
+        photo_id=photo_id,
     )
