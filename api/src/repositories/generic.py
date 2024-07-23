@@ -4,7 +4,14 @@ from typing import Generic, TypeVar, Optional
 
 from pydantic import BaseModel
 
-from sqlalchemy import select, insert, update, delete, exists
+from sqlalchemy import (
+    select,
+    insert,
+    update,
+    delete,
+    exists,
+    func,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.db.base import Base
@@ -118,3 +125,13 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
     async def delete_by_id(self, *, obj_id: int | uuid.UUID) -> None:
         stmt = delete(self.model).where(self.model.id == obj_id)
         await self.session.execute(stmt)
+
+    async def get_count(
+        self,
+        filters: Optional[list] = None,
+    ) -> int:
+        query = select([func.count()]).select_from(self.model)
+        if filters:
+            query = await self._add_filters_to_query(query, filters)
+        res = await self.session.execute(query)
+        return res.scalar()

@@ -13,6 +13,7 @@ from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductListSchema,
     ProductPhotoShow,
     CategoryCreate,
     CategoryUpdate,
@@ -24,6 +25,7 @@ from .schemas import (
     ProductRelUpdate,
     ProductRelShow,
 )
+from .dependencies import pagination_params
 from .enums import ProductRelModelEnum
 
 

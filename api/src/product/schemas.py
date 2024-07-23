@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from ..core.schemas import MainSchema
+from ..core.schemas import MainSchema, BaseListSchema
 from .enums import (
     ProductPhotoDepEnum,
     ProductOrientationEnum,
@@ -163,3 +163,6 @@ class ProductRelShow(MainSchema):
     id: int
     name: str
     active: bool
+
+
+ProductListSchema = BaseListSchema[ProductShow]
