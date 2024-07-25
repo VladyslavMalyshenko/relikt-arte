@@ -66,7 +66,6 @@ class ProductPhotoShow(MainSchema):
     type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
     color_id: Optional[int] = None
     size_id: Optional[int] = None
-    glass_color_id: Optional[int] = None
 
 
 class ProductCreate(BaseModel):
@@ -166,3 +165,6 @@ class ProductRelShow(MainSchema):
 
 
 ProductListSchema = BaseListSchema[ProductShow]
+ProductSizeListSchema = BaseListSchema[ProductSizeShow]
+ProductRelListSchema = BaseListSchema[ProductRelShow]
+CategoryListSchema = BaseListSchema[CategoryShow]

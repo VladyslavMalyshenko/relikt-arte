@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Request
 
 from ..core.db.dependencies import uowDEP
+from ..core.dependencies import pagination_params
 
 from .service import (
     ProductService,
@@ -25,7 +26,6 @@ from .schemas import (
     ProductRelUpdate,
     ProductRelShow,
 )
-from .dependencies import pagination_params
 from .enums import ProductRelModelEnum
 
 
@@ -94,6 +94,7 @@ async def delete_product_rel_object(
 async def get_all_product_rel_objects(
     uow: uowDEP,
     rel_model: ProductRelModelEnum,
+    pagination: pagination_params,
 ) -> list[ProductRelShow]:
     return await ProductRelService(uow).get_product_rel_list(
         rel_model=rel_model,

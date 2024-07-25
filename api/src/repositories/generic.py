@@ -38,6 +38,14 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
             query = query.filter(filter)
         return query
 
+    async def _add_pagination_to_query(
+        self,
+        query,
+        page: int,
+        page_size: int,
+    ) -> None:
+        return query.limit(page_size).offset((page - 1) * page_size)
+
     async def create(
         self,
         *,
@@ -97,10 +105,19 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         *,
         obj_ids: list[int | uuid.UUID],
         options: Optional[list] = None,
+        with_pagination: bool = False,
+        pagination_page: Optional[int] = None,
+        pagination_page_size: Optional[int] = None,
     ) -> list[T]:
         query = select(self.model).where(self.model.id.in_(obj_ids))
         if options:
             query = await self._add_options_to_query(query, options)
+        if with_pagination:
+            query = await self._add_pagination_to_query(
+                query,
+                page=pagination_page,
+                page_size=pagination_page_size,
+            )
         res = await self.session.execute(query)
         return res.scalars().all()
 
@@ -108,12 +125,21 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         self,
         options: Optional[list] = None,
         filters: Optional[list] = None,
+        with_pagination: bool = False,
+        pagination_page: Optional[int] = None,
+        pagination_page_size: Optional[int] = None,
     ) -> list[T]:
         query = select(self.model)
         if options:
             query = await self._add_options_to_query(query, options)
         if filters:
             query = await self._add_filters_to_query(query, filters)
+        if with_pagination:
+            query = await self._add_pagination_to_query(
+                query,
+                page=pagination_page,
+                page_size=pagination_page_size,
+            )
         res = await self.session.execute(query)
         return res.scalars().all()
 
