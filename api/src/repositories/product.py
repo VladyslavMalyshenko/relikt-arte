@@ -79,11 +79,17 @@ class ProductRepository(
         self,
         options: list | None = None,
         filters: list | None = None,
+        with_pagination: bool = False,
+        pagination_page: Optional[int] = None,
+        pagination_page_size: Optional[int] = None,
     ) -> list[Product]:
         options = await self._add_default_options(options)
         return await super().get_all(
             options=options,
             filters=filters,
+            with_pagination=False,
+            pagination_page=None,
+            pagination_page_size=None,
         )
 
     async def get_by_id(
@@ -96,10 +102,22 @@ class ProductRepository(
         return await super().get_by_id(obj_id=obj_id, options=options)
 
     async def get_by_ids(
-        self, *, obj_ids: list[int | UUID], options: list | None = None
+        self,
+        *,
+        obj_ids: list[int | UUID],
+        options: list | None = None,
+        with_pagination=False,
+        pagination_page=None,
+        pagination_page_size=None,
     ) -> list[Product]:
         options = await self._add_default_options(options)
-        return await super().get_by_ids(obj_ids=obj_ids, options=options)
+        return await super().get_by_ids(
+            obj_ids=obj_ids,
+            options=options,
+            with_pagination=False,
+            pagination_page=None,
+            pagination_page_size=None,
+        )
 
     async def get_all_by_category(
         self,
@@ -192,6 +210,22 @@ class ProductRelRepository(
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, self.model_class)
+
+    async def get_all(
+        self,
+        options: list | None = None,
+        filters: list | None = None,
+        with_pagination: bool = False,
+        pagination_page: int | None = None,
+        pagination_page_size: int | None = None,
+    ) -> list[ProductRel]:
+        return await super().get_all(
+            options,
+            filters,
+            with_pagination,
+            pagination_page,
+            pagination_page_size,
+        )
 
 
 class ProductColorRepository(ProductRelRepository[ProductColor]):

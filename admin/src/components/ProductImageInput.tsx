@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetDeleteItem } from "../redux/actions/currentDeleteObjectActions";
 import "../styles/components/ProductImageInput.scss";
+import { getElementAsync } from "../utils/getElementAsync";
 import { getItem } from "../utils/getItem";
 
 const ProductImageInput = ({
@@ -11,6 +12,8 @@ const ProductImageInput = ({
     setImage,
     selectOptions,
     optionFields,
+    setIsValid,
+    removeField,
 }: any) => {
     const action = useSelector((state: any) => state.actionReducer.action);
     const dispatch = useDispatch();
@@ -25,9 +28,8 @@ const ProductImageInput = ({
     const [currentDependencyType, setCurrentDependencyType] = useState<any>(
         image.dependency
     );
-    const [currentDependencyValue, setCurrentDependencyValue] = useState<any>(
-        {}
-    );
+    const [currentDependencyValue, setCurrentDependencyValue] =
+        useState<any>(null);
     const [isMain, setIsMain] = useState(image.is_main);
     const [currentFile, setCurrentFile] = useState<any>(null);
     const imageInputRef = useRef<any>(null);
@@ -71,8 +73,31 @@ const ProductImageInput = ({
         await getItem(category.getItemUrl, { id: item.id });
     };
 
+    const onDeleteButtonClick = async () => {
+        if (imageObject.photo) {
+            await sendRequest("delete");
+        } else {
+            removeField();
+        }
+    };
+
+    const getCurrentDependencyValue = (imageObject: any) => {
+        const currentDependency = imageObject.dependency;
+
+        const field = optionFields.find(
+            (field: any) =>
+                formatDependencyType(field.field) === currentDependency
+        );
+
+        if (field?.target) {
+            return image[field.target];
+        }
+    };
+
     useEffect(() => {
         setCurrentDependencyType(image.dependency);
+        setIsMain(image.is_main);
+        setCurrentDependencyValue(getCurrentDependencyValue(image));
         setImageObject(image);
     }, [image]);
 
@@ -87,11 +112,168 @@ const ProductImageInput = ({
     };
 
     useEffect(() => {
-        if (imageObject.photos) {
-            const newImage = { ...imageObject };
-        } else {
-        }
-    }, [currentDependencyType, currentDependencyValue]);
+        const setUpFields = async () => {
+            let currentDependencyValueItem = currentDependencyValue;
+
+            if (currentDependencyType && imageObject.photo) {
+                const currentOptions =
+                    selectOptions[currentDependencyType]?.items;
+
+                const currentTarget =
+                    selectOptions[currentDependencyType]?.target;
+
+                if (currentOptions && currentTarget) {
+                    const targetValue = JSON.parse(
+                        JSON.stringify(currentDependencyValueItem) ||
+                            JSON.stringify(imageObject[currentTarget])
+                    );
+
+                    const isValueInItems = currentOptions.some(
+                        (item: any) => (item.id || item.field) === targetValue
+                    );
+
+                    if (!isValueInItems) {
+                        currentDependencyValueItem = null;
+                    } else {
+                        currentDependencyValueItem = targetValue;
+                    }
+                }
+            }
+
+            const targetList = (await getElementAsync(
+                `.product-image-container:nth-child(${
+                    imageIndex + 1
+                }) .product-image-fields .product-image-field:nth-child(3) ul.list-input`
+            )) as any;
+
+            if (currentDependencyValueItem !== null) {
+                targetList.classList.remove("invalid");
+
+                if (imageObject.photo) {
+                    const newImage = { ...imageObject };
+
+                    newImage.is_main = isMain || false;
+
+                    if (currentDependencyType !== image.dependency) {
+                        newImage.dependency = currentDependencyType;
+                    }
+
+                    if (
+                        currentDependencyValueItem !==
+                        getCurrentDependencyValue(image)
+                    ) {
+                        const field = optionFields.find(
+                            (field: any) =>
+                                formatDependencyType(field.field) ===
+                                newImage.dependency
+                        );
+
+                        if (field?.target) {
+                            newImage[field.target] = currentDependencyValueItem;
+                        }
+                    }
+
+                    const clearOtherFields = () => {
+                        const otherFields = optionFields.filter(
+                            (field: any) =>
+                                formatDependencyType(field.field) !==
+                                currentDependencyType
+                        );
+
+                        otherFields.forEach((field: any) => {
+                            newImage[field.target] = null;
+                        });
+                    };
+
+                    clearOtherFields();
+
+                    setCurrentDependencyValue(currentDependencyValueItem);
+                    setImage(newImage);
+                } else {
+                    setIsValid(false);
+
+                    const fileIndex = imageIndex + 1;
+
+                    const targetDependencyTypeList = (await getElementAsync(
+                        `.product-image-container:nth-child(${fileIndex}) .product-image-fields .product-image-field:nth-child(2) ul.list-input`
+                    )) as any;
+
+                    const targetImage = (await getElementAsync(
+                        `.product-image-container:nth-child(${fileIndex}) img`
+                    )) as any;
+
+                    const targetDependencyList = (await getElementAsync(
+                        `.product-image-container:nth-child(${
+                            imageIndex + 1
+                        }) .product-image-fields .product-image-field:nth-child(3) ul.list-input`
+                    )) as any;
+
+                    if (!currentFile) {
+                        targetImage.classList.add("invalid");
+                    } else {
+                        targetImage.classList.remove("invalid");
+                    }
+
+                    if (!currentDependencyType) {
+                        targetDependencyTypeList.classList.add("invalid");
+                    } else {
+                        targetDependencyTypeList.classList.remove("invalid");
+                    }
+
+                    if (!currentDependencyValueItem) {
+                        targetDependencyList.classList.add("invalid");
+                    } else {
+                        targetDependencyList.classList.remove("invalid");
+                    }
+
+                    if (
+                        !currentFile ||
+                        !currentDependencyType ||
+                        !currentDependencyValueItem
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        currentFile &&
+                        currentDependencyType &&
+                        JSON.stringify(currentDependencyValueItem)
+                    ) {
+                        setImage(`file_${fileIndex}`, currentFile);
+
+                        const field = optionFields.find(
+                            (field: any) =>
+                                formatDependencyType(field.field) ===
+                                currentDependencyType
+                        );
+
+                        const dependencyObject = {
+                            dependency: currentDependencyType,
+                            [field.target]: currentDependencyValueItem,
+                            is_main: isMain || false,
+                        };
+
+                        setCurrentDependencyValue(currentDependencyValueItem);
+                        setIsValid(true);
+                        setImage(
+                            `file_${fileIndex}_dep`,
+                            JSON.stringify(dependencyObject)
+                        );
+                    }
+                }
+            } else {
+                targetList.classList.add("invalid");
+            }
+        };
+
+        setUpFields();
+    }, [
+        currentFile,
+        currentDependencyType,
+        currentDependencyValue,
+        isMain,
+        imageObject,
+    ]);
 
     return (
         <div className="product-image-container">
@@ -127,7 +309,7 @@ const ProductImageInput = ({
                 <div className="product-image-field">
                     <input
                         type="checkbox"
-                        defaultChecked={image.is_main}
+                        defaultChecked={isMain}
                         onChange={() => setIsMain(!isMain)}
                     />
                     Чи є головним?
@@ -256,12 +438,7 @@ const ProductImageInput = ({
                 </div>
             </div>
 
-            <button
-                className="delete"
-                onClick={async () => {
-                    await sendRequest("delete");
-                }}
-            >
+            <button className="delete" onClick={onDeleteButtonClick}>
                 <svg
                     viewBox="0 0 24 24"
                     fill="none"

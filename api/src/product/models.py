@@ -246,16 +246,6 @@ class ProductPhoto(BaseModelMixin, Base):
         index=True,
         doc="Size ID",
     )
-    glass_color_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product_glass_color.id",
-            onupdate="CASCADE",
-            ondelete="SET NULL",
-        ),
-        nullable=True,
-        index=True,
-        doc="Glass color ID",
-    )
 
     def __str__(self) -> str:
         return f"Photo: {self.photo}"

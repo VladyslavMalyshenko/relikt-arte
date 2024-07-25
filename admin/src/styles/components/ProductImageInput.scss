@@ -9,6 +9,10 @@
         img {
             width: 200px;
             height: 200px;
+
+            &.invalid {
+                border: 2px solid var(--red);
+            }
         }
 
         button {
