@@ -7,8 +7,15 @@ import {
 import store from "../redux/store";
 import { generateUrl } from "./generateUrl";
 
-export const addItem = async (url_part: string, newItem: any) => {
+export const addItem = async (url_part: string, newItem: any, data?: any) => {
     let validUrl = generateUrl(url_part);
+    let isResponseSuccess = false;
+
+    if (data) {
+        Object.keys(data).forEach((key) => {
+            validUrl = validUrl.replace(`$${key}`, data[key]);
+        });
+    }
 
     await axios
         .post(validUrl, newItem)
@@ -20,6 +27,7 @@ export const addItem = async (url_part: string, newItem: any) => {
 
             store.dispatch(AddNotification(success as NotificationBody));
             store.dispatch(SetCurrentAction(""));
+            isResponseSuccess = true;
         })
         .catch(() => {
             const error = {
@@ -29,4 +37,6 @@ export const addItem = async (url_part: string, newItem: any) => {
 
             store.dispatch(AddNotification(error as NotificationBody));
         });
+
+    return isResponseSuccess;
 };

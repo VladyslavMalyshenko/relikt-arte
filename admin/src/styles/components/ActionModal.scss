@@ -174,38 +174,6 @@
         overflow-x: hidden;
         padding-bottom: 20px;
         box-sizing: border-box;
-
-        .product-image {
-            &-container {
-                width: 100%;
-                height: auto;
-                display: flex;
-                align-items: center;
-                gap: 20px;
-
-                img {
-                    width: 200px;
-                    height: 200px;
-                }
-            }
-
-            &-fields {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            &-field {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-
-                ul.list-input {
-                    height: 50px;
-                    width: 150px;
-                }
-            }
-        }
     }
 
     &-container {
@@ -219,5 +187,9 @@
         justify-content: center;
         background: rgba(0, 0, 0, 0.7);
         z-index: 10;
+
+        &.no-background {
+            background: transparent;
+        }
     }
 }

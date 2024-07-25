@@ -15,7 +15,7 @@ const Test = () => {
                     data[dataKey] = data[dataKey][0];
                     data[dataKey + "_dep"] = JSON.stringify({
                         dependency: "color",
-                        color_id: 8,
+                        color_id: 13,
                     });
                 }
             }
@@ -32,7 +32,7 @@ const Test = () => {
         console.log(data);
 
         axios
-            .post("http://localhost:8000/api/v1/product/add_photo/61", fd)
+            .post("http://localhost:8000/api/v1/product/add_photo/64", fd)
             .then((res) => console.log(res))
             .catch((err) => console.log(err));
     };

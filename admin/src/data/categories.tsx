@@ -418,6 +418,8 @@ export const categoriesData: (MainCategory | Category)[] = [
                 field_name: "file_",
                 type: "product-image",
                 postUrl: "/api/v1/product/add_photo/$id/",
+                getUrl: "/api/v1/product/$id",
+                updateUrl: "/api/v1/product/update_photo/$id/",
             },
             {
                 name: "ціна",
@@ -502,6 +504,7 @@ export const categoriesData: (MainCategory | Category)[] = [
                 type: "product-image",
                 postUrl: "/api/v1/product/add_photo/$id/",
                 getUrl: "/api/v1/product/$id",
+                updateUrl: "/api/v1/product/update_photo/$id/",
             },
             {
                 name: "ціна",

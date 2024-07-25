@@ -17,6 +17,7 @@ export type InputField = {
     dependencies?: InputFieldDependency[];
     labelField?: string;
     postUrl?: string;
+    updateUrl?: string;
     required?: boolean;
     locked?: boolean;
 };
