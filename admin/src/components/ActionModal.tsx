@@ -67,8 +67,8 @@ const ActionModal = () => {
             field: "type_of_platband",
             target: "type_of_platband",
             choices: [
-                { name: "Г-подібний", field: "L-shaped" },
                 { name: "Звичайний", field: "default" },
+                { name: "Г-подібний", field: "L-shaped" },
             ],
         },
         {
