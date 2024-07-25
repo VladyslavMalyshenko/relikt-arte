@@ -1,6 +1,8 @@
 import logging
 import json
 
+from typing import Optional
+
 from pydantic import BaseModel
 
 from fastapi import Request
@@ -9,6 +11,8 @@ from fastapi.datastructures import FormData
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
+from ..core.dependencies import PaginationParams
+
 from ..repositories.product import ProductRelRepository
 from ..utils.exceptions.http.base import (
     ObjectCreateException,
@@ -23,6 +27,7 @@ from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductListSchema,
     ProductPhotoCreate,
     ProductPhotoUpdate,
     ProductPhotoShow,
@@ -30,12 +35,15 @@ from .schemas import (
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
+    CategoryListSchema,
     ProductSizeCreate,
     ProductSizeUpdate,
     ProductSizeShow,
+    ProductSizeListSchema,
     ProductRelCreate,
     ProductRelUpdate,
     ProductRelShow,
+    ProductRelListSchema,
 )
 from .enums import ProductRelModelEnum, ProductPhotoDepEnum
 from .utils import _default_product_description_json
@@ -45,6 +53,8 @@ log = logging.getLogger(__name__)
 
 
 class ProductService(BaseService):
+    list_schema = ProductListSchema
+
     async def get_show_scheme(self, obj) -> BaseModel:
         return ProductShow(
             id=obj.id,
@@ -183,13 +193,16 @@ class ProductService(BaseService):
             log.exception(e)
             raise ObjectUpdateException("Product")
 
-    async def get_product_list(self) -> list[ProductShow]:
+    async def get_product_list(
+        self,
+        pagination: Optional[PaginationParams] = None,
+    ) -> list[ProductShow]:
         try:
             async with self.uow:
-                return [
-                    await self.get_show_scheme(product)
-                    for product in await self.uow.product.get_all()
-                ]
+                return await self.get_obj_list(
+                    repo=self.uow.product,
+                    pagination_params=pagination,
+                )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("Product")
@@ -317,6 +330,8 @@ class ProductPhotoService(BaseService):
 
 
 class CategoryService(BaseService):
+    list_schema = CategoryListSchema
+
     async def get_show_scheme(self, obj) -> CategoryShow:
         return CategoryShow(
             id=obj.id,
@@ -415,6 +430,8 @@ class CategoryService(BaseService):
 
 
 class ProductSizeService(BaseService):
+    list_schema = ProductSizeListSchema
+
     async def get_show_scheme(self, obj) -> ProductSizeShow:
         return ProductSizeShow(
             id=obj.id,
@@ -471,16 +488,24 @@ class ProductSizeService(BaseService):
             log.exception(e)
             raise ObjectUpdateException("ProductSize")
 
-    async def get_product_size_list(self) -> list[ProductSizeShow]:
+    async def get_product_size_list(
+        self,
+        pagination: Optional[PaginationParams] = None,
+    ) -> ProductSizeListSchema | list[ProductSizeShow]:
         try:
             async with self.uow:
-                return await self.get_obj_list(self.uow.product_size)
+                return await self.get_obj_list(
+                    repo=self.uow.product_size,
+                    pagination_params=pagination,
+                )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("ProductSize")
 
 
 class ProductRelService(BaseService):
+    list_schema = ProductRelListSchema
+
     async def get_show_scheme(self, obj) -> BaseModel:
         return ProductRelShow(
             id=obj.id,
@@ -544,12 +569,14 @@ class ProductRelService(BaseService):
             raise ObjectUpdateException(rel_model)
 
     async def get_product_rel_list(
-        self, rel_model: ProductRelModelEnum
+        self,
+        rel_model: ProductRelModelEnum,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[ProductRelShow]:
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                return await self.get_obj_list(repo)
+                return await self.get_obj_list(repo, pagination)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException(rel_model)

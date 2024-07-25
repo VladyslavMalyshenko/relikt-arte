@@ -2,9 +2,10 @@ from typing import TypeVar, Iterable, Optional
 
 from uuid import UUID
 
-from sqlalchemy import insert
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..core.dependencies import PaginationParams
 
 from .generic import GenericRepository
 
@@ -80,16 +81,14 @@ class ProductRepository(
         options: list | None = None,
         filters: list | None = None,
         with_pagination: bool = False,
-        pagination_page: Optional[int] = None,
-        pagination_page_size: Optional[int] = None,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[Product]:
         options = await self._add_default_options(options)
         return await super().get_all(
             options=options,
             filters=filters,
-            with_pagination=False,
-            pagination_page=None,
-            pagination_page_size=None,
+            with_pagination=with_pagination,
+            pagination=pagination,
         )
 
     async def get_by_id(
@@ -107,24 +106,26 @@ class ProductRepository(
         obj_ids: list[int | UUID],
         options: list | None = None,
         with_pagination=False,
-        pagination_page=None,
-        pagination_page_size=None,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[Product]:
         options = await self._add_default_options(options)
         return await super().get_by_ids(
             obj_ids=obj_ids,
             options=options,
-            with_pagination=False,
-            pagination_page=None,
-            pagination_page_size=None,
+            with_pagination=with_pagination,
+            pagination=pagination,
         )
 
     async def get_all_by_category(
         self,
         category_id: int,
+        with_pagination=False,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[Product]:
         return await self.get_all(
             filters=[self.model.category_id == category_id],
+            with_pagination=with_pagination,
+            pagination=pagination,
         )
 
 
@@ -216,15 +217,13 @@ class ProductRelRepository(
         options: list | None = None,
         filters: list | None = None,
         with_pagination: bool = False,
-        pagination_page: int | None = None,
-        pagination_page_size: int | None = None,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[ProductRel]:
         return await super().get_all(
             options,
             filters,
             with_pagination,
-            pagination_page,
-            pagination_page_size,
+            pagination,
         )
 
 

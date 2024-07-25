@@ -15,6 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.db.base import Base
+from ..core.dependencies import PaginationParams
 from ..utils.base import clean_dict
 
 
@@ -106,8 +107,7 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         obj_ids: list[int | uuid.UUID],
         options: Optional[list] = None,
         with_pagination: bool = False,
-        pagination_page: Optional[int] = None,
-        pagination_page_size: Optional[int] = None,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
         query = select(self.model).where(self.model.id.in_(obj_ids))
         if options:
@@ -115,8 +115,8 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         if with_pagination:
             query = await self._add_pagination_to_query(
                 query,
-                page=pagination_page,
-                page_size=pagination_page_size,
+                page=pagination.page,
+                page_size=pagination.size,
             )
         res = await self.session.execute(query)
         return res.scalars().all()
@@ -126,8 +126,7 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         options: Optional[list] = None,
         filters: Optional[list] = None,
         with_pagination: bool = False,
-        pagination_page: Optional[int] = None,
-        pagination_page_size: Optional[int] = None,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
         query = select(self.model)
         if options:
@@ -137,8 +136,8 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         if with_pagination:
             query = await self._add_pagination_to_query(
                 query,
-                page=pagination_page,
-                page_size=pagination_page_size,
+                page=pagination.page,
+                page_size=pagination.size,
             )
         res = await self.session.execute(query)
         return res.scalars().all()
@@ -156,7 +155,7 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         self,
         filters: Optional[list] = None,
     ) -> int:
-        query = select([func.count()]).select_from(self.model)
+        query = select(func.count()).select_from(self.model)
         if filters:
             query = await self._add_filters_to_query(query, filters)
         res = await self.session.execute(query)

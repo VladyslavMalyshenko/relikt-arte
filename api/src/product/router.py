@@ -14,17 +14,20 @@ from .schemas import (
     ProductCreate,
     ProductUpdate,
     ProductShow,
+    ProductListSchema,
     ProductPhotoUpdate,
-    ProductPhotoShow,
     CategoryCreate,
     CategoryUpdate,
     CategoryShow,
+    CategoryListSchema,
     ProductSizeCreate,
     ProductSizeUpdate,
     ProductSizeShow,
+    ProductSizeListSchema,
     ProductRelCreate,
     ProductRelUpdate,
     ProductRelShow,
+    ProductRelListSchema,
 )
 from .enums import ProductRelModelEnum
 
@@ -88,16 +91,16 @@ async def delete_product_rel_object(
 @router.get(
     "/related/{rel_model}/list/",
     status_code=status.HTTP_200_OK,
-    response_model=list[ProductRelShow],
     tags=["Product related"],
 )
 async def get_all_product_rel_objects(
     uow: uowDEP,
     rel_model: ProductRelModelEnum,
     pagination: pagination_params,
-) -> list[ProductRelShow]:
+) -> ProductRelListSchema | list[ProductRelShow]:
     return await ProductRelService(uow).get_product_rel_list(
         rel_model=rel_model,
+        pagination=pagination,
     )
 
 
@@ -166,13 +169,15 @@ async def delete_product_size(
 @router.get(
     "/size/list/",
     status_code=status.HTTP_200_OK,
-    response_model=list[ProductSizeShow],
     tags=["Product size"],
 )
 async def get_all_product_sizes(
     uow: uowDEP,
-) -> list[ProductSizeShow]:
-    return await ProductSizeService(uow).get_product_size_list()
+    pagination: pagination_params,
+) -> ProductSizeListSchema | list[ProductSizeShow]:
+    return await ProductSizeService(uow).get_product_size_list(
+        pagination=pagination,
+    )
 
 
 @router.get(
@@ -311,13 +316,15 @@ async def product_delete(
 @router.get(
     "/list/",
     status_code=status.HTTP_200_OK,
-    response_model=list[ProductShow],
     tags=["Product"],
 )
 async def get_all_products(
     uow: uowDEP,
-) -> list[ProductShow]:
-    return await ProductService(uow).get_product_list()
+    pagination: pagination_params,
+) -> ProductListSchema | list[ProductShow]:
+    return await ProductService(uow).get_product_list(
+        pagination=pagination,
+    )
 
 
 @router.get(

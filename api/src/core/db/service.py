@@ -1,10 +1,13 @@
 import uuid
 
-from typing import TypeVar
+from typing import TypeVar, Optional
 
 from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
+
+from ...core.dependencies import PaginationParams
+from ...core.schemas import BaseListSchema
 
 from .dependencies import uowDEP
 from ...utils.exceptions.http.base import IdNotFoundException
@@ -33,6 +36,8 @@ class AbstractService(ABC):
 
 
 class BaseService(AbstractService):
+    list_schema: Optional[BaseListSchema] = None
+
     def __init__(self, uow: uowDEP) -> None:
         self.uow = uow
 
@@ -61,6 +66,43 @@ class BaseService(AbstractService):
             raise IdNotFoundException(model=repo.model, id=obj_id)
         return await self.get_show_scheme(obj)
 
-    async def get_obj_list(self, repo: Repo) -> list[BaseModel]:
-        objs = await repo.get_all()
-        return [await self.get_show_scheme(obj) for obj in objs]
+    async def get_obj_list(
+        self,
+        repo: Repo,
+        pagination_params: Optional[PaginationParams] = None,
+    ) -> BaseListSchema[BaseModel] | list[BaseModel]:
+        if pagination_params and pagination_params.page:
+            paginated = True
+            objs = await repo.get_all(
+                with_pagination=True,
+                pagination=pagination_params,
+            )
+        else:
+            paginated = False
+            objs = await repo.get_all()
+
+        objs_list = [await self.get_show_scheme(obj) for obj in objs]
+
+        if paginated:
+            objs_total_count = await repo.get_count()
+            total_pages = (
+                objs_total_count + pagination_params.size - 1
+            ) // pagination_params.size
+            next_page = (
+                pagination_params.page + 1
+                if pagination_params.page < total_pages
+                else None
+            )
+            previous_page = (
+                pagination_params.page - 1
+                if pagination_params.page > 1
+                else None
+            )
+            return self.list_schema(
+                objects_count=objs_total_count,
+                next_page=next_page,
+                previous_page=previous_page,
+                pages_count=total_pages,
+                results=objs_list,
+            )
+        return objs_list
