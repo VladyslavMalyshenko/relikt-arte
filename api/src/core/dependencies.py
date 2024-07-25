@@ -1,14 +1,14 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import Depends, Query
 
-from ..core.config import settings
+from .config import settings
 
 
 class PaginationParams:
     def __init__(
         self,
-        page: int = Query(ge=1, default=1),
+        page: Optional[int] = Query(ge=1, default=None),
         size: int = Query(
             ge=1, le=500, default=settings.pagination.limit_per_page
         ),

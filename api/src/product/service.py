@@ -228,7 +228,6 @@ class ProductPhotoService(BaseService):
             orientation=obj.orientation,
             type_of_platband=obj.type_of_platband,
             color_id=obj.color_id,
-            glass_color_id=obj.glass_color_id,
             size_id=obj.size_id,
         )
 
