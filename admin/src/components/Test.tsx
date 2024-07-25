@@ -1,11 +1,11 @@
+import axios from "axios";
 import { useForm } from "react-hook-form";
 
 const Test = () => {
     const { register, handleSubmit } = useForm();
 
     const sendNudes = (data: any) => {
-        // const fd = new FormData();
-        const dataKeys = Object.keys(data);
+        let dataKeys = Object.keys(data);
 
         dataKeys.forEach((dataKey: string) => {
             if (data[dataKey] instanceof FileList) {
@@ -13,16 +13,28 @@ const Test = () => {
                     delete data[dataKey];
                 } else {
                     data[dataKey] = data[dataKey][0];
+                    data[dataKey + "_dep"] = JSON.stringify({
+                        dependency: "color",
+                        color_id: 13,
+                    });
                 }
             }
         });
 
+        const fd = new FormData();
+
+        dataKeys = Object.keys(data);
+
+        dataKeys.forEach((key: string) => {
+            fd.append(key, data[key]);
+        });
+
         console.log(data);
 
-        // axios
-        //   .post("http://localhost:8000/api/v1/product/create", fd)
-        //   .then((res) => console.log(res))
-        //   .catch((err) => console.log(err));
+        axios
+            .post("http://localhost:8000/api/v1/product/add_photo/64", fd)
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err));
     };
 
     return (
