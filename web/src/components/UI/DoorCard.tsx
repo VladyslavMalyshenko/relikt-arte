@@ -2,7 +2,10 @@ import { useNavigate } from "react-router-dom";
 import ProductStaticImage from "../../assets/staticProductImage.webp";
 import { paths } from "../../router/paths";
 import "../../styles/components/UI/DoorCard.scss";
-import { ProductType } from "../../types/productsRelatedTypes";
+import {
+    ProductPhotoType,
+    ProductType,
+} from "../../types/productsRelatedTypes";
 import Button from "./Button";
 
 type DoorCardProps = {
@@ -20,7 +23,11 @@ const DoorCard = ({ product }: DoorCardProps) => {
             onClick={() => navigate(paths.buy + `/${product.id}`)}
         >
             <img
-                src={ProductStaticImage}
+                src={
+                    product.photos.find(
+                        (photo: ProductPhotoType) => photo.is_main
+                    )?.photo || ProductStaticImage
+                }
                 alt={`door-${product.price}-${product.id}`}
             />
             <div className="door-card-inner" onClick={stopPropagation}></div>

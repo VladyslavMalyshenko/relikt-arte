@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { SetCurrentPage } from "../../redux/actions/PageActions";
 import "../../styles/components/UI/BuySectionProducts.scss";
 import { ProductType } from "../../types/productsRelatedTypes";
 import { getItems } from "../../utils/getItems";
@@ -6,14 +8,23 @@ import BuyProductsPagination from "./BuyProductsPagination";
 import DoorCard from "./DoorCard";
 
 const BuySectionProducts = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [products, setProduts] = useState<ProductType[]>([]);
-    const pages = 4;
+    const currentPage = useSelector(
+        (state: any) => state.PageReducer.currentPage
+    );
+    const availablePages = useSelector(
+        (state: any) => state.PageReducer.availablePages
+    );
+    const [products, setProducts] = useState<ProductType[]>([]);
+    const dispatch = useDispatch();
+
+    const changePage = (page: number) => {
+        dispatch(SetCurrentPage(page));
+    };
 
     useEffect(() => {
         let page = currentPage;
         if (currentPage < 1) {
-            setCurrentPage(1);
+            changePage(1);
             page = 1;
         }
 
@@ -21,15 +32,11 @@ const BuySectionProducts = () => {
             const newProducts = await getItems(
                 `/api/v1/product/list?page=${page}`
             );
-            setProduts(newProducts || []);
+            setProducts(newProducts || []);
         };
 
         getProducts();
     }, [currentPage]);
-
-    const changePage = (page: number) => {
-        setCurrentPage(page);
-    };
 
     return (
         <div className="buy-products">
@@ -42,7 +49,7 @@ const BuySectionProducts = () => {
 
             <BuyProductsPagination
                 currentPage={currentPage}
-                pages={pages}
+                pages={availablePages}
                 changePage={changePage}
             />
         </div>

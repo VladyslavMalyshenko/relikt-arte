@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/productpage/ProductSection.scss";
-import { ProductType } from "../../../types/productsRelatedTypes";
+import {
+    ProductPhotoType,
+    ProductType,
+} from "../../../types/productsRelatedTypes";
 import { getItem } from "../../../utils/getItem";
 import Button from "../../UI/Button";
 import DropDown from "../../UI/DropDown";
@@ -52,7 +55,15 @@ const ProductSection = () => {
                     <div className="product-info">
                         <div className="product-info-main">
                             <div className="product-info-main-image">
-                                <img src="https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png" />
+                                <img
+                                    src={
+                                        product?.photos.find(
+                                            (photo: ProductPhotoType) =>
+                                                photo.is_main
+                                        )?.photo ||
+                                        "https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png"
+                                    }
+                                />
                             </div>
 
                             <div className="product-info-main-description">
