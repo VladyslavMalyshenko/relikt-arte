@@ -7,7 +7,12 @@ import {
 import store from "../redux/store";
 import { generateUrl } from "./generateUrl";
 
-export const editItem = async (url_part: string, newItem: any, data: any) => {
+export const editItem = async (
+    url_part: string,
+    newItem: any,
+    data: any,
+    onSuccess?: any
+) => {
     let validUrl = generateUrl(url_part);
 
     if (data) {
@@ -18,7 +23,7 @@ export const editItem = async (url_part: string, newItem: any, data: any) => {
 
     await axios
         .put(validUrl, newItem)
-        .then(() => {
+        .then(async (res) => {
             const success = {
                 message: `Item with id ${data.id} was changed.`,
                 type: "success",
@@ -26,6 +31,10 @@ export const editItem = async (url_part: string, newItem: any, data: any) => {
 
             store.dispatch(AddNotification(success as NotificationBody));
             store.dispatch(SetCurrentAction(""));
+
+            if (onSuccess) {
+                await onSuccess(res.data);
+            }
         })
         .catch(() => {
             const error = {

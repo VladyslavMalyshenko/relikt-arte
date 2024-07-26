@@ -43,7 +43,19 @@ const ActionModal = () => {
     const closeProductPhotoAddWindow = () => {
         setIsAddProductImageOpened(false);
         setAddProductImages([]);
-        addImagesFormDataRef.current = new FormData();
+        if (action !== "add") {
+            addImagesFormDataRef.current = new FormData();
+        }
+    };
+
+    const getAddProductImageFormDataItemsCount = (formData: any) => {
+        let counter = 0;
+
+        for (const key of formData.keys()) {
+            counter++;
+        }
+
+        return counter / 2;
     };
 
     const productImageOptionsFields = [
@@ -96,6 +108,49 @@ const ActionModal = () => {
         reset,
         setValue,
     } = useForm();
+
+    useEffect(() => {
+        if (
+            isAddProductImageOpened &&
+            action === "add" &&
+            getAddProductImageFormDataItemsCount(addImagesFormDataRef.current) >
+                0
+        ) {
+            setAddProductImages((prev: any) => {
+                const newValue = [...prev];
+
+                const availableItems = getAddProductImageFormDataItemsCount(
+                    addImagesFormDataRef.current
+                );
+
+                for (let i = 1; i <= availableItems; i++) {
+                    const prefix = `file_${i}`;
+
+                    const file = addImagesFormDataRef.current.get(prefix);
+
+                    const info = JSON.parse(
+                        addImagesFormDataRef.current.get(prefix + "_dep")
+                    );
+
+                    if (!newValue[i - 1]) {
+                        newValue[i - 1] = {};
+                    }
+
+                    if (file) {
+                        newValue[i - 1].defaultPhoto = file;
+                    }
+
+                    if (info) {
+                        Object.keys(info).forEach((infoKey: string) => {
+                            newValue[i - 1][infoKey] = info[infoKey];
+                        });
+                    }
+                }
+
+                return newValue;
+            });
+        }
+    }, [isAddProductImageOpened]);
 
     useEffect(() => {
         const getNestedValue = (obj: any, path: string): any => {
@@ -803,25 +858,27 @@ const ActionModal = () => {
                                             />
                                         )
                                     )}
-                                <button
-                                    className="add-item"
-                                    onClick={() => {
-                                        setIsAddProductImageOpened(true);
-                                        setIsProductImageOpened(false);
-                                    }}
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                                        fill="currentColor"
-                                        version="1.1"
-                                        viewBox="0 0 490 490"
-                                        xmlSpace="preserve"
+                                {action !== "show" && (
+                                    <button
+                                        className="add-item"
+                                        onClick={() => {
+                                            setIsAddProductImageOpened(true);
+                                            setIsProductImageOpened(false);
+                                        }}
                                     >
-                                        <path d="M227.8,174.1v53.7h-53.7c-9.5,0-17.2,7.7-17.2,17.2s7.7,17.2,17.2,17.2h53.7v53.7c0,9.5,7.7,17.2,17.2,17.2     s17.1-7.7,17.1-17.2v-53.7h53.7c9.5,0,17.2-7.7,17.2-17.2s-7.7-17.2-17.2-17.2h-53.7v-53.7c0-9.5-7.7-17.2-17.1-17.2     S227.8,164.6,227.8,174.1z" />
-                                        <path d="M71.7,71.7C25.5,118,0,179.5,0,245s25.5,127,71.8,173.3C118,464.5,179.6,490,245,490s127-25.5,173.3-71.8     C464.5,372,490,310.4,490,245s-25.5-127-71.8-173.3C372,25.5,310.5,0,245,0C179.6,0,118,25.5,71.7,71.7z M455.7,245     c0,56.3-21.9,109.2-61.7,149s-92.7,61.7-149,61.7S135.8,433.8,96,394s-61.7-92.7-61.7-149S56.2,135.8,96,96s92.7-61.7,149-61.7     S354.2,56.2,394,96S455.7,188.7,455.7,245z" />
-                                    </svg>
-                                </button>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xmlnsXlink="http://www.w3.org/1999/xlink"
+                                            fill="currentColor"
+                                            version="1.1"
+                                            viewBox="0 0 490 490"
+                                            xmlSpace="preserve"
+                                        >
+                                            <path d="M227.8,174.1v53.7h-53.7c-9.5,0-17.2,7.7-17.2,17.2s7.7,17.2,17.2,17.2h53.7v53.7c0,9.5,7.7,17.2,17.2,17.2     s17.1-7.7,17.1-17.2v-53.7h53.7c9.5,0,17.2-7.7,17.2-17.2s-7.7-17.2-17.2-17.2h-53.7v-53.7c0-9.5-7.7-17.2-17.1-17.2     S227.8,164.6,227.8,174.1z" />
+                                            <path d="M71.7,71.7C25.5,118,0,179.5,0,245s25.5,127,71.8,173.3C118,464.5,179.6,490,245,490s127-25.5,173.3-71.8     C464.5,372,490,310.4,490,245s-25.5-127-71.8-173.3C372,25.5,310.5,0,245,0C179.6,0,118,25.5,71.7,71.7z M455.7,245     c0,56.3-21.9,109.2-61.7,149s-92.7,61.7-149,61.7S135.8,433.8,96,394s-61.7-92.7-61.7-149S56.2,135.8,96,96s92.7-61.7,149-61.7     S354.2,56.2,394,96S455.7,188.7,455.7,245z" />
+                                        </svg>
+                                    </button>
+                                )}
 
                                 <div className="action-modal-buttons">
                                     <button
@@ -837,7 +894,7 @@ const ActionModal = () => {
                         </div>
                     </div>
                 )}
-                {isAddProductImageOpened && (
+                {isAddProductImageOpened && action !== "show" ? (
                     <div
                         onMouseDown={closeProductPhotoAddWindow}
                         className="action-modal-container no-background"
@@ -848,7 +905,9 @@ const ActionModal = () => {
                             onMouseDown={(e) => e.stopPropagation()}
                         >
                             <div className="action-modal-content not-main ">
-                                {addProductImages.length > 0 &&
+                                {(getAddProductImageFormDataItemsCount(
+                                    addImagesFormDataRef.current
+                                ) || addProductImages.length) > 0 &&
                                     addProductImages.map(
                                         (
                                             imageObject: any,
@@ -858,7 +917,9 @@ const ActionModal = () => {
                                                 image={imageObject}
                                                 imageIndex={imageIndex}
                                                 key={`${
-                                                    fieldName + imageObject.id
+                                                    fieldName +
+                                                    (imageObject.id ||
+                                                        imageIndex + 1)
                                                 }`}
                                                 selectOptions={
                                                     productImageOptions
@@ -933,35 +994,37 @@ const ActionModal = () => {
                                         className={"show"}
                                         onClick={closeProductPhotoAddWindow}
                                     >
-                                        Закрити
+                                        Повернутися
                                     </button>
 
-                                    <button
-                                        className={"add"}
-                                        onClick={async () => {
-                                            const newItem = await addItem(
-                                                fieldObject.postUrl as string,
-                                                addImagesFormDataRef.current,
-                                                { id: item.id }
-                                            );
+                                    {action !== "add" && (
+                                        <button
+                                            className={"add"}
+                                            onClick={async () => {
+                                                const newItem = await addItem(
+                                                    fieldObject.postUrl as string,
+                                                    addImagesFormDataRef.current,
+                                                    { id: item.id }
+                                                );
 
-                                            if (newItem) {
-                                                closeProductPhotoAddWindow();
+                                                if (newItem) {
+                                                    closeProductPhotoAddWindow();
+                                                }
+                                            }}
+                                            disabled={
+                                                !isAddProductImageValid.every(
+                                                    (item: any) => item
+                                                )
                                             }
-                                        }}
-                                        disabled={
-                                            !isAddProductImageValid.every(
-                                                (item: any) => item
-                                            )
-                                        }
-                                    >
-                                        Додати
-                                    </button>
+                                        >
+                                            Додати
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                )}
+                ) : null}
             </>
         ) : (
             <input
@@ -1110,32 +1173,37 @@ const ActionModal = () => {
         };
 
         const handleSuccess = async () => {
-            const data = getValues();
-            const isAnyError = await handleErrors();
-
             if (action === "show") {
                 closeModal();
 
                 return;
             } else if (action === "delete") {
-                deleteItem(
-                    deleteObject?.url || category.deleteUrl,
-                    {
-                        id: deleteObject?.item?.id || item.id,
-                    },
-                    "edit"
-                );
+                if (JSON.stringify(deleteObject) !== "{}") {
+                    await deleteItem(
+                        deleteObject?.url || category.deleteUrl,
+                        {
+                            id: deleteObject?.item?.id || item.id,
+                        },
+                        "edit"
+                    );
 
-                if (deleteObject) {
                     dispatch(SetDeleteItem({}));
+                } else {
+                    await deleteItem(category.deleteUrl, {
+                        id: item.id,
+                    });
                 }
 
-                if (isProductImageOpened) {
+                if (isProductImageOpened || isAddProductImageOpened) {
                     setIsProductImageOpened(false);
+                    setIsAddProductImageOpened(false);
                 }
 
                 return;
             }
+
+            const data = getValues();
+            const isAnyError = await handleErrors();
 
             if (!isAnyError) {
                 delete data.field;
@@ -1150,54 +1218,79 @@ const ActionModal = () => {
 
                         const handleProductPhotos = async () => {
                             if (originalItem?.photos) {
-                                let newPhotos = productImages.map(
+                                const photos = productImages.map(
                                     (item: any) => item
                                 );
 
-                                newPhotos.forEach(
-                                    (newPhoto: any, index: number) => {
-                                        const initialPhotoObject =
-                                            originalItem.photos.find(
-                                                (photo: any) =>
-                                                    photo.id === newPhoto.id
-                                            );
+                                const clearPhotos = photos
+                                    .map(
+                                        (
+                                            newPhoto: any,
+                                            index: number,
+                                            currentPhotos: any
+                                        ) => {
+                                            const initialPhotoObject =
+                                                originalItem.photos.find(
+                                                    (originalPhoto: any) =>
+                                                        originalPhoto.id ===
+                                                        newPhoto.id
+                                                );
 
-                                        if (
-                                            JSON.stringify(newPhoto) ===
-                                            JSON.stringify(initialPhotoObject)
-                                        ) {
-                                            newPhotos.splice(index, 1);
-                                            return;
-                                        }
-
-                                        const photoKeys =
-                                            Object.keys(initialPhotoObject);
-
-                                        photoKeys.forEach((key: string) => {
                                             if (
-                                                key !== "id" &&
-                                                newPhoto[key] ===
-                                                    initialPhotoObject[key]
+                                                !newPhoto ||
+                                                !initialPhotoObject
                                             ) {
-                                                delete newPhoto[key];
+                                                return;
                                             }
-                                        });
-                                    }
-                                );
 
-                                newPhotos = newPhotos.filter(
-                                    (newPhoto: any) =>
-                                        Object.keys(newPhoto).length > 1
-                                );
+                                            if (
+                                                JSON.stringify(newPhoto) ===
+                                                JSON.stringify(
+                                                    initialPhotoObject
+                                                )
+                                            ) {
+                                                currentPhotos.splice(index, 1);
+                                            } else {
+                                                const photoKeys =
+                                                    Object.keys(
+                                                        initialPhotoObject
+                                                    );
+
+                                                photoKeys.forEach(
+                                                    (key: string) => {
+                                                        if (
+                                                            key !== "id" &&
+                                                            newPhoto[key] ===
+                                                                initialPhotoObject[
+                                                                    key
+                                                                ]
+                                                        ) {
+                                                            delete newPhoto[
+                                                                key
+                                                            ];
+                                                        }
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    )
+                                    .filter(
+                                        (newPhoto: any) =>
+                                            newPhoto &&
+                                            Object.keys(newPhoto).length > 1
+                                    );
 
                                 const fieldObject = categoryFields.find(
                                     (field) => field.type === "product-image"
                                 ) as any;
 
-                                if (fieldObject.updateUrl) {
+                                if (
+                                    fieldObject.updateUrl &&
+                                    clearPhotos.length > 0
+                                ) {
                                     await bulkEdit(
                                         fieldObject.updateUrl,
-                                        newPhotos,
+                                        clearPhotos,
                                         ["id"]
                                     );
                                 }
@@ -1300,7 +1393,7 @@ const ActionModal = () => {
                         item
                     );
 
-                    editItem(category.editUrl, newItem, {
+                    await editItem(category.editUrl, newItem, {
                         id: item.id,
                     });
                 } else if (action === "add") {
@@ -1507,7 +1600,28 @@ const ActionModal = () => {
                         }
                     );
 
-                    addItem(category.addUrl, newItem);
+                    await addItem(
+                        category.addUrl,
+                        newItem,
+                        null,
+                        async (data: any) => {
+                            const fieldObject = category.inputFields.find(
+                                (field: any) => field.type === "product-image"
+                            );
+
+                            if (fieldObject) {
+                                const newItem = await addItem(
+                                    fieldObject.postUrl as string,
+                                    addImagesFormDataRef.current,
+                                    { id: data.id }
+                                );
+
+                                if (newItem) {
+                                    closeProductPhotoAddWindow();
+                                }
+                            }
+                        }
+                    );
                 }
             }
         };

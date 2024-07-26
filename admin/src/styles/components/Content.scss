@@ -185,4 +185,51 @@
             }
         }
     }
+
+    .pagination {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        &-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--active-background);
+            color: var(--text-color);
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+            aspect-ratio: 1/1;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.3s;
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            &.active {
+                background: var(--active-color);
+                color: var(--active-background);
+            }
+
+            &:active:not(.disabled) {
+                background: var(--active-color);
+                color: var(--active-background);
+            }
+        }
+    }
+}
+
+@media (hover: hover) {
+    .pagination-button:hover:not(.disabled) {
+        background: var(--active-color);
+        color: var(--active-background);
+    }
 }
