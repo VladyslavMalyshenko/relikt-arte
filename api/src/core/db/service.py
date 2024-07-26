@@ -69,17 +69,24 @@ class BaseService(AbstractService):
     async def get_obj_list(
         self,
         repo: Repo,
+        options: Optional[list] = None,
+        filters: Optional[list] = None,
         pagination_params: Optional[PaginationParams] = None,
     ) -> BaseListSchema[BaseModel] | list[BaseModel]:
         if pagination_params and pagination_params.page:
             paginated = True
             objs = await repo.get_all(
                 with_pagination=True,
+                options=options,
+                filters=filters,
                 pagination=pagination_params,
             )
         else:
             paginated = False
-            objs = await repo.get_all()
+            objs = await repo.get_all(
+                options=options,
+                filters=filters,
+            )
 
         objs_list = [await self.get_show_scheme(obj) for obj in objs]
 

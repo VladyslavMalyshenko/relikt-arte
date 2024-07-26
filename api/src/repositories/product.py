@@ -116,18 +116,6 @@ class ProductRepository(
             pagination=pagination,
         )
 
-    async def get_all_by_category(
-        self,
-        category_id: int,
-        with_pagination=False,
-        pagination: Optional[PaginationParams] = None,
-    ) -> list[Product]:
-        return await self.get_all(
-            filters=[self.model.category_id == category_id],
-            with_pagination=with_pagination,
-            pagination=pagination,
-        )
-
 
 class ProductPhotoRepository(
     GenericRepository[ProductPhoto, ProductPhotoCreate, ProductPhotoUpdate]
@@ -151,13 +139,6 @@ class CategoryRepository(
 ):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Category)
-
-    async def get_all_with_allowed_sizes(self) -> list[Category]:
-        return await self.get_all(
-            options=[
-                selectinload(self.model.allowed_sizes),
-            ]
-        )
 
     async def get_by_id_with_allowed_sizes(self, obj_id: int) -> Category:
         return await self.get_by_id(
@@ -219,11 +200,12 @@ class ProductRelRepository(
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[ProductRel]:
+        print(f"FILTERS : {filters}")
         return await super().get_all(
-            options,
-            filters,
-            with_pagination,
-            pagination,
+            options=options,
+            filters=filters,
+            with_pagination=with_pagination,
+            pagination=pagination,
         )
 
 
