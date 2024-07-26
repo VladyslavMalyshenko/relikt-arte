@@ -244,13 +244,13 @@ async def delete_category(
 @router.get(
     "/category/list/",
     status_code=status.HTTP_200_OK,
-    response_model=list[CategoryShow],
     tags=["Category"],
 )
 async def get_all_categories(
     uow: uowDEP,
-) -> list[CategoryShow]:
-    return await CategoryService(uow).get_category_list()
+    pagination: pagination_params,
+) -> CategoryListSchema | list[CategoryShow]:
+    return await CategoryService(uow).get_category_list(pagination=pagination)
 
 
 @router.get(
@@ -330,15 +330,16 @@ async def get_all_products(
 @router.get(
     "/list/category/{category_id}/",
     status_code=status.HTTP_200_OK,
-    response_model=list[ProductShow],
     tags=["Product"],
 )
 async def get_all_products_by_category(
     uow: uowDEP,
     category_id: int,
-) -> list[ProductShow]:
+    pagination: pagination_params,
+) -> ProductListSchema | list[ProductShow]:
     return await ProductService(uow).get_products_by_category(
         category_id=category_id,
+        pagination=pagination,
     )
 
 

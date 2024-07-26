@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from fastapi import Request
 from fastapi.datastructures import FormData
 
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
@@ -208,7 +209,9 @@ class ProductService(BaseService):
             raise ObjectUpdateException("Product")
 
     async def get_products_by_category(
-        self, category_id: int
+        self,
+        category_id: int,
+        pagination: Optional[PaginationParams] = None,
     ) -> list[ProductShow]:
         try:
             async with self.uow:
@@ -218,12 +221,14 @@ class ProductService(BaseService):
                     raise IdNotFoundException(
                         self.uow.category.model, category_id
                     )
-                return [
-                    await self.get_show_scheme(product)
-                    for product in await self.uow.product.get_all_by_category(
-                        category_id=category_id
-                    )
-                ]
+                return await self.get_obj_list(
+                    repo=self.uow.product,
+                    filters=[
+                        self.uow.product.model.category_id == category_id
+                    ],
+                    pagination_params=pagination,
+                )
+
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("Product")
@@ -417,13 +422,19 @@ class CategoryService(BaseService):
             log.exception(e)
             raise ObjectUpdateException("Category")
 
-    async def get_category_list(self) -> list[CategoryShow]:
+    async def get_category_list(
+        self,
+        pagination: Optional[PaginationParams] = None,
+    ) -> list[CategoryShow]:
         try:
             async with self.uow:
-                return [
-                    await self.get_show_scheme(category)
-                    for category in await self.uow.category.get_all_with_allowed_sizes()
-                ]
+                return await self.get_obj_list(
+                    repo=self.uow.category,
+                    options=[
+                        selectinload(self.uow.category.model.allowed_sizes),
+                    ],
+                    pagination_params=pagination,
+                )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("Category")
@@ -576,7 +587,9 @@ class ProductRelService(BaseService):
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
-                return await self.get_obj_list(repo, pagination)
+                return await self.get_obj_list(
+                    repo=repo, pagination_params=pagination
+                )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException(rel_model)
