@@ -125,7 +125,8 @@
             transition: 0.3s;
 
             &.opened {
-                max-height: 3000px;
+                max-height: 500px;
+                overflow-y: auto;
             }
         }
 

@@ -13,6 +13,7 @@ export type ProductPhotoType = {
 
 export type ProductType = {
     id: number;
+    sku: string;
     price: number;
     photo: string;
     description?: {

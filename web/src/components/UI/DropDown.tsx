@@ -1,16 +1,80 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/components/UI/BuySectionFilters.scss";
+import { getItems } from "../../utils/getItems";
 import FilterInput from "./FilterInput";
+
+type DropDownOption = {
+    name: string;
+    value: any;
+    key?: string;
+};
+
+type DropDownAsyncOption = {
+    url: string;
+    labelKey: string;
+};
 
 type DropDownProps = {
     label: string;
-    options: string[];
+    options: DropDownOption[] | DropDownAsyncOption;
+    field: string;
     borderless?: boolean;
+    onChosen: any;
 };
 
-const DropDown = ({ label, options, borderless = true }: DropDownProps) => {
+const DropDown = ({
+    label,
+    options,
+    field,
+    onChosen,
+    borderless = true,
+}: DropDownProps) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
+    const [currentOptions, setCurrentOptions] = useState<any[]>([]);
+
+    useEffect(() => {
+        const getOptions = async () => {
+            let newCurrentOptions: DropDownAsyncOption | DropDownOption[] =
+                options;
+
+            if (Array.isArray(newCurrentOptions)) {
+                setCurrentOptions(newCurrentOptions);
+            } else if (newCurrentOptions.url && newCurrentOptions.labelKey) {
+                let newOptions = await getItems(newCurrentOptions.url);
+
+                newOptions = newOptions.map((item: any) => ({
+                    name: item[
+                        (newCurrentOptions as DropDownAsyncOption).labelKey
+                    ],
+                    key: `${
+                        item[
+                            (newCurrentOptions as DropDownAsyncOption).labelKey
+                        ]
+                    }-${item.id}`,
+                    value: item.id,
+                }));
+
+                setCurrentOptions(newOptions);
+                newCurrentOptions = newOptions;
+            }
+
+            if (
+                newCurrentOptions &&
+                (newCurrentOptions as DropDownOption[]).length > 0
+            ) {
+                const option = (newCurrentOptions as DropDownOption[])[0];
+                const targetValue = option.value;
+
+                const currentIdentifier = `option-${option.key || option.name}`;
+
+                onChosen(field, targetValue);
+                setSelectedOption(currentIdentifier);
+            }
+        };
+
+        getOptions();
+    }, [options]);
 
     return (
         <div className="filters-filter">
@@ -43,16 +107,30 @@ const DropDown = ({ label, options, borderless = true }: DropDownProps) => {
                     filtersOpened ? " opened" : ""
                 }`}
             >
-                {options.map((option, index) => (
-                    <FilterInput
-                        type="radio"
-                        key={`option-${index}`}
-                        label={option}
-                        groupName={label}
-                        isChecked={selectedOption === `option-${index}`}
-                        onChange={() => setSelectedOption(`option-${index}`)}
-                    />
-                ))}
+                {currentOptions.length > 0 &&
+                    currentOptions.map((option: DropDownOption) => {
+                        const currentIdentifier = `option-${
+                            option.key || option.name
+                        }`;
+
+                        const targetValue = option.value;
+
+                        return (
+                            <FilterInput
+                                type="radio"
+                                key={currentIdentifier}
+                                label={
+                                    (option as DropDownOption).name as string
+                                }
+                                groupName={field}
+                                isChecked={selectedOption === currentIdentifier}
+                                onChange={() => {
+                                    setSelectedOption(currentIdentifier);
+                                    onChosen(field, targetValue);
+                                }}
+                            />
+                        );
+                    })}
             </div>
         </div>
     );

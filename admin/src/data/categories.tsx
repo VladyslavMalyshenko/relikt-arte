@@ -412,7 +412,12 @@ export const categoriesData: (MainCategory | Category)[] = [
             },
         ],
         addItemFields: [
-            { name: "артикул", field_name: "sku", type: "text" },
+            {
+                name: "артикул",
+                field_name: "sku",
+                type: "text",
+                required: true,
+            },
             {
                 name: "Зображення",
                 field_name: "file_",
@@ -497,7 +502,12 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "id",
                 type: "text",
             },
-            { name: "артикул", field_name: "sku", type: "text" },
+            {
+                name: "артикул",
+                field_name: "sku",
+                type: "text",
+                required: true,
+            },
             {
                 name: "Зображення",
                 field_name: "file_",

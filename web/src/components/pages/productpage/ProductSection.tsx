@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/productpage/ProductSection.scss";
@@ -16,6 +17,7 @@ const ProductSection = () => {
     const [product, setProduct] = useState<ProductType | undefined>(undefined);
     const [isLoaded, setIsLoaded] = useState(false);
     const navigate = useNavigate();
+    const { setValue, handleSubmit } = useForm();
 
     useEffect(() => {
         setIsLoaded(false);
@@ -46,7 +48,7 @@ const ProductSection = () => {
                             { name: "головна", location: paths.main },
                             { name: "продукція", location: paths.buy },
                             {
-                                name: "тестовий продукт",
+                                name: product?.sku || "",
                                 location: paths.buy + `/${product_id}`,
                             },
                         ]}
@@ -86,6 +88,9 @@ const ProductSection = () => {
                                         inversed={true}
                                         borderless={false}
                                         additionalClasses={["upper"]}
+                                        onClickCallback={handleSubmit(
+                                            (data: any) => console.log(data)
+                                        )}
                                     >
                                         <svg
                                             width="19"
@@ -119,61 +124,86 @@ const ProductSection = () => {
                                     <DropDown
                                         borderless={false}
                                         label="колір"
-                                        options={[
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                        ]}
+                                        field="color"
+                                        options={{
+                                            url: "api/v1/product/related/product_color/list/",
+                                            labelKey: "name",
+                                        }}
+                                        onChosen={(
+                                            fieldName: string,
+                                            value: any
+                                        ) => {
+                                            setValue(fieldName, value);
+                                        }}
                                     />
+
                                     <DropDown
                                         borderless={false}
-                                        label="колір"
-                                        options={["1", "2"]}
+                                        label="розмір"
+                                        field="size"
+                                        options={{
+                                            url: "api/v1/product/size/list/",
+                                            labelKey: "dimensions",
+                                        }}
+                                        onChosen={(
+                                            fieldName: string,
+                                            value: any
+                                        ) => {
+                                            setValue(fieldName, value);
+                                        }}
                                     />
-                                    <DropDown
-                                        borderless={false}
-                                        label="колір"
-                                        options={["1", "2"]}
-                                    />
-                                    <DropDown
-                                        borderless={false}
-                                        label="колір"
-                                        options={[
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                            "1",
-                                            "2",
-                                        ]}
-                                    />
+
+                                    {product?.have_glass && (
+                                        <DropDown
+                                            borderless={false}
+                                            label="наявність скла"
+                                            field="have_glass"
+                                            options={[
+                                                {
+                                                    name: "Присутнє",
+                                                    value: true,
+                                                },
+                                                {
+                                                    name: "Відсутнє",
+                                                    value: false,
+                                                },
+                                            ]}
+                                            onChosen={(
+                                                fieldName: string,
+                                                value: any
+                                            ) => {
+                                                setValue(fieldName, value);
+                                            }}
+                                        />
+                                    )}
+
+                                    {product?.orientation_choice && (
+                                        <DropDown
+                                            borderless={false}
+                                            label="сторона петель"
+                                            field="orientation_choice"
+                                            options={[
+                                                { name: "Ліва", value: "left" },
+                                                {
+                                                    name: "Права",
+                                                    value: "right",
+                                                },
+                                            ]}
+                                            onChosen={(
+                                                fieldName: string,
+                                                value: any
+                                            ) => {
+                                                setValue(fieldName, value);
+                                            }}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>
 
                         <div className="product-info-additional">
-                            {product?.description?.advantages && (
+                            {product?.description?.advantages &&
+                            product.description.advantages.length > 0 ? (
                                 <div className="product-info-additional-opportunities">
                                     <p className="upper pre-small black bold">
                                         Переваги
@@ -209,10 +239,12 @@ const ProductSection = () => {
                                         )}
                                     </div>
                                 </div>
-                            )}
+                            ) : null}
 
                             {product?.description?.finishing?.covering
-                                ?.advantages && (
+                                ?.advantages &&
+                            product.description.finishing.covering.advantages
+                                .length > 0 ? (
                                 <div className="product-info-additional-decoration">
                                     <p className="upper pre-small black bold">
                                         Оздоблення
@@ -255,7 +287,7 @@ const ProductSection = () => {
                                         )}
                                     </div>
                                 </div>
-                            )}
+                            ) : null}
                         </div>
                     </div>
                 </>
