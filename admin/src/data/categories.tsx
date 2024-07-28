@@ -209,7 +209,7 @@ export const categoriesData: (MainCategory | Category)[] = [
                 field: "width",
             },
             {
-                name: "ширина",
+                name: "товщина",
                 field: "thickness",
             },
         ],
@@ -227,7 +227,7 @@ export const categoriesData: (MainCategory | Category)[] = [
                 required: true,
             },
             {
-                name: "ширина",
+                name: "товщина",
                 field_name: "thickness",
                 type: "number",
                 required: true,
@@ -249,7 +249,7 @@ export const categoriesData: (MainCategory | Category)[] = [
                 type: "number",
             },
             {
-                name: "ширина",
+                name: "товщина",
                 field_name: "thickness",
                 type: "number",
             },
