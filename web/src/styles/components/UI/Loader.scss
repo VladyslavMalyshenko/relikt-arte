@@ -1,0 +1,21 @@
+.loader {
+    color: var(--black);
+    padding-top: 100px;
+    box-sizing: border-box;
+    animation: loading 3s infinite linear;
+    user-select: none;
+}
+
+@keyframes loading {
+    0% {
+        opacity: 100;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}

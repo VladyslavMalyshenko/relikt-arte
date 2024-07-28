@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { SetIsLoaded } from "../../redux/actions/LoadActions";
 import { SetCurrentPage } from "../../redux/actions/PageActions";
 import "../../styles/components/UI/BuySectionProducts.scss";
 import { ProductType } from "../../types/productsRelatedTypes";
@@ -14,6 +15,7 @@ const BuySectionProducts = () => {
     const availablePages = useSelector(
         (state: any) => state.PageReducer.availablePages
     );
+    const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
     const [products, setProducts] = useState<ProductType[]>([]);
     const dispatch = useDispatch();
 
@@ -32,6 +34,8 @@ const BuySectionProducts = () => {
             const newProducts = await getItems(
                 `/api/v1/product/list?page=${page}`
             );
+
+            dispatch(SetIsLoaded(true));
             setProducts(newProducts || []);
         };
 
@@ -39,20 +43,27 @@ const BuySectionProducts = () => {
     }, [currentPage]);
 
     return (
-        <div className="buy-products">
-            <div className="buy-products-wrapper">
-                {products &&
-                    products.map((product: ProductType, index) => (
-                        <DoorCard key={`product[${index}]`} product={product} />
-                    ))}
-            </div>
+        <>
+            {isLoaded && (
+                <div className="buy-products">
+                    <div className="buy-products-wrapper">
+                        {products &&
+                            products.map((product: ProductType, index) => (
+                                <DoorCard
+                                    key={`product[${index}]`}
+                                    product={product}
+                                />
+                            ))}
+                    </div>
 
-            <BuyProductsPagination
-                currentPage={currentPage}
-                pages={availablePages}
-                changePage={changePage}
-            />
-        </div>
+                    <BuyProductsPagination
+                        currentPage={currentPage}
+                        pages={availablePages}
+                        changePage={changePage}
+                    />
+                </div>
+            )}
+        </>
     );
 };
 

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { SetIsLoaded } from "../../../redux/actions/LoadActions";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/productpage/ProductSection.scss";
 import {
@@ -10,25 +12,29 @@ import {
 import { getItem } from "../../../utils/getItem";
 import Button from "../../UI/Button";
 import DropDown from "../../UI/DropDown";
+import Loader from "../../UI/Loader";
 import Path from "../../UI/Path";
 
 const ProductSection = () => {
     const { product_id } = useParams();
     const [product, setProduct] = useState<ProductType | undefined>(undefined);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
     const navigate = useNavigate();
     const { setValue, handleSubmit } = useForm();
+    const [allowedSizes, setAllowedSizes] = useState<any>([]);
+    const dispatch = useDispatch();
+
+    const setIsLoaded = (isLoaded: boolean) => {
+        dispatch(SetIsLoaded(isLoaded));
+    };
 
     useEffect(() => {
-        setIsLoaded(false);
-
         const getCurrentProduct = async () => {
             try {
                 const newProduct = await getItem("api/v1/product/$id", {
                     id: product_id,
                 });
 
-                setIsLoaded(true);
                 setProduct(newProduct);
             } catch {
                 navigate(paths.buy);
@@ -37,23 +43,58 @@ const ProductSection = () => {
 
         getCurrentProduct();
     }, []);
+
+    useEffect(() => {
+        const getAllowedSizes = async () => {
+            if (product && product?.category_id !== null) {
+                let currentSizes: any = [];
+
+                const currentCategory = await getItem(
+                    `api/v1/product/category/${product.category_id}/`
+                );
+
+                const allowedSizes = currentCategory.allowed_sizes;
+
+                if (allowedSizes && allowedSizes.length > 0) {
+                    for (const sizeId of allowedSizes) {
+                        const sizeObject = await getItem(
+                            "api/v1/product/size/$id",
+                            {
+                                id: sizeId,
+                            }
+                        );
+
+                        if (sizeObject) {
+                            currentSizes.push(sizeObject);
+                        }
+                    }
+                }
+
+                setAllowedSizes(currentSizes);
+                setIsLoaded(true);
+            }
+        };
+
+        getAllowedSizes();
+    }, [product]);
+
     return (
         <div className="product-section">
-            {!isLoaded && (!product || JSON.stringify(product) === "{}") ? (
-                <p>Завантаження...</p>
+            <Path
+                segments={[
+                    { name: "головна", location: paths.main },
+                    { name: "продукція", location: paths.buy },
+                    {
+                        name: product?.sku || "",
+                        location: paths.buy + `/${product_id}`,
+                    },
+                ]}
+            />
+
+            {!isLoaded || !product || JSON.stringify(product) === "{}" ? (
+                <Loader />
             ) : (
                 <>
-                    <Path
-                        segments={[
-                            { name: "головна", location: paths.main },
-                            { name: "продукція", location: paths.buy },
-                            {
-                                name: product?.sku || "",
-                                location: paths.buy + `/${product_id}`,
-                            },
-                        ]}
-                    />
-
                     <div className="product-info">
                         <div className="product-info-main">
                             <div className="product-info-main-image">
@@ -137,21 +178,23 @@ const ProductSection = () => {
                                         }}
                                     />
 
-                                    <DropDown
-                                        borderless={false}
-                                        label="розмір"
-                                        field="size"
-                                        options={{
-                                            url: "api/v1/product/size/list/",
-                                            labelKey: "dimensions",
-                                        }}
-                                        onChosen={(
-                                            fieldName: string,
-                                            value: any
-                                        ) => {
-                                            setValue(fieldName, value);
-                                        }}
-                                    />
+                                    {allowedSizes && allowedSizes.length > 0 ? (
+                                        <DropDown
+                                            borderless={false}
+                                            label="розмір"
+                                            field="size"
+                                            options={{
+                                                value: allowedSizes,
+                                                labelKey: "dimensions",
+                                            }}
+                                            onChosen={(
+                                                fieldName: string,
+                                                value: any
+                                            ) => {
+                                                setValue(fieldName, value);
+                                            }}
+                                        />
+                                    ) : null}
 
                                     {product?.have_glass && (
                                         <DropDown

@@ -10,8 +10,9 @@ type DropDownOption = {
 };
 
 type DropDownAsyncOption = {
-    url: string;
+    url?: string;
     labelKey: string;
+    value?: any;
 };
 
 type DropDownProps = {
@@ -31,7 +32,7 @@ const DropDown = ({
 }: DropDownProps) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
-    const [currentOptions, setCurrentOptions] = useState<any[]>([]);
+    const [currentOptions, setCurrentOptions] = useState<any>([]);
 
     useEffect(() => {
         const getOptions = async () => {
@@ -55,7 +56,26 @@ const DropDown = ({
                     value: item.id,
                 }));
 
-                setCurrentOptions(newOptions);
+                newCurrentOptions = newOptions;
+            } else if (
+                !newCurrentOptions.url &&
+                (newCurrentOptions.value !== null ||
+                    newCurrentOptions.value !== undefined) &&
+                newCurrentOptions.labelKey
+            ) {
+                const newOptions = newCurrentOptions.value.map((item: any) => {
+                    const itemName =
+                        item[
+                            (newCurrentOptions as DropDownAsyncOption).labelKey
+                        ];
+
+                    return {
+                        name: itemName,
+                        key: `${itemName}-${item.id}`,
+                        value: item.id,
+                    };
+                });
+
                 newCurrentOptions = newOptions;
             }
 
@@ -71,6 +91,8 @@ const DropDown = ({
                 onChosen(field, targetValue);
                 setSelectedOption(currentIdentifier);
             }
+
+            setCurrentOptions(newCurrentOptions);
         };
 
         getOptions();
