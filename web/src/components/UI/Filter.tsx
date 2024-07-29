@@ -1,25 +1,17 @@
 import { useState } from "react";
-import { Filter as FilterType } from "../../data/filters"; // Ensure this import matches your project structure
 import "../../styles/components/UI/BuySectionFilters.scss";
 import FilterInput from "./FilterInput";
 
-type FilterProps = {
-    filter: FilterType;
-};
-
-const Filter = ({ filter }: FilterProps) => {
+const Filter = ({ label, options, filters, handleFilter }: any) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
-    const [selectedFiltersOptions, setSelectedFiltersOptions] = useState<
-        string[]
-    >([]);
 
     const handleCheckboxChange = (option: string) => {
-        if (selectedFiltersOptions.includes(option)) {
-            setSelectedFiltersOptions(
-                selectedFiltersOptions.filter((item) => item !== option)
+        if (filters.includes(option)) {
+            handleFilter((prev: any) =>
+                prev.filter((item: any) => item !== option)
             );
         } else {
-            setSelectedFiltersOptions([...selectedFiltersOptions, option]);
+            handleFilter((prev: any) => [...prev, option]);
         }
     };
 
@@ -31,7 +23,7 @@ const Filter = ({ filter }: FilterProps) => {
                 }`}
                 onClick={() => setFiltersOpened(!filtersOpened)}
             >
-                {filter.name}
+                {label}
                 <svg
                     width="14"
                     height="6"
@@ -52,17 +44,22 @@ const Filter = ({ filter }: FilterProps) => {
                     filtersOpened ? " opened" : ""
                 }`}
             >
-                {filter.options &&
-                    filter.options.map((option, index) => (
-                        <FilterInput
-                            type="checkbox"
-                            key={`option${index}`}
-                            label={option}
-                            groupName={filter.name}
-                            isChecked={selectedFiltersOptions.includes(option)}
-                            onChange={() => handleCheckboxChange(option)}
-                        />
-                    ))}
+                {options &&
+                    options.map((option: any, index: any) => {
+                        const isChecked = filters.some(
+                            (filter: any) => filter.name === option.name
+                        );
+                        return (
+                            <FilterInput
+                                type="checkbox"
+                                key={`option${index}`}
+                                label={option.name}
+                                groupName={label}
+                                isChecked={isChecked}
+                                onChange={() => handleCheckboxChange(option)}
+                            />
+                        );
+                    })}
             </div>
         </div>
     );

@@ -14,7 +14,9 @@ export const getItems = async (
     if (data) {
         const filters = encodeData(data);
 
-        validUrl += `${validUrl.includes("?") ? "&" : "?"}filters=${filters}`;
+        validUrl += `${
+            validUrl.includes("?") ? "&" : "?"
+        }encoded_filters=${filters}`;
     }
     if (usePagination) {
         const currentState = RootStore.getState();

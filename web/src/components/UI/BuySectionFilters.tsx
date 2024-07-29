@@ -1,7 +1,14 @@
-import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { Filter as FilterType, filtersData } from "../../data/filters";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { filtersData } from "../../data/filters";
+import {
+    RANGE,
+    VALUE_LESS_THAN_OR_EQUALS,
+    VALUE_MORE_THAN_OR_EQUALS,
+} from "../../data/operations";
+import { SetFilters } from "../../redux/actions/FiltersActions";
 import "../../styles/components/UI/BuySectionFilters.scss";
+import { getItems } from "../../utils/getItems";
 import { handleInputByAllowedSymbols } from "../../utils/handleInputByAllowedSymbols";
 import Filter from "./Filter";
 import Loader from "./Loader";
@@ -9,7 +16,10 @@ import Loader from "./Loader";
 const BuySectionFilters = () => {
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
+    const [filtersOptions, setFiltersOptions] = useState<any>({});
+    const [currentFilters, setCurrentFilters] = useState<any>([]);
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const dispatch = useDispatch();
 
     const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
     const currentWidth = useSelector(
@@ -25,6 +35,117 @@ const BuySectionFilters = () => {
             e.currentTarget.classList.toggle("active");
         }
     };
+
+    useEffect(() => {
+        let readyFilters = currentFilters.map((filter: any) => {
+            if (filter && JSON.stringify(filter) !== "{}") {
+                if (
+                    Array.isArray(filter) &&
+                    filter.some((value: any) => value === undefined)
+                ) {
+                    return filter;
+                } else {
+                    const keys = Object.keys(filter);
+                    let invalid = false;
+
+                    for (const key of keys) {
+                        if (filter[key] === undefined) {
+                            invalid = true;
+                        }
+                    }
+
+                    if (!invalid) {
+                        return filter;
+                    }
+                }
+            }
+        });
+
+        if (readyFilters && JSON.stringify(readyFilters) !== "{}") {
+            dispatch(SetFilters(readyFilters));
+        }
+    }, [currentFilters]);
+
+    useEffect(() => {
+        const setUpOptions = async () => {
+            const filtersOptionsFields = filtersData
+                .map((item: any) =>
+                    item.optionsUrl
+                        ? {
+                              field: item.field,
+                              url: item.optionsUrl,
+                              targetKey: item.targetKey,
+                          }
+                        : {
+                              field: item.field,
+                              options: item.options,
+                          }
+                )
+                .filter((item: any) => item);
+
+            if (filtersOptionsFields && filtersOptionsFields.length > 0) {
+                const newOptions: any = {};
+
+                for (const field of filtersOptionsFields) {
+                    const options = field.url
+                        ? await getItems(field.url)
+                        : field.options;
+
+                    if (field.url) {
+                        if (options && options.length > 0) {
+                            const newOption = options.map((option: any) => ({
+                                name: option[field.targetKey],
+                                value: option.id,
+                                field: field.field,
+                            }));
+
+                            newOptions[field.field] = newOption;
+                        }
+                    } else {
+                        const newOption = options.map((option: any) => ({
+                            ...option,
+                            field: field.field,
+                        }));
+
+                        newOptions[field.field] = newOption;
+                    }
+                }
+
+                if (JSON.stringify(newOptions) !== "{}") {
+                    setFiltersOptions(newOptions);
+                }
+            }
+        };
+
+        setUpOptions();
+    }, []);
+
+    useEffect(() => {
+        let field: any = {};
+        let value;
+        let operation;
+        const currentMinPrice = +minPrice;
+        const currentMaxPrice = +maxPrice;
+
+        if (currentMinPrice && currentMaxPrice) {
+            value = [currentMinPrice, currentMaxPrice];
+            operation = RANGE;
+        } else if (currentMinPrice) {
+            value = currentMinPrice;
+            operation = VALUE_MORE_THAN_OR_EQUALS;
+        } else if (currentMaxPrice) {
+            value = currentMaxPrice;
+            operation = VALUE_LESS_THAN_OR_EQUALS;
+        }
+
+        field = {
+            value,
+            field: "price",
+            operation,
+        };
+
+        setCurrentFilters((prev: any) => [...prev, field]);
+    }, [minPrice, maxPrice]);
 
     return (
         <>
@@ -82,14 +203,20 @@ const BuySectionFilters = () => {
                             </div>
                         </div>
 
-                        {filtersData.map(
-                            (filter: FilterType, index: number) => (
-                                <Filter
-                                    key={`filter[${index}]`}
-                                    filter={filter}
-                                />
-                            )
-                        )}
+                        {filtersData.map((filter: any, index: number) => (
+                            <Filter
+                                key={`filter[${index}]`}
+                                label={filter.name}
+                                options={
+                                    filtersOptions[filter.field] ||
+                                    filter.options
+                                }
+                                filters={currentFilters}
+                                handleFilter={(data: any) =>
+                                    setCurrentFilters(data)
+                                }
+                            />
+                        ))}
                     </div>
                 </>
             )}
