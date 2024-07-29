@@ -63,8 +63,11 @@ const BuySectionProducts = () => {
                             newFilters.push(newField);
                         } else {
                             newFilters.forEach((field: any) => {
-                                if (field[0] === "price") {
+                                if (filter[0] === "price") {
                                     field[1] = filter.operation;
+                                    field[2] = filter.value;
+                                } else if (filter[0] === "have_glass") {
+                                    field[1] = EQUALS;
                                     field[2] = filter.value;
                                 } else if (field[0] === filter.field) {
                                     let operation = "";

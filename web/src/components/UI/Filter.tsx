@@ -2,10 +2,24 @@ import { useState } from "react";
 import "../../styles/components/UI/BuySectionFilters.scss";
 import FilterInput from "./FilterInput";
 
-const Filter = ({ label, options, filters, handleFilter }: any) => {
+const Filter = ({ label, options, filters, handleFilter, type }: any) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
 
-    const handleCheckboxChange = (option: string) => {
+    const handleCheckboxChange = (option: any) => {
+        const isThereAnyValuesWithField = filters.find(
+            (field: any) =>
+                field.field === option.field && field.value !== option.value
+        );
+
+        if (isThereAnyValuesWithField && type === "radio") {
+            handleFilter((prev: any) =>
+                prev.filter(
+                    (item: any) =>
+                        JSON.stringify(isThereAnyValuesWithField) !==
+                        JSON.stringify(item)
+                )
+            );
+        }
         if (filters.includes(option)) {
             handleFilter((prev: any) =>
                 prev.filter((item: any) => item !== option)
@@ -49,9 +63,10 @@ const Filter = ({ label, options, filters, handleFilter }: any) => {
                         const isChecked = filters.some(
                             (filter: any) => filter.name === option.name
                         );
+
                         return (
                             <FilterInput
-                                type="checkbox"
+                                type={type || "checkbox"}
                                 key={`option${index}`}
                                 label={option.name}
                                 groupName={label}

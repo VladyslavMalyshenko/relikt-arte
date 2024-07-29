@@ -222,6 +222,9 @@ const BuySectionFilters = () => {
                                 handleFilter={(data: any) =>
                                     setCurrentFilters(data)
                                 }
+                                {...(filter.field === "have_glass"
+                                    ? { type: "radio" }
+                                    : {})}
                             />
                         ))}
                     </div>

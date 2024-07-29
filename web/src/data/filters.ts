@@ -21,12 +21,4 @@ export const filtersData: Filter[] = [
             { name: "Відсутнє", value: false },
         ],
     },
-    {
-        name: "Сторона петель",
-        field: "orientation_choice",
-        options: [
-            { name: "Ліва", value: "left" },
-            { name: "Права", value: "right" },
-        ],
-    },
 ];
