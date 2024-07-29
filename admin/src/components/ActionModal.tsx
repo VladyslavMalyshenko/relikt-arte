@@ -1250,6 +1250,8 @@ const ActionModal = () => {
                                                 )
                                             ) {
                                                 currentPhotos.splice(index, 1);
+
+                                                return;
                                             } else {
                                                 const photoKeys =
                                                     Object.keys(
@@ -1272,6 +1274,8 @@ const ActionModal = () => {
                                                     }
                                                 );
                                             }
+
+                                            return newPhoto;
                                         }
                                     )
                                     .filter(
