@@ -1,7 +1,7 @@
 import logging
 import json
 
-from typing import Optional
+from typing import Optional, TypeVar
 
 from pydantic import BaseModel
 
@@ -20,6 +20,8 @@ from ..utils.exceptions.http.base import (
     ObjectUpdateException,
 )
 from ..utils.exceptions.uow import GetRepoByAttrNameException
+from ..utils.exceptions.processors.filters import FilterException
+from ..utils.exceptions.http.filters import FilterProcessException
 from ..utils.exceptions.http.base import IdNotFoundException
 from ..utils.base import merge_dicts, model_to_dict
 from ..utils.processors.static.base import StaticFilesProcessor
@@ -48,13 +50,26 @@ from .schemas import (
 )
 from .enums import ProductRelModelEnum, ProductPhotoDepEnum
 from .utils import _default_product_description_json
+from ..utils.processors.filters.decoder import FiltersDecoder
+from ..utils.processors.filters.product import (
+    ProductFilterProcessor,
+    CategoryFilterProcessor,
+    ProductSizeFilterProcessor,
+    ProductColorFilterProcessor,
+    ProductCoveringFilterProcessor,
+    ProductGlassColorFilterProcessor,
+)
 
 
 log = logging.getLogger(__name__)
 
 
+Repo = TypeVar("Repo")
+
+
 class ProductService(BaseService):
     list_schema = ProductListSchema
+    filter_processor = ProductFilterProcessor
 
     async def get_show_scheme(self, obj) -> BaseModel:
         return ProductShow(
@@ -197,21 +212,26 @@ class ProductService(BaseService):
     async def get_product_list(
         self,
         pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> list[ProductShow]:
         try:
             async with self.uow:
                 return await self.get_obj_list(
                     repo=self.uow.product,
                     pagination_params=pagination,
+                    filters_decoder=filters_decoder,
                 )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("Product")
+        except FilterException as e:
+            raise FilterProcessException(e.message)
 
     async def get_products_by_category(
         self,
         category_id: int,
         pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> list[ProductShow]:
         try:
             async with self.uow:
@@ -227,6 +247,7 @@ class ProductService(BaseService):
                         self.uow.product.model.category_id == category_id
                     ],
                     pagination_params=pagination,
+                    filters_decoder=filters_decoder,
                 )
 
         except SQLAlchemyError as e:
@@ -335,6 +356,7 @@ class ProductPhotoService(BaseService):
 
 
 class CategoryService(BaseService):
+    filter_processor = CategoryFilterProcessor
     list_schema = CategoryListSchema
 
     async def get_show_scheme(self, obj) -> CategoryShow:
@@ -425,6 +447,7 @@ class CategoryService(BaseService):
     async def get_category_list(
         self,
         pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> list[CategoryShow]:
         try:
             async with self.uow:
@@ -434,6 +457,7 @@ class CategoryService(BaseService):
                         selectinload(self.uow.category.model.allowed_sizes),
                     ],
                     pagination_params=pagination,
+                    filters_decoder=filters_decoder,
                 )
         except SQLAlchemyError as e:
             log.exception(e)
@@ -441,6 +465,7 @@ class CategoryService(BaseService):
 
 
 class ProductSizeService(BaseService):
+    filter_processor = ProductSizeFilterProcessor
     list_schema = ProductSizeListSchema
 
     async def get_show_scheme(self, obj) -> ProductSizeShow:
@@ -502,12 +527,14 @@ class ProductSizeService(BaseService):
     async def get_product_size_list(
         self,
         pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> ProductSizeListSchema | list[ProductSizeShow]:
         try:
             async with self.uow:
                 return await self.get_obj_list(
                     repo=self.uow.product_size,
                     pagination_params=pagination,
+                    filters_decoder=filters_decoder,
                 )
         except SQLAlchemyError as e:
             log.exception(e)
@@ -515,6 +542,7 @@ class ProductSizeService(BaseService):
 
 
 class ProductRelService(BaseService):
+    filter_processor = None
     list_schema = ProductRelListSchema
 
     async def get_show_scheme(self, obj) -> BaseModel:
@@ -530,6 +558,16 @@ class ProductRelService(BaseService):
         if not hasattr(self.uow, rel_model.value):
             raise GetRepoByAttrNameException(label=rel_model.value)
         return getattr(self.uow, rel_model.value)
+
+    async def set_filter_processor(
+        self, rel_model: ProductRelModelEnum
+    ) -> None:
+        if rel_model == ProductRelModelEnum.COLOR:
+            self.filter_processor = ProductColorFilterProcessor
+        elif rel_model == ProductRelModelEnum.COVERING:
+            self.filter_processor = ProductCoveringFilterProcessor
+        elif rel_model == ProductRelModelEnum.GLASS_COLOR:
+            self.filter_processor = ProductGlassColorFilterProcessor
 
     async def create_product_rel(
         self, data: ProductRelCreate, rel_model: ProductRelModelEnum
@@ -579,16 +617,32 @@ class ProductRelService(BaseService):
             log.exception(e)
             raise ObjectUpdateException(rel_model)
 
+    async def get_obj_list(
+        self,
+        repo: Repo,
+        options: list | None = None,
+        filters: list | None = None,
+        pagination_params: PaginationParams | None = None,
+        filters_decoder: FiltersDecoder | None = None,
+    ) -> ProductRelListSchema | list[ProductRelShow]:
+        return await super().get_obj_list(
+            repo, options, filters, pagination_params, filters_decoder
+        )
+
     async def get_product_rel_list(
         self,
         rel_model: ProductRelModelEnum,
         pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> list[ProductRelShow]:
         try:
             async with self.uow:
                 repo = await self.get_repo(rel_model)
+                await self.set_filter_processor(rel_model)
                 return await self.get_obj_list(
-                    repo=repo, pagination_params=pagination
+                    repo=repo,
+                    pagination_params=pagination,
+                    filters_decoder=filters_decoder,
                 )
         except SQLAlchemyError as e:
             log.exception(e)
