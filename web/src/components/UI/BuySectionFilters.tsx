@@ -121,30 +121,37 @@ const BuySectionFilters = () => {
     }, []);
 
     useEffect(() => {
-        let field: any = {};
-        let value;
-        let operation;
-        const currentMinPrice = +minPrice;
-        const currentMaxPrice = +maxPrice;
+        if (minPrice || maxPrice) {
+            let field: any = {};
+            let value;
+            let operation;
 
-        if (currentMinPrice && currentMaxPrice) {
-            value = [currentMinPrice, currentMaxPrice];
-            operation = RANGE;
-        } else if (currentMinPrice) {
-            value = currentMinPrice;
-            operation = VALUE_MORE_THAN_OR_EQUALS;
-        } else if (currentMaxPrice) {
-            value = currentMaxPrice;
-            operation = VALUE_LESS_THAN_OR_EQUALS;
+            const currentMinPrice = +minPrice;
+            const currentMaxPrice = +maxPrice;
+
+            if (currentMinPrice && currentMaxPrice) {
+                value = [currentMinPrice, currentMaxPrice];
+                operation = RANGE;
+            } else if (currentMinPrice) {
+                value = currentMinPrice;
+                operation = VALUE_MORE_THAN_OR_EQUALS;
+            } else if (currentMaxPrice) {
+                value = currentMaxPrice;
+                operation = VALUE_LESS_THAN_OR_EQUALS;
+            }
+
+            field = {
+                value,
+                field: "price",
+                operation,
+            };
+
+            setCurrentFilters((prev: any) => [...prev, field]);
+        } else {
+            setCurrentFilters((prev: any) =>
+                prev.filter((filter: any) => filter[0] !== "price")
+            );
         }
-
-        field = {
-            value,
-            field: "price",
-            operation,
-        };
-
-        setCurrentFilters((prev: any) => [...prev, field]);
     }, [minPrice, maxPrice]);
 
     return (
