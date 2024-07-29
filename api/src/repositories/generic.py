@@ -11,6 +11,7 @@ from sqlalchemy import (
     delete,
     exists,
     func,
+    and_,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,8 +36,7 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         return query
 
     async def _add_filters_to_query(self, query, filters: list) -> None:
-        for filter in filters:
-            query = query.filter(filter)
+        query = query.where(and_(*filters))
         return query
 
     async def _add_pagination_to_query(
