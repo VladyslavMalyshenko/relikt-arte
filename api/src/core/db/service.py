@@ -1,6 +1,6 @@
 import uuid
 
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Callable
 
 from abc import ABC, abstractmethod
 
@@ -10,6 +10,10 @@ from ...core.dependencies import PaginationParams
 from ...core.schemas import BaseListSchema
 
 from .dependencies import uowDEP
+from ...utils.processors.filters.dependencies import FiltersDecoder
+from ...utils.processors.filters.base import FilterProcessor
+from ...utils.exceptions.processors.filters import FilterException
+from ...utils.exceptions.http.filters import FilterProcessException
 from ...utils.exceptions.http.base import IdNotFoundException
 
 
@@ -36,6 +40,7 @@ class AbstractService(ABC):
 
 
 class BaseService(AbstractService):
+    filter_processor: FilterProcessor
     list_schema: Optional[BaseListSchema] = None
 
     def __init__(self, uow: uowDEP) -> None:
@@ -72,7 +77,22 @@ class BaseService(AbstractService):
         options: Optional[list] = None,
         filters: Optional[list] = None,
         pagination_params: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
     ) -> BaseListSchema[BaseModel] | list[BaseModel]:
+        try:
+            if filters_decoder and filters_decoder.decoded_filters:
+                decoded_filters = (
+                    await self.filter_processor().process_filters(
+                        filters_decoder.decoded_filters,
+                    )
+                )
+                if filters:
+                    filters.extend(decoded_filters)
+                else:
+                    filters = decoded_filters
+        except FilterException:
+            raise FilterProcessException()
+
         if pagination_params and pagination_params.page:
             paginated = True
             objs = await repo.get_all(

@@ -31,6 +31,8 @@ from .schemas import (
 )
 from .enums import ProductRelModelEnum
 
+from ..utils.processors.filters.dependencies import filters_decoder
+
 
 router = APIRouter(
     prefix="/product",
@@ -97,10 +99,12 @@ async def get_all_product_rel_objects(
     uow: uowDEP,
     rel_model: ProductRelModelEnum,
     pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
 ) -> ProductRelListSchema | list[ProductRelShow]:
     return await ProductRelService(uow).get_product_rel_list(
         rel_model=rel_model,
         pagination=pagination,
+        filters_decoder=filters_decoder,
     )
 
 
@@ -174,9 +178,11 @@ async def delete_product_size(
 async def get_all_product_sizes(
     uow: uowDEP,
     pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
 ) -> ProductSizeListSchema | list[ProductSizeShow]:
     return await ProductSizeService(uow).get_product_size_list(
         pagination=pagination,
+        filters_decoder=filters_decoder,
     )
 
 
@@ -249,8 +255,12 @@ async def delete_category(
 async def get_all_categories(
     uow: uowDEP,
     pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
 ) -> CategoryListSchema | list[CategoryShow]:
-    return await CategoryService(uow).get_category_list(pagination=pagination)
+    return await CategoryService(uow).get_category_list(
+        pagination=pagination,
+        filters_decoder=filters_decoder,
+    )
 
 
 @router.get(
@@ -321,9 +331,11 @@ async def product_delete(
 async def get_all_products(
     uow: uowDEP,
     pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
 ) -> ProductListSchema | list[ProductShow]:
     return await ProductService(uow).get_product_list(
         pagination=pagination,
+        filters_decoder=filters_decoder,
     )
 
 
@@ -336,10 +348,12 @@ async def get_all_products_by_category(
     uow: uowDEP,
     category_id: int,
     pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
 ) -> ProductListSchema | list[ProductShow]:
     return await ProductService(uow).get_products_by_category(
         category_id=category_id,
         pagination=pagination,
+        filters_decoder=filters_decoder,
     )
 
 
