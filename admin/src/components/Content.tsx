@@ -2,12 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { categoriesData } from "../data/categories";
+import {
+    EQUALS,
+    RANGE,
+    VALUE_IN,
+    VALUE_LESS_THAN_OR_EQUALS,
+    VALUE_MORE_THAN_OR_EQUALS,
+} from "../data/operations";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetCurrentCategory } from "../redux/actions/currentCategoryActions";
 import {
     SetAvailablePagesCount,
     SetCurrentPage,
 } from "../redux/actions/currentPageActions";
+import "../styles/components/ActionModal.scss";
 import "../styles/components/Content.scss";
 import { Category, MainCategory, TableField } from "../types/categoriesTypes";
 import { getItems } from "../utils/getItems";
@@ -27,18 +35,26 @@ const Content = () => {
     const [previousCategory, setPreviousCategory] = useState(
         category.link || ""
     );
+    const [previousFilters, setPreviousFilters] = useState([]);
     const [fields, setFields] = useState<(TableField | string)[]>([
         "id",
         "name",
         "category",
         "price",
     ]);
+    const [filtersOpened, setFiltersOpened] = useState(false);
     const [products, setProducts] = useState<any>([]);
+    const [filters, setFilters] = useState<any>([]);
     const dispatch = useDispatch();
     const params = useParams();
 
     const setUpTable = async () => {
-        const items = await getItems(category.getUrl, null, true);
+        const areFiltersValid =
+            filters && Array.isArray(filters) && filters.length > 0;
+
+        let readyFilters = areFiltersValid ? filters : undefined;
+
+        const items = await getItems(category.getUrl, readyFilters, true);
 
         setProducts(items || []);
         setFields(category.fields);
@@ -55,14 +71,280 @@ const Content = () => {
             setUpTable();
         }
 
-        if (category.link !== previousCategory) {
+        if (category.link !== previousCategory || filters !== previousFilters) {
             dispatch(SetCurrentPage(1));
             dispatch(SetAvailablePagesCount(1));
-            setPreviousCategory(category.link);
+
+            if (category.link !== previousCategory) {
+                setPreviousCategory(category.link);
+                setFilters([]);
+                setFiltersOpened(false);
+            }
         }
 
+        setPreviousFilters(filters);
         setPreviousAction(action);
-    }, [category, params.category, action, currentPage]);
+    }, [category, params.category, action, currentPage, filters]);
+
+    const getListInput = (
+        fieldName: string,
+        options: any,
+        isSingle?: boolean
+    ) => {
+        const onChange = (e: any, option: any) => {
+            setFilters((prev: any) => {
+                const currentValue = [...(prev || [])];
+
+                if (currentValue.length > 0) {
+                    const filtersHasOptions = filters.some(
+                        (filter: any) => filter[0] === fieldName
+                    );
+
+                    if (filtersHasOptions) {
+                        currentValue.forEach(
+                            (prevFilter: any, index: number) => {
+                                if (prevFilter[0] === fieldName) {
+                                    if (
+                                        isSingle ||
+                                        prevFilter[2] === undefined
+                                    ) {
+                                        prevFilter[2] = option.value;
+                                        prevFilter[1] = EQUALS;
+                                    } else if (Array.isArray(prevFilter[2])) {
+                                        const doesValueIncludeCurrentOptionValue =
+                                            prevFilter[2].includes(
+                                                option.value
+                                            );
+
+                                        if (
+                                            doesValueIncludeCurrentOptionValue
+                                        ) {
+                                            prevFilter[2] =
+                                                prevFilter[2].filter(
+                                                    (value: any) =>
+                                                        value !== option.value
+                                                );
+
+                                            if (
+                                                prevFilter[2].length > 0 &&
+                                                prevFilter[2].length === 1
+                                            ) {
+                                                prevFilter[2] =
+                                                    prevFilter[2][0];
+                                                prevFilter[1] = EQUALS;
+                                            } else if (
+                                                prevFilter[2].length > 1
+                                            ) {
+                                                prevFilter[1] = VALUE_IN;
+                                            }
+                                        } else if (
+                                            !doesValueIncludeCurrentOptionValue
+                                        ) {
+                                            prevFilter[2].push(option.value);
+                                            prevFilter[1] = VALUE_IN;
+                                        }
+                                    } else if (prevFilter[2] !== undefined) {
+                                        if (e.target.checked) {
+                                            prevFilter[2] = [
+                                                prevFilter[2],
+                                                option.value,
+                                            ];
+                                            prevFilter[1] = VALUE_IN;
+                                        } else {
+                                            currentValue.splice(index, 1);
+                                        }
+                                    }
+                                }
+                            }
+                        );
+                    } else {
+                        currentValue.push([fieldName, EQUALS, option.value]);
+                    }
+                } else {
+                    currentValue.push([fieldName, EQUALS, option.value]);
+                }
+
+                return currentValue;
+            });
+        };
+
+        const isChecked = (value: any) => {
+            return Array.isArray(filters)
+                ? filters.some(
+                      (filter: any) =>
+                          filter[0] === fieldName &&
+                          (filter[2] === value ||
+                              (Array.isArray(filter[2]) &&
+                                  filter[2].includes(value)))
+                  )
+                : false;
+        };
+
+        return (
+            <div className="input-filter-container">
+                <ul className="list-input" id={fieldName}>
+                    {options.length > 0 &&
+                        options.map((option: any, index: number) => (
+                            <li
+                                key={`${fieldName}[${index}]`}
+                                id={`${fieldName}[${index}]`}
+                            >
+                                <input
+                                    name={fieldName}
+                                    type={!isSingle ? "checkbox" : "radio"}
+                                    checked={isChecked(option.value)}
+                                    onChange={(e) => onChange(e, option)}
+                                    {...(isSingle
+                                        ? {
+                                              onClick: (e: any) =>
+                                                  e.target.checked
+                                                      ? setFilters(
+                                                            (prev: any) => {
+                                                                const currentValue =
+                                                                    [...prev];
+
+                                                                currentValue.forEach(
+                                                                    (
+                                                                        filter: any,
+                                                                        index: number
+                                                                    ) => {
+                                                                        if (
+                                                                            !Array.isArray(
+                                                                                filter[2]
+                                                                            )
+                                                                        ) {
+                                                                            currentValue.splice(
+                                                                                index,
+                                                                                1
+                                                                            );
+                                                                        } else {
+                                                                            filter[2] =
+                                                                                filter[2].filter(
+                                                                                    (
+                                                                                        value: any
+                                                                                    ) =>
+                                                                                        value !==
+                                                                                        option.value
+                                                                                );
+                                                                        }
+                                                                    }
+                                                                );
+
+                                                                return currentValue;
+                                                            }
+                                                        )
+                                                      : null,
+                                          }
+                                        : {})}
+                                />
+                                {option.name}
+                            </li>
+                        ))}
+                </ul>
+            </div>
+        );
+    };
+
+    const getNumberInput = (fieldName: string) => {
+        const onChange = (value: number, isMax?: boolean) => {
+            const valueInt = +value;
+
+            setFilters((prev: any) => {
+                const currentValue = [...(prev || [])];
+
+                const isFieldInFilters = filters.some(
+                    (filter: any) => filter[0] === fieldName
+                );
+
+                if (isFieldInFilters) {
+                    currentValue.forEach((filter: any, index: number) => {
+                        if (filter[0] === fieldName) {
+                            const notUndefinedValue = Array.isArray(filter[2])
+                                ? filter[2].find(
+                                      (item: any) => item !== undefined
+                                  )
+                                : filter[2];
+
+                            if (!notUndefinedValue) {
+                                currentValue.splice(index, 1);
+                                return;
+                            }
+
+                            if (!valueInt && Array.isArray(filter[2])) {
+                                filter[2] = filter[2][isMax ? 0 : 1];
+                                filter[1] = isMax
+                                    ? VALUE_MORE_THAN_OR_EQUALS
+                                    : VALUE_LESS_THAN_OR_EQUALS;
+                                return;
+                            } else if (!valueInt) {
+                                currentValue.splice(index, 1);
+                                return;
+                            }
+
+                            if (filter[2] === undefined) {
+                                filter[2] = valueInt;
+                            } else if (
+                                filter[2] !== undefined &&
+                                !Array.isArray(filter[2])
+                            ) {
+                                if (filter[1] === VALUE_MORE_THAN_OR_EQUALS) {
+                                    filter[2] = !isMax
+                                        ? valueInt
+                                        : [filter[2], valueInt];
+
+                                    if (isMax) {
+                                        filter[1] = RANGE;
+                                    }
+                                } else if (
+                                    filter[1] === VALUE_LESS_THAN_OR_EQUALS
+                                ) {
+                                    filter[2] = isMax
+                                        ? valueInt
+                                        : [valueInt, filter[2]];
+
+                                    if (!isMax) {
+                                        filter[1] = RANGE;
+                                    }
+                                }
+                            } else if (
+                                filter[2] !== undefined &&
+                                Array.isArray(filter[2])
+                            ) {
+                                filter[2][isMax ? 1 : 0] = valueInt;
+                            }
+                        }
+                    });
+                } else {
+                    currentValue.push([
+                        fieldName,
+                        isMax
+                            ? VALUE_LESS_THAN_OR_EQUALS
+                            : VALUE_MORE_THAN_OR_EQUALS,
+                        valueInt,
+                    ]);
+                }
+
+                return currentValue;
+            });
+        };
+        return (
+            <div className="input-filter-container from-to-input">
+                <input
+                    placeholder="Мінімальне значення"
+                    className="filter-input"
+                    type="number"
+                    onChange={(e: any) => onChange(e.target.value)}
+                />
+                <span></span>
+                <input
+                    placeholder="Максимальне значення"
+                    className="filter-input"
+                    type="number"
+                    onChange={(e: any) => onChange(e.target.value, true)}
+                />
+            </div>
+        );
+    };
 
     return (
         <div className="content">
@@ -93,6 +375,35 @@ const Content = () => {
                             </button>
                         )}
                     </p>
+
+                    {category.filters && category.filters.length > 0 ? (
+                        <div
+                            className={`filters-inputs-container${
+                                filtersOpened ? " active" : ""
+                            }`}
+                        >
+                            {category.filters.map((filter: any) => (
+                                <div key={`filter[${filter.name}]`}>
+                                    <p className="filter-name">{filter.name}</p>
+
+                                    {Array.isArray(filter.choices)
+                                        ? getListInput(
+                                              filter.field,
+                                              filter.choices,
+                                              filter.type === "radio"
+                                          )
+                                        : getNumberInput(filter.field)}
+                                </div>
+                            ))}
+                        </div>
+                    ) : null}
+                    <button
+                        className="default-button"
+                        onClick={() => setFiltersOpened(!filtersOpened)}
+                    >
+                        Відкрити фільтри
+                    </button>
+
                     {category.main ? (
                         <div className="dashboard-container">
                             <div className="dashboard-list">

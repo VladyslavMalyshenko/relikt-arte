@@ -32,6 +32,7 @@ export type Category = {
     deleteUrl: string;
     getItemUrl: string;
     fields?: (TableField | string)[];
+    filters?: any;
     addItemFields: InputField[];
     inputFields: InputField[];
 };

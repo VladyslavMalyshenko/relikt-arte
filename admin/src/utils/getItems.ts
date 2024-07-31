@@ -6,7 +6,7 @@ import { generateUrl } from "./generateUrl";
 
 export const getItems = async (
     url_part: string,
-    data?: string | null,
+    data?: any,
     usePagination?: boolean
 ) => {
     let validUrl = generateUrl(url_part);
@@ -18,7 +18,9 @@ export const getItems = async (
     if (data) {
         const filters = encodeData(data);
 
-        validUrl += `${validUrl.includes("?") ? "&" : "?"}filters=${filters}`;
+        validUrl += `${
+            validUrl.includes("?") ? "&" : "?"
+        }encoded_filters=${filters}`;
     }
 
     if (usePagination) {

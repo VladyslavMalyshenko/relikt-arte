@@ -40,6 +40,16 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/related/product_color/$id/update/",
         deleteUrl: "/api/v1/product/related/product_color/$id/delete/",
         getItemUrl: "/api/v1/product/related/product_color/$id/",
+        filters: [
+            {
+                name: "Активні елементи",
+                field: "active",
+                choices: [
+                    { name: "Лише активні", value: true },
+                    { name: "Лише неактивні", value: false },
+                ],
+            },
+        ],
         fields: [
             "id",
             { name: "назва", field: "name" },
@@ -97,6 +107,16 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/related/product_covering/$id/update/",
         deleteUrl: "/api/v1/product/related/product_covering/$id/delete/",
         getItemUrl: "/api/v1/product/related/product_covering/$id/",
+        filters: [
+            {
+                name: "Активні елементи",
+                field: "active",
+                choices: [
+                    { name: "Лише активні", value: true },
+                    { name: "Лише неактивні", value: false },
+                ],
+            },
+        ],
         fields: [
             "id",
             { name: "назва", field: "name" },
@@ -149,6 +169,16 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/related/product_glass_color/$id/update/",
         deleteUrl: "/api/v1/product/related/product_glass_color/$id/delete/",
         getItemUrl: "/api/v1/product/related/product_glass_color/$id/",
+        filters: [
+            {
+                name: "Активні елементи",
+                field: "active",
+                choices: [
+                    { name: "Лише активні", value: true },
+                    { name: "Лише неактивні", value: false },
+                ],
+            },
+        ],
         fields: [
             "id",
             { name: "назва", field: "name" },
@@ -198,6 +228,23 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/size/$id/update/",
         deleteUrl: "/api/v1/product/size/$id/delete/",
         getItemUrl: "/api/v1/product/size/$id/",
+        filters: [
+            {
+                name: "висота",
+                field: "height",
+                type: "from-to",
+            },
+            {
+                name: "довжина",
+                field: "width",
+                type: "from-to",
+            },
+            {
+                name: "товщина",
+                field: "thickness",
+                type: "from-to",
+            },
+        ],
         fields: [
             "id",
             {
@@ -291,6 +338,44 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/category/$id/update/",
         deleteUrl: "/api/v1/product/category/$id/delete/",
         getItemUrl: "/api/v1/product/category/$id/",
+        filters: [
+            {
+                name: "наявність скла",
+                field: "is_glass_available",
+                type: "radio",
+                choices: [
+                    { name: "Присутнє", value: true },
+                    { name: "Відсутнє", value: false },
+                ],
+            },
+            {
+                name: "наявність матеріалу",
+                field: "have_material_choice",
+                type: "radio",
+                choices: [
+                    { name: "Присутній", value: true },
+                    { name: "Відсутній", value: false },
+                ],
+            },
+            {
+                name: "вибір сторони",
+                field: "have_orientation_choice",
+                type: "radio",
+                choices: [
+                    { name: "Вибір є", value: true },
+                    { name: "Немає вибору", value: false },
+                ],
+            },
+            {
+                name: "вибір лиштви",
+                field: "have_type_of_platband_choice",
+                type: "radio",
+                choices: [
+                    { name: "Вибір є", value: true },
+                    { name: "Немає вибору", value: false },
+                ],
+            },
+        ],
         fields: [
             "id",
             { name: "назва", field: "name" },
@@ -398,6 +483,31 @@ export const categoriesData: (MainCategory | Category)[] = [
         editUrl: "/api/v1/product/$id/update/",
         deleteUrl: "/api/v1/product/$id/delete/",
         getItemUrl: "/api/v1/product/$id/",
+        filters: [
+            {
+                name: "ціна",
+                field: "price",
+                type: "from-to",
+            },
+            {
+                name: "наявність скла",
+                field: "have_glass",
+                type: "radio",
+                choices: [
+                    { name: "Присутнє", value: true },
+                    { name: "Відсутнє", value: false },
+                ],
+            },
+            {
+                name: "вибір сторони",
+                field: "orientation_choice",
+                type: "radio",
+                choices: [
+                    { name: "Присутній", value: true },
+                    { name: "Відсутній", value: false },
+                ],
+            },
+        ],
         fields: [
             "id",
             { name: "артикул", field: "sku" },
