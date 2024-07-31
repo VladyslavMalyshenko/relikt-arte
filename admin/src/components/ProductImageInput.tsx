@@ -23,14 +23,14 @@ const ProductImageInput = ({
 
     const item = useSelector((state: any) => state.itemReducer.item);
 
-    const [imageObject, setImageObject] = useState(image);
+    const [imageObject, setImageObject] = useState(image || {});
 
     const [currentDependencyType, setCurrentDependencyType] = useState<any>(
-        image.dependency
+        image.dependency || ""
     );
     const [currentDependencyValue, setCurrentDependencyValue] =
         useState<any>(null);
-    const [isMain, setIsMain] = useState(image.is_main);
+    const [isMain, setIsMain] = useState(image.is_main || false);
     const [currentFile, setCurrentFile] = useState<any>(null);
     const imageInputRef = useRef<any>(null);
 
@@ -96,9 +96,13 @@ const ProductImageInput = ({
 
     useEffect(() => {
         setCurrentDependencyType(image.dependency);
-        setIsMain(image.is_main);
+        setIsMain(image.is_main || false);
         setCurrentDependencyValue(getCurrentDependencyValue(image));
         setImageObject(image);
+
+        if (image.defaultPhoto && !currentFile && !image.photo) {
+            setCurrentFile(image.defaultPhoto);
+        }
     }, [image]);
 
     const formatDependencyType = (dependency: string) => {
@@ -147,7 +151,7 @@ const ProductImageInput = ({
             )) as any;
 
             if (currentDependencyValueItem !== null) {
-                targetList.classList.remove("invalid");
+                targetList?.classList.remove("invalid");
 
                 if (imageObject.photo) {
                     const newImage = { ...imageObject };
@@ -203,27 +207,25 @@ const ProductImageInput = ({
                     )) as any;
 
                     const targetDependencyList = (await getElementAsync(
-                        `.product-image-container:nth-child(${
-                            imageIndex + 1
-                        }) .product-image-fields .product-image-field:nth-child(3) ul.list-input`
+                        `.product-image-container:nth-child(${fileIndex}) .product-image-fields .product-image-field:nth-child(3) ul.list-input`
                     )) as any;
 
                     if (!currentFile) {
-                        targetImage.classList.add("invalid");
+                        targetImage?.classList.add("invalid");
                     } else {
-                        targetImage.classList.remove("invalid");
+                        targetImage?.classList.remove("invalid");
                     }
 
                     if (!currentDependencyType) {
-                        targetDependencyTypeList.classList.add("invalid");
+                        targetDependencyTypeList?.classList.add("invalid");
                     } else {
-                        targetDependencyTypeList.classList.remove("invalid");
+                        targetDependencyTypeList?.classList.remove("invalid");
                     }
 
                     if (!currentDependencyValueItem) {
-                        targetDependencyList.classList.add("invalid");
+                        targetDependencyList?.classList.add("invalid");
                     } else {
-                        targetDependencyList.classList.remove("invalid");
+                        targetDependencyList?.classList.remove("invalid");
                     }
 
                     if (
@@ -262,7 +264,7 @@ const ProductImageInput = ({
                     }
                 }
             } else {
-                targetList.classList.add("invalid");
+                targetList?.classList.add("invalid");
             }
         };
 
@@ -277,7 +279,7 @@ const ProductImageInput = ({
 
     return (
         <div className="product-image-container">
-            {imageObject.photo ? (
+            {imageObject.photo || action === "show" ? (
                 <img src={imageObject.photo} />
             ) : (
                 <>
@@ -309,8 +311,14 @@ const ProductImageInput = ({
                 <div className="product-image-field">
                     <input
                         type="checkbox"
-                        defaultChecked={isMain}
+                        checked={isMain}
                         onChange={() => setIsMain(!isMain)}
+                        {...(action !== "add"
+                            ? {
+                                  disabled:
+                                      action === "show" || action === "delete",
+                              }
+                            : {})}
                     />
                     Чи є головним?
                 </div>
@@ -438,21 +446,23 @@ const ProductImageInput = ({
                 </div>
             </div>
 
-            <button className="delete" onClick={onDeleteButtonClick}>
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M3 3L6 6M6 6L10 10M6 6V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18M6 6H4M10 10L14 14M10 10V17M14 14L18 18M14 14V17M18 18L21 21M18 6V12.3906M18 6H16M18 6H20M16 6L15.4558 4.36754C15.1836 3.55086 14.4193 3 13.5585 3H10.4415C9.94239 3 9.47572 3.18519 9.11861 3.5M16 6H11.6133"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </svg>
-            </button>
+            {action !== "show" && (
+                <button className="delete" onClick={onDeleteButtonClick}>
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M3 3L6 6M6 6L10 10M6 6V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18M6 6H4M10 10L14 14M10 10V17M14 14L18 18M14 14V17M18 18L21 21M18 6V12.3906M18 6H16M18 6H20M16 6L15.4558 4.36754C15.1836 3.55086 14.4193 3 13.5585 3H10.4415C9.94239 3 9.47572 3.18519 9.11861 3.5M16 6H11.6133"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                </button>
+            )}
         </div>
     );
 };

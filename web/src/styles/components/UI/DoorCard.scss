@@ -31,6 +31,7 @@
         overflow: auto;
         cursor: auto;
         gap: 20px;
+        user-select: none;
 
         p {
             height: max-content;
