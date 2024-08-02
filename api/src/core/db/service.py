@@ -1,6 +1,6 @@
 import uuid
 
-from typing import TypeVar, Optional, Callable
+from typing import TypeVar, Optional
 
 from abc import ABC, abstractmethod
 

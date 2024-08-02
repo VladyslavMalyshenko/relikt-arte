@@ -1,6 +1,10 @@
 from .base import BaseCustomException
 
 
+class UserByEmailAlreadyExistsException(BaseCustomException):
+    error = "User with this email already exists!"
+
+
 class PasswordValidationException(BaseCustomException):
     pass
 

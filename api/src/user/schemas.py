@@ -1,21 +1,27 @@
+import uuid
+import datetime
+
 from typing import Optional
 
 from fastapi import HTTPException
 
+from pydantic import BaseModel
 from pydantic import EmailStr, field_validator
 
-from ..core.schemas import MainSchema
+from ..core.schemas import MainSchema, BaseListSchema
 
 from ..utils.validators.user.password import validate_password
 from ..utils.exceptions.user import PasswordValidationException
 
 
-class UserCreate(MainSchema):
+class BaseUserCreate(BaseModel):
     email: EmailStr
+    as_admin: Optional[bool] = False
     phone: str
     password: str
-    password_confirm: str
 
+
+class PasswordValidatorMixin:
     @field_validator("password")
     def validate_password(cls, value):
         try:
@@ -30,7 +36,29 @@ class UserCreate(MainSchema):
         return value
 
 
-class UserUpdate(MainSchema):
+class UserCreate(BaseUserCreate, PasswordValidatorMixin):
+    password_confirm: str
+
+
+class AdminUserCreate(BaseUserCreate):
+    as_admin: Optional[bool] = True
+
+
+class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
     new_email: Optional[EmailStr] = None
+
+
+class UserShow(MainSchema):
+    id: uuid.UUID
+    email: EmailStr
+    phone: str
+    full_name: Optional[str] = None
+    is_active: bool
+    is_admin: bool
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+
+UserListSchema = BaseListSchema[UserShow]
