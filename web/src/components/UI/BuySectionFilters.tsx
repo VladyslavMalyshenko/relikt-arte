@@ -62,10 +62,15 @@ const BuySectionFilters = () => {
         const clearFilters = () => {
             const filtersNotDuplicated: any = {};
             for (const filter of readyFilters) {
-                filtersNotDuplicated[filter.field] = filter;
+                if (filter.field === "price") {
+                    filtersNotDuplicated[filter.field] = filter;
+                } else {
+                }
             }
 
-            const newFilters: any = [];
+            let newFilters: any = readyFilters.filter(
+                (filter: any) => filter.field !== "price"
+            );
 
             Object.keys(filtersNotDuplicated).forEach((key: string) => {
                 newFilters.push(filtersNotDuplicated[key]);
