@@ -31,6 +31,8 @@ const BuySectionProducts = () => {
         }
 
         const getProducts = async () => {
+            dispatch(SetIsLoaded(false));
+
             const filtersProcessor = (filters: any) => {
                 const newFilters: any = [];
 

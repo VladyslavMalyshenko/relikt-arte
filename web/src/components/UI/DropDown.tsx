@@ -33,11 +33,12 @@ const DropDown = ({
     const [filtersOpened, setFiltersOpened] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
     const [currentOptions, setCurrentOptions] = useState<any>([]);
+    const [optionsProps, setOptionsProps] = useState(options);
 
     useEffect(() => {
         const getOptions = async () => {
             let newCurrentOptions: DropDownAsyncOption | DropDownOption[] =
-                options;
+                optionsProps;
 
             if (Array.isArray(newCurrentOptions)) {
                 setCurrentOptions(newCurrentOptions);
@@ -96,7 +97,7 @@ const DropDown = ({
         };
 
         getOptions();
-    }, [options]);
+    }, [optionsProps]);
 
     return (
         <div className="filters-filter">

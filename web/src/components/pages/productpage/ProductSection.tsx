@@ -18,6 +18,8 @@ import Path from "../../UI/Path";
 const ProductSection = () => {
     const { product_id } = useParams();
     const [product, setProduct] = useState<ProductType | undefined>(undefined);
+    const [productPhotos, setProductPhotos] = useState<ProductPhotoType[]>([]);
+    const [currentPhoto, setCurrentPhoto] = useState<string>("");
     const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
     const navigate = useNavigate();
     const { setValue, handleSubmit } = useForm();
@@ -45,6 +47,8 @@ const ProductSection = () => {
     }, []);
 
     useEffect(() => {
+        setIsLoaded(false);
+
         const getAllowedSizes = async () => {
             if (product && product?.category_id !== null) {
                 let currentSizes: any = [];
@@ -75,8 +79,32 @@ const ProductSection = () => {
             }
         };
 
+        const setUpPhotos = () => {
+            if (product && product.photos) {
+                setProductPhotos(product.photos);
+                setCurrentPhoto(
+                    product.photos.find(
+                        (photo: ProductPhotoType) => photo.is_main
+                    )?.photo || ""
+                );
+            }
+        };
+
         getAllowedSizes();
+        setUpPhotos();
     }, [product]);
+
+    const onChosen = (fieldName: string, value: any, field: string) => {
+        const newPhoto = productPhotos.find(
+            (photo: any) => photo[field] === value
+        );
+
+        if (newPhoto) {
+            setCurrentPhoto(newPhoto.photo);
+        }
+
+        setValue(fieldName, value);
+    };
 
     return (
         <div className="product-section">
@@ -100,10 +128,7 @@ const ProductSection = () => {
                             <div className="product-info-main-image">
                                 <img
                                     src={
-                                        product?.photos.find(
-                                            (photo: ProductPhotoType) =>
-                                                photo.is_main
-                                        )?.photo ||
+                                        currentPhoto ||
                                         "https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png"
                                     }
                                 />
@@ -173,9 +198,13 @@ const ProductSection = () => {
                                         onChosen={(
                                             fieldName: string,
                                             value: any
-                                        ) => {
-                                            setValue(fieldName, value);
-                                        }}
+                                        ) =>
+                                            onChosen(
+                                                fieldName,
+                                                value,
+                                                "color_id"
+                                            )
+                                        }
                                     />
 
                                     {allowedSizes && allowedSizes.length > 0 ? (
@@ -190,9 +219,13 @@ const ProductSection = () => {
                                             onChosen={(
                                                 fieldName: string,
                                                 value: any
-                                            ) => {
-                                                setValue(fieldName, value);
-                                            }}
+                                            ) =>
+                                                onChosen(
+                                                    fieldName,
+                                                    value,
+                                                    "size_id"
+                                                )
+                                            }
                                         />
                                     ) : null}
 
@@ -214,9 +247,13 @@ const ProductSection = () => {
                                             onChosen={(
                                                 fieldName: string,
                                                 value: any
-                                            ) => {
-                                                setValue(fieldName, value);
-                                            }}
+                                            ) =>
+                                                onChosen(
+                                                    fieldName,
+                                                    value,
+                                                    "with_glass"
+                                                )
+                                            }
                                         />
                                     )}
 
@@ -235,9 +272,13 @@ const ProductSection = () => {
                                             onChosen={(
                                                 fieldName: string,
                                                 value: any
-                                            ) => {
-                                                setValue(fieldName, value);
-                                            }}
+                                            ) =>
+                                                onChosen(
+                                                    fieldName,
+                                                    value,
+                                                    "type_of_platband"
+                                                )
+                                            }
                                         />
                                     )}
                                 </div>
