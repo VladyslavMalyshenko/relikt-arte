@@ -18,6 +18,9 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
 
+    async def get_by_email(self, email: str) -> User:
+        return await self.get_by_attr(attr=self.model.email, value=email)
+
     async def create(
         self,
         *,
@@ -40,6 +43,9 @@ class AuthTokenRepository(
 ):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, AuthToken)
+
+    async def get_by_token(self, token: str) -> AuthToken:
+        return await self.get_by_attr(attr=self.model.token, value=token)
 
     async def exists_by_token(self, token: str) -> bool:
         return await self.exists_by_attr(attr=self.model.token, value=token)

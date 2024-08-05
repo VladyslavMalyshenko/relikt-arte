@@ -133,6 +133,10 @@ class Settings(BaseSettings):
     # SMTP
     smtp: SMTPSettings = Field(default_factory=SMTPSettings)
 
+    @property
+    def base_url(self) -> str:
+        return f"{self.app_scheme}://{self.app_domain}"
+
 
 @lru_cache
 def get_settings() -> Settings:

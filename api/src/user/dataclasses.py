@@ -3,5 +3,5 @@ from dataclasses import dataclass
 
 @dataclass
 class AuthTokenEmailMessageContext:
-    title: str
-    message: str
+    subject: str
+    body_message: str

@@ -1,26 +1,26 @@
 import asyncio
+import logging
+import json
 
-from fastapi_mail import FastMail, MessageSchema
+from pydantic import ValidationError
+
+from .schemas import AuthTokenShow
+from .utils import AuthTokenEmailManager
 
 from ..core.celery import app as celery_app
-from ..core.config import settings
+
+
+log = logging.getLogger(__name__)
 
 
 @celery_app.task(name="send_registration_email")
-def send_registration_email():
-
-    body = """
-    <p>This is the registration confirmation email. Please click the link below to confirm your registration:</p>
-    <br/>
-    <br/>
-    <a href="http://localhost:8000/api/v1/auth/confirm-registration?token=1234567890">Confirm registration</a>
-    """
-
-    message = MessageSchema(
-        subject="Hello",
-        recipients=["okuzmenko31us@gmail.com"],
-        body=body,
-        subtype="html",
-    )
-    fm = FastMail(settings.smtp.connection_config)
-    asyncio.run(fm.send_message(message))
+def send_registration_email(token_data: str):
+    token_data = json.loads(token_data)
+    try:
+        token_data = AuthTokenShow(**token_data)
+        print(f"TOKEN DATA : {token_data}")
+        asyncio.run(AuthTokenEmailManager().send_registration_confirmation(token_data))
+    except ValidationError as e:
+        log.exception(e.errors())
+    except Exception as e:
+        log.exception(e)

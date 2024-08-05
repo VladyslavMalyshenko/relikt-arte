@@ -23,13 +23,16 @@ class BaseUserCreate(BaseModel):
     password: str
 
 
-class PasswordValidatorMixin:
+class UserCreate(BaseUserCreate):
+    password_confirm: str
+
     @field_validator("password")
     def validate_password(cls, value):
         try:
             validate_password(value)
         except PasswordValidationException as e:
             raise HTTPException(detail=e, status_code=400)
+        return value
 
     @field_validator("password_confirm")
     def validate_password_confirm(cls, value, values):
@@ -38,12 +41,9 @@ class PasswordValidatorMixin:
         return value
 
 
-class UserCreate(BaseUserCreate, PasswordValidatorMixin):
-    password_confirm: str
-
-
 class AdminUserCreate(BaseUserCreate):
     as_admin: Optional[bool] = True
+    is_active: Optional[bool] = True
 
 
 class UserUpdate(BaseModel):

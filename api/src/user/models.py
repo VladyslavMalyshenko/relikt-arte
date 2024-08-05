@@ -41,7 +41,7 @@ class User(BaseModelMixin, Base):
         doc="Role",
     )
     is_active: Mapped[bool] = mapped_column(
-        nullable=False, index=True, default=True, doc="Is active"
+        nullable=False, index=True, default=False, doc="Is active"
     )
 
     @hybrid_property

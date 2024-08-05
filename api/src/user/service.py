@@ -9,6 +9,11 @@ from ..utils.exceptions.http.base import (  # noqa: F401
     ObjectCreateException,
     ObjectUpdateException,
 )
+from ..utils.exceptions.http.user import (
+    UserNotFoundByEmailException,
+    TokenNotFoundException,
+    InvalidTokenTypeException,
+)
 
 from ..utils.token import generate_token
 
@@ -22,7 +27,7 @@ from .schemas import (
     AuthTokenShow,
 )
 from .enums import AuthTokenType
-from .utils import AuthTokenEmailManager
+from .tasks import send_registration_email
 
 
 log = logging.getLogger(__name__)
@@ -33,7 +38,7 @@ class AuthTokenService(BaseService):
         return AuthTokenShow(
             id=obj.id,
             token=obj.token,
-            token_type=obj.type,
+            token_type=obj.token_type,
             owner_email=obj.owner_email,
             expires_at=obj.expires_at,
             created_at=obj.created_at,
@@ -42,8 +47,10 @@ class AuthTokenService(BaseService):
 
     async def create_auth_token(self, data: AuthTokenCreate) -> AuthTokenShow:
         try:
-            while await self.uow.auth_token.exists_by_token(data.token):
-                data.token = generate_token()
+            token = generate_token()
+            while await self.uow.auth_token.exists_by_token(token):
+                token = generate_token()
+            data.token = token
             token_id = await self.uow.auth_token.create(obj_in=data)
             token = await self.uow.auth_token.get_by_id(obj_id=token_id)
             return await self.get_show_scheme(token)
@@ -88,11 +95,29 @@ class UserService(BaseService):
                             owner_email=user.email,
                         )
                     )
-                    await AuthTokenEmailManager().send_registration_confirmation(
-                        token_data
-                    )
+                    send_registration_email.delay(token_data.model_dump_json())
                 await self.uow.commit()
                 return await self.get_show_scheme(user)
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectCreateException("User")
+
+    async def confirm_registration(self, token: str) -> bool:
+        try:
+            async with self.uow:
+                token_obj = await self.uow.auth_token.get_by_token(token)
+                if not token_obj:
+                    raise TokenNotFoundException(token)
+                if token_obj.token_type != AuthTokenType.REGISTRATION_CONFIRM:
+                    raise InvalidTokenTypeException(token, token_obj.token_type.value)
+                user = await self.uow.user.get_by_email(token_obj.owner_email)
+                if not user:
+                    raise UserNotFoundByEmailException(token_obj.owner_email)
+                user.is_active = True
+                await self.uow.add(user)
+                await self.uow.auth_token.delete_by_id(obj_id=token_obj.id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
