@@ -108,3 +108,17 @@ dev-pip-list:
 
 prod-pip-list:
 	$(dc_prod) exec $(OPTIONS) $(CONTAINER) pip list
+
+# Shell scripts
+define RUN_CREATE_ADMIN
+	@read -p "Enter email: " email; \
+	read -p "Enter phone number: " phone; \
+	read -p "Enter password: " password; \
+	$($(1)) exec $(OPTIONS) $(CONTAINER) ../create_admin.sh -e $$email -p $$phone -psw $$password
+endef
+
+create-admin-dev:
+	$(call RUN_CREATE_ADMIN,dc_dev)
+
+create-admin-prod:
+	$(call RUN_CREATE_ADMIN,dc_prod)

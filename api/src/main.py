@@ -15,7 +15,10 @@ from .core.db.session import (
 
 from .admin.model_views import get_model_views
 
+from .user.router import router as user_router
 from .product.router import router as product_router
+
+from .user.tasks import send_registration_email
 
 
 # Lifespan events
@@ -23,6 +26,7 @@ from .product.router import router as product_router
 async def lifespan(app: FastAPI):  # noqa
     # Initialize the cache backend
     init_caching()
+    # send_registration_email.delay()
     yield
 
 
@@ -43,6 +47,7 @@ app.add_middleware(
 
 # Include routers
 routers: list[APIRouter] = [
+    user_router,
     product_router,
 ]
 for router in routers:

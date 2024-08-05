@@ -3,10 +3,10 @@ from ..utils.enums import BaseEnum
 
 class UserRole(BaseEnum):
     ADMIN = "admin"
-    USER = "user"
+    CUSTOMER = "customer"
 
 
-class UserPriority(BaseEnum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
+class AuthTokenType(BaseEnum):
+    REGISTRATION_CONFIRM = "registration_confirm"
+    PASSWORD_RESET = "password_reset"
+    EMAIL_CHANGE_CONFIRM = "email_change_confirm"

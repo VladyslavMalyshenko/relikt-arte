@@ -1,6 +1,6 @@
 import uuid
 
-from typing import Generic, TypeVar, Optional
+from typing import Generic, TypeVar, Optional, Any
 
 from pydantic import BaseModel
 
@@ -145,6 +145,11 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
     async def exists_by_id(self, *, obj_id: int | uuid.UUID) -> bool:
         query = exists().where(self.model.id == obj_id).select()
         res = await self.session.execute(query)
+        return res.scalar_one()
+
+    async def exists_by_attr(self, attr: Any, value: Any) -> bool:
+        query = exists(self.model).where(attr == value)
+        res = await self.session.execute(query.select())
         return res.scalar_one()
 
     async def delete_by_id(self, *, obj_id: int | uuid.UUID) -> None:

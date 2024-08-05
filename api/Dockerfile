@@ -49,6 +49,10 @@ COPY --chmod=765 scripts/celery.sh /app/celery.sh
 RUN chmod +x /app/run.sh
 RUN chmod +x /app/celery.sh
 
+# Make create admin script executable
+COPY --chmod=765 scripts/create_admin.sh /app/create_admin.sh
+RUN chmod +x /app/create_admin.sh
+
 # Run application as root user
 USER root
 
