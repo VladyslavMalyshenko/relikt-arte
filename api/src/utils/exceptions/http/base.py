@@ -41,12 +41,17 @@ class ObjectCreateException(HTTPException):
 
     def __init__(
         self,
-        object_name: str,
+        object_name: Optional[str] = None,
+        message: Optional[str] = None,
         headers: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to {self._operation} {object_name}",
+            detail=(
+                f"Failed to {self._operation} {object_name}"
+                if message is None
+                else message
+            ),
             headers=headers,
         )
 
