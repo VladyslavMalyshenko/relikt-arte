@@ -13,6 +13,8 @@ from ..core.schemas import MainSchema, BaseListSchema
 from ..utils.validators.user.password import validate_password
 from ..utils.exceptions.user import PasswordValidationException
 
+from .enums import AuthTokenType
+
 
 class BaseUserCreate(BaseModel):
     email: EmailStr
@@ -57,6 +59,26 @@ class UserShow(MainSchema):
     full_name: Optional[str] = None
     is_active: bool
     is_admin: bool
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+
+
+class AuthTokenCreate(BaseModel):
+    token: Optional[str] = None
+    token_type: AuthTokenType
+    owner_email: EmailStr
+
+
+class AuthTokenUpdate(AuthTokenCreate):
+    pass
+
+
+class AuthTokenShow(MainSchema):
+    id: int
+    token: str
+    token_type: AuthTokenType
+    owner_email: EmailStr
+    expires_at: datetime.datetime
     created_at: datetime.datetime
     updated_at: datetime.datetime
 

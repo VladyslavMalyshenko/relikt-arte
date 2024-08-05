@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+from fastapi_mail import ConnectionConfig
+
 from pydantic import (
     Field,
     field_validator,
@@ -80,6 +82,27 @@ class PaginationSettings(BaseSettings):
     )
 
 
+class SMTPSettings(BaseSettings):
+    host: str = Field(alias="smtp_host", default="smtp.gmail.com")
+    port: int = Field(alias="smtp_port", default=587)
+    username: str = Field(alias="smtp_username")
+    password: str = Field(alias="smtp_password")
+
+    @property
+    def connection_config(self) -> ConnectionConfig:
+        return ConnectionConfig(
+            MAIL_USERNAME=self.username,
+            MAIL_PASSWORD=self.password,
+            MAIL_FROM=self.username,
+            MAIL_PORT=self.port,
+            MAIL_SERVER=self.host,
+            MAIL_STARTTLS=True,
+            MAIL_SSL_TLS=False,
+            USE_CREDENTIALS=True,
+            VALIDATE_CERTS=True,
+        )
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -106,6 +129,9 @@ class Settings(BaseSettings):
 
     # Pagination
     pagination: PaginationSettings = Field(default_factory=PaginationSettings)
+
+    # SMTP
+    smtp: SMTPSettings = Field(default_factory=SMTPSettings)
 
 
 @lru_cache

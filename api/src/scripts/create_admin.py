@@ -57,7 +57,10 @@ async def main(argv=sys.argv):
         parser.error(e.errors())
 
     try:
-        user_show = await UserService(UnitOfWork()).create_user(data)
+        user_show = await UserService(UnitOfWork()).create_user(
+            data=data,
+            send_confirmation_email=False,
+        )
         print(f"\n\nAdmin user created: {user_show.model_dump()}\n\n")
     except UserByEmailAlreadyExistsException as e:
         parser.error(e)

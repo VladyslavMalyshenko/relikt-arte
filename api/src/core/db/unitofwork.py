@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db.session import create_async_session_maker
 
-from ...repositories.user import UserRepository
+from ...repositories.user import UserRepository, AuthTokenRepository
 from ...repositories.product import (
     ProductRepository,
     ProductPhotoRepository,
@@ -19,6 +19,7 @@ from ...repositories.product import (
 
 class AbstractUnitOfWork(ABC):
     user: UserRepository
+    auth_token: AuthTokenRepository
     product: ProductRepository
     product_photo: ProductPhotoRepository
     category: CategoryRepository
@@ -59,8 +60,9 @@ class UnitOfWork(AbstractUnitOfWork):
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
 
-        # User
+        # User and AuthToken
         self.user = UserRepository(self.session)
+        self.auth_token = AuthTokenRepository(self.session)
 
         # Product and related
         self.product = ProductRepository(self.session)

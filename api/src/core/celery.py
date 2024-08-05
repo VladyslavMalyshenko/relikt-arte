@@ -9,3 +9,4 @@ app.conf.update(
     timezone=settings.celery.timezone,
     broker_heartbeat=240,
 )
+app.autodiscover_tasks(["src.user.tasks"])
