@@ -41,3 +41,16 @@ class InvalidTokenTypeException(HTTPException):
             detail=f"Invalid token type: {token_type} for token: {token}",
             headers=headers,
         )
+
+
+class TokenExpiredException(HTTPException):
+    def __init__(
+        self,
+        token: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Token: {token} has expired",
+            headers=headers,
+        )
