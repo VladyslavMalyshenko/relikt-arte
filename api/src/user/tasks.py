@@ -18,8 +18,9 @@ def send_registration_email(token_data: str):
     token_data = json.loads(token_data)
     try:
         token_data = AuthTokenShow(**token_data)
-        print(f"TOKEN DATA : {token_data}")
-        asyncio.run(AuthTokenEmailManager().send_registration_confirmation(token_data))
+        asyncio.run(
+            AuthTokenEmailManager().send_registration_confirmation(token_data),
+        )
     except ValidationError as e:
         log.exception(e.errors())
     except Exception as e:

@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -13,6 +14,7 @@ from ..utils.exceptions.http.user import (
     UserNotFoundByEmailException,
     TokenNotFoundException,
     InvalidTokenTypeException,
+    TokenExpiredException,
 )
 
 from ..utils.token import generate_token
@@ -108,6 +110,8 @@ class UserService(BaseService):
                 token_obj = await self.uow.auth_token.get_by_token(token)
                 if not token_obj:
                     raise TokenNotFoundException(token)
+                if token_obj.expires_at < datetime.datetime.now():
+                    raise TokenExpiredException(token)
                 if token_obj.token_type != AuthTokenType.REGISTRATION_CONFIRM:
                     raise InvalidTokenTypeException(token, token_obj.token_type.value)
                 user = await self.uow.user.get_by_email(token_obj.owner_email)
