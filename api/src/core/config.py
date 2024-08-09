@@ -103,6 +103,12 @@ class SMTPSettings(BaseSettings):
         )
 
 
+class JWTSettings(BaseSettings):
+    access_token_expire: int = Field(alias="jwt_access_token_expire")
+    refresh_token_expire: int = Field(alias="jwt_refresh_token_expire")
+    algorithm: str = Field(alias="jwt_algorithm")
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -132,6 +138,9 @@ class Settings(BaseSettings):
 
     # SMTP
     smtp: SMTPSettings = Field(default_factory=SMTPSettings)
+
+    # JWT
+    jwt: JWTSettings = Field(default_factory=JWTSettings)
 
     @property
     def base_url(self) -> str:

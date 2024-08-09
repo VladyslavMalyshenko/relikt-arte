@@ -45,8 +45,6 @@ async def main(argv=sys.argv):
 
     args = parser.parse_args(argv[1:])
 
-    print(args.phone)
-
     try:
         data = AdminUserCreate(
             email=args.email,
