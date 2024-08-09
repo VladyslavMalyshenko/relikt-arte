@@ -16,6 +16,45 @@ class UserNotFoundByEmailException(HTTPException):
         )
 
 
+class UserInvalidPasswordException(HTTPException):
+    def __init__(
+        self,
+        email: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The password for user with email: {email} is invalid",
+            headers=headers,
+        )
+
+
+class UserInactiveException(HTTPException):
+    def __init__(
+        self,
+        email: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User with email: {email} is inactive. Check your email for registration confirmation link or contact support",
+            headers=headers,
+        )
+
+
+class UserIsNotAdminException(HTTPException):
+    def __init__(
+        self,
+        email: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User with email: {email} is not an admin",
+            headers=headers,
+        )
+
+
 class TokenNotFoundException(HTTPException):
     def __init__(
         self,

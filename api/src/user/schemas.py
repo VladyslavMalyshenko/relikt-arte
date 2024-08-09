@@ -83,4 +83,19 @@ class AuthTokenShow(MainSchema):
     updated_at: datetime.datetime
 
 
+class UserAuth(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class JWTTokensSchema(BaseModel):
+    access_token: str
+    refresh_token: Optional[str] = None
+    token_type: Optional[str] = None
+
+
+class TokenVerifyOrRefreshSchema(BaseModel):
+    token: str
+
+
 UserListSchema = BaseListSchema[UserShow]

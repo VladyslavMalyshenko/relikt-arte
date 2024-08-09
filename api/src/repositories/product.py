@@ -200,7 +200,6 @@ class ProductRelRepository(
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[ProductRel]:
-        print(f"FILTERS : {filters}")
         return await super().get_all(
             options=options,
             filters=filters,

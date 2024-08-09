@@ -1,4 +1,5 @@
 import logging
+import uuid
 import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,6 +13,9 @@ from ..utils.exceptions.http.base import (  # noqa: F401
 )
 from ..utils.exceptions.http.user import (
     UserNotFoundByEmailException,
+    UserInvalidPasswordException,
+    UserInactiveException,
+    UserIsNotAdminException,
     TokenNotFoundException,
     InvalidTokenTypeException,
     TokenExpiredException,
@@ -24,12 +28,16 @@ from .schemas import (
     UserCreate,
     AdminUserCreate,
     UserShow,
+    UserAuth,
     UserListSchema,
     AuthTokenCreate,
     AuthTokenShow,
+    JWTTokensSchema,
+    TokenVerifyOrRefreshSchema,
 )
 from .enums import AuthTokenType
 from .tasks import send_registration_email
+from .mixins import JWTTokensMixin
 
 
 log = logging.getLogger(__name__)
@@ -61,7 +69,7 @@ class AuthTokenService(BaseService):
             raise ObjectCreateException("Auth token")
 
 
-class UserService(BaseService):
+class UserService(JWTTokensMixin, BaseService):
     list_schema = UserListSchema
 
     async def get_show_scheme(self, obj: User) -> UserShow:
@@ -113,7 +121,9 @@ class UserService(BaseService):
                 if token_obj.expires_at < datetime.datetime.now():
                     raise TokenExpiredException(token)
                 if token_obj.token_type != AuthTokenType.REGISTRATION_CONFIRM:
-                    raise InvalidTokenTypeException(token, token_obj.token_type.value)
+                    raise InvalidTokenTypeException(
+                        token, token_obj.token_type.value
+                    )
                 user = await self.uow.user.get_by_email(token_obj.owner_email)
                 if not user:
                     raise UserNotFoundByEmailException(token_obj.owner_email)
@@ -121,6 +131,68 @@ class UserService(BaseService):
                 await self.uow.add(user)
                 await self.uow.auth_token.delete_by_id(obj_id=token_obj.id)
                 await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
+
+    async def authenticate_user(
+        self,
+        data: UserAuth,
+        as_admin: bool = False,
+    ) -> JWTTokensSchema:
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_email(data.email)
+                if not user:
+                    raise UserNotFoundByEmailException(data.email)
+                if not user.check_password(data.password):
+                    raise UserInvalidPasswordException(data.email)
+                if not user.is_active:
+                    raise UserInactiveException(data.email)
+                if as_admin and not user.is_admin:
+                    raise UserIsNotAdminException(data.email)
+                tokens = await self.generate_tokens_for_user(user.id, as_admin)
+                return JWTTokensSchema(**tokens)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise UserNotFoundByEmailException(data.email)
+
+    async def _user_id_from_jwt(
+        self,
+        token: str,
+        check_bearer: bool = True,
+    ) -> uuid.UUID | None:
+        token_data = await self.get_jwt_token_data(token, check_bearer)
+        if token_data:
+            try:
+                return token_data["sub"]
+            except KeyError:
+                return None
+
+    async def verify_user_token(
+        self,
+        data: TokenVerifyOrRefreshSchema,
+        as_admin: bool = False,
+    ) -> bool:
+        token_valid = await self.is_token_valid(
+            data.token,
+            as_admin=as_admin,
+        )
+        if not token_valid:
+            return False
+        user_id = await self._user_id_from_jwt(data.token, check_bearer=False)
+        if not user_id:
+            return False
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    return False
+                if not user.is_active:
+                    return False
+                if as_admin and not user.is_admin:
+                    return False
                 return True
         except SQLAlchemyError as e:
             log.exception(e)
