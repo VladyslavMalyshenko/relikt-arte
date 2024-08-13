@@ -1,4 +1,6 @@
 import axios from "axios";
+import { RootStore } from "../redux/Stores/RootStore";
+import { SetAuth } from "../redux/actions/AuthActions";
 import { generateUrl } from "./generateUrl";
 
 const accessTokenName = "ACCESS_RELIKTARTE_TOKEN";
@@ -21,16 +23,40 @@ export const setRefreshToken = (token: string) => {
 };
 
 export const validateToken = async () => {
-    const isTokenValid = await axios
-        .post(generateUrl("api/v1/token/verify/"), {
-            token: getAccessToken(),
-        })
-        .then(() => true)
-        .catch(() => false);
+    let isValid = false;
 
-    if (!isTokenValid) {
-        // refresh token logic here
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
+
+    if (accessToken) {
+        const isTokenValid = await axios
+            .post(generateUrl("api/v1/user/token/verify/"), {
+                token: accessToken,
+            })
+            .then((res) => res.data || false)
+            .catch(() => false);
+        isValid = isTokenValid;
     }
+
+    if (!isValid && refreshToken) {
+        const isRefreshTokenValid = await axios
+            .post(generateUrl("api/v1/user/token/refresh_from_access/"), {
+                token: refreshToken,
+            })
+            .then((res) => {
+                setAccessToken(res.data.access_token);
+                setRefreshToken("");
+
+                return true;
+            })
+            .catch(() => false);
+
+        isValid = isRefreshTokenValid;
+    }
+
+    RootStore.dispatch(SetAuth(isValid));
+
+    return isValid;
 };
 
 export const registerUser = async (data: any) => {
@@ -39,6 +65,22 @@ export const registerUser = async (data: any) => {
             ...data,
         })
         .then(() => true)
+        .catch((err) => ({
+            error: err.response.data.detail || "Щось пішло не так.",
+        }));
+};
+
+export const singInAccount = async (data: any) => {
+    return await axios
+        .post(generateUrl("api/v1/user/auth"), {
+            ...data,
+        })
+        .then((res) => {
+            setAccessToken(res.data.access_token);
+            setRefreshToken(res.data.refresh_token);
+
+            return true;
+        })
         .catch((err) => ({
             error: err.response.data.detail || "Щось пішло не так.",
         }));

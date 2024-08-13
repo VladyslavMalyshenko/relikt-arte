@@ -1,0 +1,89 @@
+.auth-section {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 25px;
+
+    .input-field {
+        &-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            label {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                text-transform: capitalize;
+                box-sizing: border-box;
+
+                input {
+                    border: 2px solid transparent;
+                    width: 15em;
+                    height: 2.5em;
+                    outline: none;
+                    overflow: hidden;
+                    background-color: var(--background-color-muted);
+                    border-radius: 10px;
+                    transition: all 0.3s;
+
+                    &.invalid {
+                        border: 2px solid var(--red);
+                    }
+
+                    &:hover,
+                    &:focus {
+                        border: 2px solid var(--active-color);
+                        box-shadow: 0px 0px 0px 7px var(--active-background);
+                        background-color: var(var(--background-color));
+                    }
+
+                    &::placeholder {
+                        text-transform: capitalize;
+                    }
+                }
+            }
+        }
+
+        &-error {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: start;
+            color: var(--red);
+        }
+    }
+
+    button {
+        width: min-content;
+        height: min-content;
+        color: var(--text-color);
+        border: 1px solid transparent;
+        cursor: pointer;
+        background: transparent;
+        border-radius: 8px;
+        aspect-ratio: 2 / 1;
+        transition: 0.3s;
+
+        &:not(:disabled):hover {
+            color: var(--active-color);
+            background: var(--active-background);
+            border-color: var(--active-color);
+        }
+
+        &:disabled {
+            filter: brightness(0) saturate(100%);
+
+            &:hover {
+                color: var(--red);
+                background: var(--red-background);
+                border-color: var(--red);
+            }
+        }
+    }
+}

@@ -8,6 +8,7 @@ import { ProductType } from "../../types/productsRelatedTypes";
 import { getItems } from "../../utils/getItems";
 import BuyProductsPagination from "./BuyProductsPagination";
 import DoorCard from "./DoorCard";
+import Loader from "./Loader";
 
 const BuySectionProducts = () => {
     const currentPage = useSelector(
@@ -118,7 +119,7 @@ const BuySectionProducts = () => {
 
     return (
         <>
-            {isLoaded && (
+            {isLoaded ? (
                 <div className="buy-products">
                     <div className="buy-products-wrapper">
                         {products &&
@@ -136,6 +137,8 @@ const BuySectionProducts = () => {
                         changePage={changePage}
                     />
                 </div>
+            ) : (
+                <Loader />
             )}
         </>
     );

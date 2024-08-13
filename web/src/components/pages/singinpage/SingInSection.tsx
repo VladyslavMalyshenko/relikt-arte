@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
+import { singInAccount } from "../../../utils/tokenUtils";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 
 const SingInSection = () => {
     const navigate = useNavigate();
+    const [message, setMessage] = useState("");
 
     interface SingInFormData {
         email: string;
@@ -26,8 +29,16 @@ const SingInSection = () => {
         defaultValues,
     });
 
-    const onSubmit = (data: SingInFormData) => {
-        console.log(data);
+    const onSubmit = async (data: SingInFormData) => {
+        setMessage("");
+
+        const response: any = await singInAccount(data);
+
+        if (!response.error) {
+            navigate(paths.profile);
+        } else {
+            setMessage(response.error);
+        }
     };
 
     return (
@@ -74,6 +85,17 @@ const SingInSection = () => {
                             забули пароль?
                         </Link>
                     </div>
+
+                    {message && (
+                        <p
+                            className="black small"
+                            style={{
+                                color: "var(--red)",
+                            }}
+                        >
+                            {message}
+                        </p>
+                    )}
 
                     <Button
                         additionalClasses={["upper"]}
