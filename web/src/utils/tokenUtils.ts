@@ -34,9 +34,14 @@ export const validateToken = async () => {
 };
 
 export const registerUser = async (data: any) => {
-    await axios.post(generateUrl("api/v1/user/create"), {
-        ...data,
-    });
+    return await axios
+        .post(generateUrl("api/v1/user/create"), {
+            ...data,
+        })
+        .then(() => true)
+        .catch((err) => ({
+            error: err.response.data.detail || "Щось пішло не так.",
+        }));
 };
 
 export const confirmRegistration = async (token: string) => {
