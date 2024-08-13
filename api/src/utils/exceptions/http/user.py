@@ -16,6 +16,19 @@ class UserNotFoundByEmailException(HTTPException):
         )
 
 
+class UserNotFoundByIdException(HTTPException):
+    def __init__(
+        self,
+        user_id: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id: {user_id} not found",
+            headers=headers,
+        )
+
+
 class UserInvalidPasswordException(HTTPException):
     def __init__(
         self,
@@ -64,6 +77,32 @@ class TokenNotFoundException(HTTPException):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Token: {token} not found",
+            headers=headers,
+        )
+
+
+class InvalidTokenException(HTTPException):
+    def __init__(
+        self,
+        token: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid token: {token}",
+            headers=headers,
+        )
+
+
+class InvalidTokenUserException(HTTPException):
+    def __init__(
+        self,
+        token: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Token: {token} does not belong to the user or user_id is invalid",
             headers=headers,
         )
 
