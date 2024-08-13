@@ -9,7 +9,7 @@ from ..core.config import settings
 class AuthTokenEmailManager:
     @property
     def registration_confirmation_link(self) -> str:
-        return f"{settings.base_url}/api/v1/user/confirm_registration"
+        return f"{settings.frontend_app.base_url}/{settings.frontend_app.registration_confirm_path}"
 
     async def send_email(
         self,
