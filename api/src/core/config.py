@@ -109,6 +109,21 @@ class JWTSettings(BaseSettings):
     algorithm: str = Field(alias="jwt_algorithm")
 
 
+class FrontendSettings(BaseSettings):
+    app_scheme: str = Field(alias="frontend_app_scheme", default="http")
+    app_domain: str = Field(
+        alias="frontend_app_domain",
+        default="localhost:3000",
+    )
+    registration_confirm_path: str = Field(
+        alias="frontend_registration_confirm_path",
+    )
+
+    @property
+    def base_url(self) -> str:
+        return f"{self.app_scheme}://{self.app_domain}"
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -141,6 +156,9 @@ class Settings(BaseSettings):
 
     # JWT
     jwt: JWTSettings = Field(default_factory=JWTSettings)
+
+    # Frontend
+    frontend_app: FrontendSettings = Field(default_factory=FrontendSettings)
 
     @property
     def base_url(self) -> str:
