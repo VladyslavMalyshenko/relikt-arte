@@ -72,3 +72,19 @@ async def verify_token(
     as_admin: bool = False,
 ) -> bool:
     return await UserService(uow).verify_user_token(token_data, as_admin)
+
+
+@router.post(
+    "/token/refresh_from_access/",
+    status_code=status.HTTP_200_OK,
+    response_model=JWTTokensSchema,
+)
+async def refresh_token_from_access(
+    uow: uowDEP,
+    token_data: TokenVerifyOrRefreshSchema,
+    as_admin: bool = False,
+) -> JWTTokensSchema:
+    return await UserService(uow).get_user_access_from_refresh(
+        token_data,
+        as_admin,
+    )

@@ -13,11 +13,14 @@ from ..utils.exceptions.http.base import (  # noqa: F401
 )
 from ..utils.exceptions.http.user import (
     UserNotFoundByEmailException,
+    UserNotFoundByIdException,
     UserInvalidPasswordException,
     UserInactiveException,
     UserIsNotAdminException,
     TokenNotFoundException,
     InvalidTokenTypeException,
+    InvalidTokenException,
+    InvalidTokenUserException,
     TokenExpiredException,
 )
 
@@ -197,3 +200,38 @@ class UserService(JWTTokensMixin, BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             return False
+
+    async def get_user_access_from_refresh(
+        self,
+        data: TokenVerifyOrRefreshSchema,
+        as_admin: bool = False,
+    ):
+        token_valid = await self.is_token_valid(
+            data.token,
+            check_refresh=True,
+            as_admin=as_admin,
+        )
+        if not token_valid:
+            raise InvalidTokenException(data.token)
+        user_id = await self._user_id_from_jwt(data.token, check_bearer=False)
+        if not user_id:
+            raise InvalidTokenUserException(data.token)
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                if not user.is_active:
+                    raise UserInactiveException(user.email)
+                if as_admin and not user.is_admin:
+                    raise UserIsNotAdminException(user.email)
+                access_token = await self.generate_access_token(
+                    user.id, as_admin
+                )
+                return JWTTokensSchema(
+                    access_token=access_token,
+                    token_type="bearer",
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise InvalidTokenException(data.token)
