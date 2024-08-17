@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
+import { registerUser } from "../../../utils/tokenUtils";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 
@@ -14,12 +16,16 @@ interface RegisterFormData {
 
 const RegisterSection = () => {
     const navigate = useNavigate();
+    const [message, setMessage] = useState("");
+    const [success, setSuccess] = useState(false);
+
     const defaultValues = {
         email: "",
-        phoneNumber: "",
+        phone: "",
         password: "",
-        confirmPassword: "",
+        password_confirm: "",
     };
+
     const {
         control,
         handleSubmit,
@@ -29,8 +35,21 @@ const RegisterSection = () => {
         defaultValues,
     });
 
-    const onSubmit = (data: RegisterFormData) => {
-        console.log(data);
+    const onSubmit = async (data: RegisterFormData) => {
+        setSuccess(false);
+        setMessage("");
+
+        const response: any = await registerUser(data);
+
+        if (!response.error) {
+            setSuccess(true);
+            setMessage(
+                "Ви успішно пройшли реєстрацію. На Вашу поштову скриньку було надіслано лист з посиланням для підтвердження аккаунту. Перейдіть за посиланням у листі й увійдіть до аккаунту."
+            );
+        } else {
+            setSuccess(false);
+            setMessage(response.error);
+        }
     };
 
     return (
@@ -44,7 +63,7 @@ const RegisterSection = () => {
                             control={control}
                             errors={errors}
                             placeholder="email"
-                            name="email "
+                            name="email"
                         />
 
                         <Input
@@ -52,7 +71,7 @@ const RegisterSection = () => {
                             control={control}
                             errors={errors}
                             placeholder="номер телефону"
-                            name="phoneNumber"
+                            name="phone"
                         />
 
                         <div className="auth-modal-inputs-devided">
@@ -76,7 +95,7 @@ const RegisterSection = () => {
                                 control={control}
                                 errors={errors}
                                 placeholder="повторити пароль"
-                                name="confirmPassword"
+                                name="password_confirm"
                                 rules={{
                                     required: "Повторний пароль є обов'язковим",
                                     validate: (value: string) =>
@@ -86,6 +105,17 @@ const RegisterSection = () => {
                             />
                         </div>
                     </div>
+
+                    {message && (
+                        <p
+                            className="black small"
+                            style={{
+                                color: success ? "var(--green)" : "var(--red)",
+                            }}
+                        >
+                            {message}
+                        </p>
+                    )}
 
                     <Button
                         additionalClasses={["upper"]}
