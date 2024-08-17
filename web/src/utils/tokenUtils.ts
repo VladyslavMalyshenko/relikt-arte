@@ -40,7 +40,7 @@ export const validateToken = async () => {
 
     if (!isValid && refreshToken) {
         const isRefreshTokenValid = await axios
-            .post(generateUrl("api/v1/user/token/refresh_from_access/"), {
+            .post(generateUrl("api/v1/user/token/access_from_refresh/"), {
                 token: refreshToken,
             })
             .then((res) => {
