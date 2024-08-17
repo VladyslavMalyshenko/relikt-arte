@@ -6,6 +6,7 @@ import HomePage from "../pages/HomePage";
 import PasswordRecoveryPage from "../pages/PasswordRecoveryPage";
 import ProductPage from "../pages/ProductPage";
 import ProfilePage from "../pages/ProfilePage";
+import RegisterConformationPage from "../pages/RegisterConformationPage";
 import RegisterPage from "../pages/RegisterPage";
 import SingInPage from "../pages/SingInPage";
 import { paths } from "./paths";
@@ -25,6 +26,10 @@ const Router = () => {
             <Route path={paths.profile} element={<ProfilePage />} />
             <Route path={paths.checkout} element={<CheckoutPage />} />
             <Route path={paths.contacts} element={<ContactsPage />} />
+            <Route
+                path={paths.registerConfirmation}
+                element={<RegisterConformationPage />}
+            />
         </Routes>
     );
 };
