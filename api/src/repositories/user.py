@@ -30,6 +30,7 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             phone=obj_in.phone,
             password=obj_in.password,
+            is_active=obj_in.is_active if hasattr(obj_in, "is_active") else False,
             role=UserRole.ADMIN if obj_in.as_admin else UserRole.CUSTOMER,
         )
         return user
