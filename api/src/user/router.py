@@ -75,11 +75,11 @@ async def verify_token(
 
 
 @router.post(
-    "/token/refresh_from_access/",
+    "/token/access_from_refresh/",
     status_code=status.HTTP_200_OK,
     response_model=JWTTokensSchema,
 )
-async def refresh_token_from_access(
+async def access_token_from_refresh(
     uow: uowDEP,
     token_data: TokenVerifyOrRefreshSchema,
     as_admin: bool = False,

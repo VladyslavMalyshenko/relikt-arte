@@ -1,0 +1,103 @@
+from enum import Enum as PyEnum
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import ENUM
+
+from ..core.db.mixins import BaseModelMixin
+from ..product.models import Product
+from ..product.enums import ProductTypeOfPlatbandEnum, ProductOrientationEnum
+
+from .enums import ItemMaterialEnum
+
+
+class ItemMixin(BaseModelMixin):
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("product.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+        index=True,
+        doc="Product ID",
+    )
+    color_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_color.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        nullable=True,
+        index=True,
+        doc="Color ID",
+    )
+    size_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_size.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        nullable=True,
+        index=True,
+        doc="Size ID",
+    )
+    covering_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_covering.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        nullable=True,
+        index=True,
+        doc="Covering ID",
+    )
+    glass_color_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "product_glass_color.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        nullable=True,
+        index=True,
+        doc="Glass color ID",
+    )
+
+    material: Mapped[ItemMaterialEnum] = mapped_column(
+        ENUM(
+            ItemMaterialEnum,
+            name="item_material_enum",
+        ),
+        nullable=True,
+        doc="Material",
+    )
+    type_of_platband: Mapped[PyEnum] = mapped_column(
+        ENUM(
+            ProductTypeOfPlatbandEnum,
+            name="product_type_of_platband_enum",
+        ),
+        nullable=True,
+        doc="Type of platband",
+    )
+    orientation: Mapped[PyEnum] = mapped_column(
+        ENUM(
+            ProductOrientationEnum,
+            name="product_orientation_enum",
+        ),
+        nullable=True,
+        doc="Orientation",
+    )
+    with_glass: Mapped[bool] = mapped_column(
+        nullable=True,
+        doc="With glass",
+    )
+
+    quantity: Mapped[int] = mapped_column(
+        nullable=False,
+        doc="Quantity",
+    )
+
+    product: Mapped[Product] = relationship(
+        backref="basket_items",
+    )
+
+    @hybrid_property
+    def total_price(self):
+        return self.product.price * self.quantity
