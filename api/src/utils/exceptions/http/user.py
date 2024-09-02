@@ -29,6 +29,18 @@ class UserNotFoundByIdException(HTTPException):
         )
 
 
+class InvalidCredentialsException(HTTPException):
+    def __init__(
+        self,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid credentials",
+            headers=headers,
+        )
+
+
 class UserInvalidPasswordException(HTTPException):
     def __init__(
         self,

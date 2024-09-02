@@ -1,7 +1,9 @@
+import uuid
+
 from enum import Enum as PyEnum
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -72,6 +74,7 @@ class ItemMixin(BaseModelMixin):
         ENUM(
             ProductTypeOfPlatbandEnum,
             name="product_type_of_platband_enum",
+            create_type=False,
         ),
         nullable=True,
         doc="Type of platband",
@@ -80,6 +83,7 @@ class ItemMixin(BaseModelMixin):
         ENUM(
             ProductOrientationEnum,
             name="product_orientation_enum",
+            create_type=False,
         ),
         nullable=True,
         doc="Orientation",
@@ -94,10 +98,29 @@ class ItemMixin(BaseModelMixin):
         doc="Quantity",
     )
 
-    product: Mapped[Product] = relationship(
-        backref="basket_items",
-    )
+    @declared_attr
+    def product(cls) -> Mapped[Product]:
+        return relationship(
+            Product,
+        )
 
     @hybrid_property
     def total_price(self):
         return self.product.price * self.quantity
+
+
+class BasketAndOrderMixin(BaseModelMixin):
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
+        index=True,
+        doc="User ID",
+    )
+
+    @hybrid_property
+    def total_value(self):
+        return sum(item.total_price for item in self.items)
+
+    @hybrid_property
+    def total_items(self):
+        return sum(item.quantity for item in self.items)
