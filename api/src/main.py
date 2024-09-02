@@ -17,8 +17,7 @@ from .admin.model_views import get_model_views
 
 from .user.router import router as user_router
 from .product.router import router as product_router
-
-from .user.tasks import send_registration_email
+from .order.router import router as order_router
 
 
 # Lifespan events
@@ -49,6 +48,7 @@ app.add_middleware(
 routers: list[APIRouter] = [
     user_router,
     product_router,
+    order_router,
 ]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")

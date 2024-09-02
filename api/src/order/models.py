@@ -1,121 +1,114 @@
-import uuid
+from enum import Enum as PyEnum
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import ENUM
 
 from ..core.db.base import Base
-from ..core.db.mixins import BaseModelMixin
 
-from ..user.models import User
-from ..product.models import (
-    Product,
-    ProductColor,
-    ProductCovering,
-    ProductGlassColor,
-    ProductSize,
-)
+from .mixins import ItemMixin, BasketAndOrderMixin
+from .enums import OrderStatusEnum
 
 
-class Basket(BaseModelMixin, Base):
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"),
+class Basket(BasketAndOrderMixin, Base):
+    basket_token: Mapped[str] = mapped_column(
         nullable=True,
         index=True,
-        doc="User ID",
+        doc="Basket token",
     )
-
-    session_id: Mapped[str] = mapped_column(
-        nullable=True,
-        index=True,
-        doc="Session ID",
-    )
-
     items: Mapped[list["BasketItem"]] = relationship(
-        "BasketItem",
         backref="basket",
         cascade="all, delete-orphan",
     )
 
-    @hybrid_property
-    def total_value(self):
-        return sum(item.total_price for item in self.items)
-
-    @hybrid_property
-    def total_items(self):
-        return sum(item.quantity for item in self.items)
+    def __str__(self) -> str:
+        return f"Basket {self.id}. Total items: {self.total_items}. Total value: {self.total_value}"
 
 
-class BasketItem(BaseModelMixin, Base):
+class BasketItem(ItemMixin, Base):
+    __tablename__ = "basket_item"
+
     basket_id: Mapped[int] = mapped_column(
-        ForeignKey("basket.id", ondelete="CASCADE", onupdate="CASCADE"),
+        ForeignKey(
+            "basket.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
         nullable=False,
         index=True,
         doc="Basket ID",
     )
-    product_id: Mapped[int] = mapped_column(
-        ForeignKey("product.id", ondelete="CASCADE", onupdate="CASCADE"),
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} - {self.quantity} шт."
+
+
+class Order(BasketAndOrderMixin, Base):
+    full_name: Mapped[str] = mapped_column(
+        nullable=False,
+        doc="Full name",
+    )
+    phone: Mapped[str] = mapped_column(
+        nullable=False,
+        doc="Phone",
+    )
+    email: Mapped[str] = mapped_column(
+        nullable=False,
+        doc="Email",
+    )
+    region: Mapped[str] = mapped_column(
+        nullable=False,
+        doc="Region",
+    )
+    city_or_settlement: Mapped[str] = mapped_column(
+        nullable=False,
+        doc="City or settlement",
+    )
+    warehouse: Mapped[str] = mapped_column(
+        nullable=True,
+        doc="Warehouse",
+    )
+    delivery_address: Mapped[str] = mapped_column(
+        nullable=True,
+        doc="Delivery address",
+    )
+    additional_info: Mapped[str] = mapped_column(
+        nullable=True,
+        doc="Additional info",
+    )
+    status: Mapped[PyEnum] = mapped_column(
+        ENUM(
+            OrderStatusEnum,
+            name="order_status_enum",
+            create_type=True,
+        ),
+        default=OrderStatusEnum.NEW,
+        nullable=False,
+        doc="Order status",
+    )
+
+    items: Mapped[list["OrderItem"]] = relationship(
+        backref="order",
+        cascade="all, delete-orphan",
+    )
+
+    def __str__(self) -> str:
+        return f"Order {self.id}"
+
+
+class OrderItem(ItemMixin, Base):
+    __tablename__ = "order_item"
+
+    order_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "order.id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
         nullable=False,
         index=True,
-        doc="Product ID",
-    )
-    color_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product_color.id",
-            ondelete="SET NULL",
-            onupdate="CASCADE",
-        ),
-        nullable=True,
-        index=True,
-        doc="Color ID",
-    )
-    size_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product_size.id",
-            ondelete="SET NULL",
-            onupdate="CASCADE",
-        ),
-        nullable=True,
-        index=True,
-        doc="Size ID",
-    )
-    covering_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product_covering.id",
-            ondelete="SET NULL",
-            onupdate="CASCADE",
-        ),
-        nullable=True,
-        index=True,
-        doc="Covering ID",
-    )
-    glass_color_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "product_glass_color.id",
-            ondelete="SET NULL",
-            onupdate="CASCADE",
-        ),
-        nullable=True,
-        index=True,
-        doc="Glass color ID",
+        doc="Order ID",
     )
 
-    quantity: Mapped[int] = mapped_column(
-        nullable=False,
-        doc="Quantity",
-    )
-
-    product: Mapped[Product] = relationship(
-        backref="basket_items",
-    )
-
-    @hybrid_property
-    def total_price(self):
-        return self.product.price * self.quantity
-
-
-# Order statuses
-# 1 - Новый заказ (Красный)
-# 2 - Принятый заказ (Желтый)
-# 3 - Готовый к отгрузке (Зеленый)
-
+    def __str__(self) -> str:
+        return f"{self.product.sku} - {self.quantity} шт."

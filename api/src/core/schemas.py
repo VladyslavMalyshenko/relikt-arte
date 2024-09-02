@@ -11,8 +11,8 @@ class MainSchema(BaseModel):
 
 
 class BaseListSchema(MainSchema, Generic[T]):
-    objects_count: int
+    objects_count: Optional[int] = None
     next_page: Optional[int] = None
     previous_page: Optional[int] = None
-    pages_count: int
-    results: list[T]
+    pages_count: Optional[int] = None
+    results: Optional[list[T]] = None

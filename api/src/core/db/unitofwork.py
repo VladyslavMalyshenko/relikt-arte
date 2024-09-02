@@ -15,6 +15,7 @@ from ...repositories.product import (
     ProductCoveringRepository,
     ProductGlassColorRepository,
 )
+from ...repositories.order import BasketRepository, BasketItemRepository
 
 
 class AbstractUnitOfWork(ABC):
@@ -27,6 +28,8 @@ class AbstractUnitOfWork(ABC):
     product_color: ProductColorRepository
     product_covering: ProductCoveringRepository
     product_glass_color: ProductGlassColorRepository
+    basket: BasketRepository
+    basket_item: BasketItemRepository
 
     @abstractmethod
     async def __aenter__(self):
@@ -74,6 +77,10 @@ class UnitOfWork(AbstractUnitOfWork):
 
         # Category
         self.category = CategoryRepository(self.session)
+
+        # Basket and Basket Item
+        self.basket = BasketRepository(self.session)
+        self.basket_item = BasketItemRepository(self.session)
 
     async def __aexit__(self, *args):
         await self.rollback()

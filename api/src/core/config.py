@@ -124,6 +124,11 @@ class FrontendSettings(BaseSettings):
         return f"{self.app_scheme}://{self.app_domain}"
 
 
+class NovaPostSettings(BaseSettings):
+    api_key: str = Field(alias="nova_post_api_key")
+    enter_url: str = Field(alias="nova_post_enter_url")
+
+
 class Settings(BaseSettings):
     # App settings
     app_name: str = "Relict Arte API"
@@ -159,6 +164,9 @@ class Settings(BaseSettings):
 
     # Frontend
     frontend_app: FrontendSettings = Field(default_factory=FrontendSettings)
+
+    # Nova Post
+    nova_post: NovaPostSettings = Field(default_factory=NovaPostSettings)
 
     @property
     def base_url(self) -> str:
