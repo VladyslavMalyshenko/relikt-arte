@@ -13,6 +13,8 @@ from ..utils.exceptions.http.user import (
 from ..utils.exceptions.http.order import (
     BasketGetException,
     BasketItemAddException,
+    BasketItemUpdateException,
+    BasketItemRemoveException,
 )
 
 from .models import Basket
@@ -22,6 +24,7 @@ from .schemas import (
     BasketItemList,
     BasketItemShow,
     BasketItemCreate,
+    BasketItemUpdate,
 )
 from .utils import generate_basket_token
 
@@ -62,7 +65,11 @@ class BasketService(BaseService):
             ),
         )
 
-    async def get_basket(self, authorization: str | None = None) -> BasketShow:
+    async def get_basket(
+        self,
+        authorization: str | None = None,
+        basket_token: str = None,
+    ) -> BasketShow:
         try:
             async with self.uow:
                 basket = None
@@ -84,11 +91,16 @@ class BasketService(BaseService):
                             )
                         )
                 else:
-                    basket_id = await self.uow.basket.create(
-                        obj_in=BasketCreate(
-                            basket_token=generate_basket_token(),
+                    if basket_token:
+                        basket = await self.uow.basket.get_by_token(
+                            token=basket_token
                         )
-                    )
+                    else:
+                        basket_id = await self.uow.basket.create(
+                            obj_in=BasketCreate(
+                                basket_token=generate_basket_token(),
+                            )
+                        )
                 await self.uow.commit()
                 if not basket:
                     basket = await self.uow.basket.get_by_id(obj_id=basket_id)
@@ -117,7 +129,7 @@ class BasketService(BaseService):
                     basket = await self.uow.basket.get_by_user_id(user.id)
                 else:
                     basket = await self.uow.basket.get_by_token(
-                        basket_token=basket_token
+                        token=basket_token
                     )
                 if not basket:
                     raise BasketGetException()
@@ -129,9 +141,76 @@ class BasketService(BaseService):
                     raise BasketItemAddException(
                         product_id=item_data.product_id
                     )
-                await self.uow.basket_item.create(obj_in=item_data)
+                if await self.uow.basket_item.exists_by_attr(
+                    self.uow.basket_item.model.product_id,
+                    item_data.product_id,
+                ):
+                    basket_item = await self.uow.basket_item.get_by_attrs(
+                        {
+                            self.uow.basket_item.model.product_id: item_data.product_id,
+                            self.uow.basket_item.model.basket_id: basket.id,
+                        }
+                    )
+                    basket_item.quantity += item_data.quantity
+                else:
+                    await self.uow.basket_item.create(obj_in=item_data)
                 await self.uow.commit()
                 return await self.get_show_scheme(basket)
         except SQLAlchemyError as e:
             log.exception(e)
             raise BasketItemAddException(product_id=item_data.product_id)
+
+    async def update_item(
+        self,
+        item_data: BasketItemUpdate,
+        item_id: int,
+        authorization: str | None = None,
+        basket_token: str | None = None,
+    ):
+        try:
+            async with self.uow:
+                if authorization:
+                    user_id = await UserService(self.uow)._user_id_from_jwt(
+                        authorization
+                    )
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException()
+                    basket = await self.uow.basket.get_by_user_id(user.id)
+                else:
+                    basket = await self.uow.basket.get_by_token(
+                        basket_token=basket_token
+                    )
+                if not basket:
+                    raise BasketGetException()
+                item = await self.uow.basket_item.get_by_id(
+                    obj_id=item_id
+                )
+                if not item:
+                    raise BasketItemUpdateException(item_id=item_id)
+                await self.uow.basket_item.update(
+                    obj_in=item_data, obj_id=item.id
+                )
+                await self.uow.commit()
+                return await self.get_show_scheme(basket)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise BasketItemUpdateException(item_id=item_data.product_id)
+
+    async def remove_item(
+        self,
+        item_id: int,
+    ):
+        try:
+            async with self.uow:
+                item = await self.uow.basket_item.get_by_id(obj_id=item_id)
+                if not item:
+                    raise BasketItemRemoveException(item_id=item_id)
+                await self.uow.basket_item.delete_by_id(obj_id=item_id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise BasketItemRemoveException(item_id=item_id)

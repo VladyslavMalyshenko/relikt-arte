@@ -113,6 +113,19 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         res = await self.session.execute(query)
         return res.scalar()
 
+    async def get_by_attrs(
+        self,
+        attrs: dict,
+        options: Optional[list] = None,
+    ) -> T:
+        query = select(self.model).where(
+            and_(*[attr == value for attr, value in attrs.items()])
+        )
+        if options:
+            query = await self._add_options_to_query(query, options)
+        res = await self.session.execute(query)
+        return res.scalar()
+
     async def get_by_ids(
         self,
         *,

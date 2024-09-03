@@ -26,24 +26,47 @@ class BasketRepository(GenericRepository[Basket, BasketCreate, BasketUpdate]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Basket)
 
-    async def get_by_user_id(self, user_id: uuid.UUID) -> Basket:
-        query = (
-            select(self.model)
-            .where(self.model.user_id == user_id)
-            .options(
-                selectinload(self.model.items).options(
+    async def _add_default_options(self, options: list | None) -> list:
+        default_options = (
+            selectinload(self.model.items).options(
+                selectinload(
+                    BasketItem.product,
+                ).options(
                     selectinload(
-                        BasketItem.product,
-                    ).options(
-                        selectinload(
-                            Product.photos,
-                        )
-                    ),
+                        Product.photos,
+                    )
                 ),
-            )
+            ),
         )
-        res = await self.session.execute(query)
-        return res.scalar()
+        if not options:
+            options = default_options
+        else:
+            options.append(default_options)
+        return options
+
+    async def get_by_user_id(
+        self,
+        user_id: uuid.UUID,
+        options: list | None = None,
+    ) -> Basket:
+        options = await self._add_default_options(options)
+        return await self.get_by_attr(
+            self.model.user_id,
+            user_id,
+            options=options,
+        )
+
+    async def get_by_token(
+        self,
+        token: str,
+        options: list | None = None,
+    ) -> Basket:
+        options = await self._add_default_options(options)
+        return await self.get_by_attr(
+            self.model.basket_token,
+            token,
+            options=options,
+        )
 
 
 class BasketItemRepository(

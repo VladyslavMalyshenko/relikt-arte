@@ -25,8 +25,7 @@ class BasketItemShow(MainSchema):
     product: ProductShow
 
 
-class BasketItemCreate(MainSchema):
-    product_id: int
+class BaseBasketItem(MainSchema):
     basket_id: Optional[int] = None
     color_id: Optional[int] = None
     size_id: Optional[int] = None
@@ -39,7 +38,11 @@ class BasketItemCreate(MainSchema):
     quantity: int
 
 
-class BasketItemUpdate(BasketItemCreate):
+class BasketItemCreate(BaseBasketItem):
+    product_id: int
+
+
+class BasketItemUpdate(BaseBasketItem):
     quantity: Optional[int] = None
 
 
