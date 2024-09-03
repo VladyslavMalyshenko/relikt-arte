@@ -78,6 +78,8 @@ class ProductService(BaseService):
             price=obj.price,
             description=obj.description,
             have_glass=obj.have_glass,
+            material_choice=obj.material_choice,
+            type_of_platband_choice=obj.type_of_platband_choice,
             orientation_choice=obj.orientation_choice,
             category_id=obj.category_id,
             covering_id=obj.covering_id,
