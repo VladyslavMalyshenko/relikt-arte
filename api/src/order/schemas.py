@@ -6,7 +6,7 @@ from ..core.schemas import MainSchema, BaseListSchema
 from ..product.schemas import ProductShow
 from ..product.enums import ProductTypeOfPlatbandEnum, ProductOrientationEnum
 
-from .enums import ItemMaterialEnum
+from .enums import ItemMaterialEnum, OrderStatusEnum
 
 
 class BasketItemShow(MainSchema):
@@ -65,3 +65,41 @@ class BasketCreate(MainSchema):
 
 class BasketUpdate(BasketCreate):
     pass
+
+
+class OrderItemShow(MainSchema):
+    id: int
+    product_id: int
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    covering_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+    material: Optional[ItemMaterialEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    with_glass: Optional[bool] = None
+    quantity: int
+    total_price: int
+    product: ProductShow
+
+
+OrderItemList = BaseListSchema[OrderItemShow]
+
+
+class OrderShow(MainSchema):
+    id: int
+    user_id: Optional[uuid.UUID] = None
+    full_name: str
+    phone: str
+    email: str
+    region: str
+    city_or_settlement: str
+    warehouse: Optional[str] = None
+    delivery_address: Optional[str] = None
+    additional_info: Optional[str] = None
+    items: Optional[OrderItemList] = None
+    status: OrderStatusEnum
+    total_value: int
+    total_items: int
+    created_at: str
+    updated_at: str

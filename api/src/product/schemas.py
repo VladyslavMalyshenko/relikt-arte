@@ -73,6 +73,8 @@ class ProductCreate(BaseModel):
     price: int
     description: Optional[ProductDescription] = None
     have_glass: bool
+    material_choice: bool
+    type_of_platband_choice: bool
     orientation_choice: bool
     category_id: int
     covering_id: Optional[int] = None
@@ -83,6 +85,8 @@ class ProductUpdate(BaseModel):
     price: Optional[int] = None
     description: Optional[ProductDescription] = None
     have_glass: Optional[bool] = None
+    material_choice: Optional[bool] = None
+    type_of_platband_choice: Optional[bool] = None
     orientation_choice: Optional[bool] = None
     category_id: Optional[int] = None
     covering_id: Optional[int] = None
@@ -94,6 +98,8 @@ class ProductShow(MainSchema):
     price: int
     description: Optional[ProductDescription] = None
     have_glass: bool
+    material_choice: bool
+    type_of_platband_choice: bool
     orientation_choice: bool
     category_id: int
     covering_id: Optional[int] = None
