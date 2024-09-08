@@ -215,4 +215,5 @@ class BasketService(BaseService):
 
 
 class OrderService(BaseService):
-    pass
+    async def create_order(self):
+        pass
