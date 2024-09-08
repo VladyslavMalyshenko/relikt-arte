@@ -19,6 +19,10 @@ from ..order.schemas import (
     BasketUpdate,
     BasketItemCreate,
     BasketItemUpdate,
+    OrderCreate,
+    OrderUpdate,
+    OrderItemCreate,
+    OrderItemUpdate,
 )
 
 
@@ -74,3 +78,15 @@ class BasketItemRepository(
 ):
     def __init__(self, session: AsyncSession):
         super().__init__(session, BasketItem)
+
+
+class OrderRepository(GenericRepository[Order, OrderCreate, OrderUpdate]):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session, Order)
+
+
+class OrderItemRepository(
+    GenericRepository[OrderItem, OrderItemCreate, OrderItemUpdate]
+):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session, OrderItem)
