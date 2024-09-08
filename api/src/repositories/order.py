@@ -48,6 +48,15 @@ class BasketRepository(GenericRepository[Basket, BasketCreate, BasketUpdate]):
             options.append(default_options)
         return options
 
+    async def get_by_id(
+        self,
+        *,
+        obj_id: uuid.UUID,
+        options: list | None = None,
+    ) -> Basket:
+        options = await self._add_default_options(options)
+        return await super().get_by_id(obj_id=obj_id, options=options)
+
     async def get_by_user_id(
         self,
         user_id: uuid.UUID,
