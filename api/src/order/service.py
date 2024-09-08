@@ -185,9 +185,7 @@ class BasketService(BaseService):
                     )
                 if not basket:
                     raise BasketGetException()
-                item = await self.uow.basket_item.get_by_id(
-                    obj_id=item_id
-                )
+                item = await self.uow.basket_item.get_by_id(obj_id=item_id)
                 if not item:
                     raise BasketItemUpdateException(item_id=item_id)
                 await self.uow.basket_item.update(
@@ -214,3 +212,7 @@ class BasketService(BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise BasketItemRemoveException(item_id=item_id)
+
+
+class OrderService(BaseService):
+    pass

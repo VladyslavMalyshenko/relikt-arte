@@ -103,3 +103,46 @@ class OrderShow(MainSchema):
     total_items: int
     created_at: str
     updated_at: str
+
+
+class OrderItemCreate(MainSchema):
+    product_id: int
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    covering_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+    material: Optional[ItemMaterialEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    with_glass: Optional[bool] = None
+    quantity: int
+
+
+class OrderItemUpdate(MainSchema):
+    color_id: Optional[int] = None
+    size_id: Optional[int] = None
+    covering_id: Optional[int] = None
+    glass_color_id: Optional[int] = None
+    material: Optional[ItemMaterialEnum] = None
+    type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
+    orientation: Optional[ProductOrientationEnum] = None
+    with_glass: Optional[bool] = None
+    quantity: Optional[int] = None
+
+
+class OrderCreate(MainSchema):
+    user_id: Optional[uuid.UUID] = None
+    full_name: str
+    phone: str
+    email: str
+    region: str
+    city_or_settlement: str
+    warehouse: Optional[str] = None
+    delivery_address: Optional[str] = None
+    additional_info: Optional[str] = None
+    items: Optional[OrderItemCreate] = None
+    status: OrderStatusEnum
+
+
+class OrderUpdate(OrderCreate):
+    pass
