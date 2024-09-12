@@ -35,7 +35,7 @@ class BaseBasketItem(MainSchema):
     type_of_platband: Optional[ProductTypeOfPlatbandEnum] = None
     orientation: Optional[ProductOrientationEnum] = None
     with_glass: Optional[bool] = None
-    quantity: int
+    quantity: Optional[int] = None
 
 
 class BasketItemCreate(BaseBasketItem):
@@ -144,5 +144,13 @@ class OrderCreate(MainSchema):
     status: OrderStatusEnum
 
 
-class OrderUpdate(OrderCreate):
-    pass
+class OrderUpdate(MainSchema):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    region: Optional[str] = None
+    city_or_settlement: Optional[str] = None
+    warehouse: Optional[str] = None
+    delivery_address: Optional[str] = None
+    additional_info: Optional[str] = None
+    status: Optional[OrderStatusEnum] = None

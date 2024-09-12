@@ -3,8 +3,14 @@ from fastapi import APIRouter
 from ..core.db.dependencies import uowDEP
 from ..user.dependencies import authorization
 
-from .schemas import BasketShow, BasketItemCreate, BasketItemUpdate
-from .service import BasketService
+from .schemas import (
+    BasketShow,
+    BasketItemCreate,
+    BasketItemUpdate,
+    OrderCreate,
+    OrderShow,
+)
+from .service import BasketService, OrderService
 
 
 router = APIRouter(
@@ -35,7 +41,11 @@ async def add_item_to_basket(
     )
 
 
-@router.put("/basket/update_item/{item_id}/", response_model=BasketShow, tags=["Basket"])
+@router.put(
+    "/basket/update_item/{item_id}/",
+    response_model=BasketShow,
+    tags=["Basket"],
+)
 async def update_item_in_basket(
     basket_item: BasketItemUpdate,
     item_id: int,
@@ -63,3 +73,17 @@ async def remove_item_from_basket(
     return await BasketService(uow).remove_item(
         item_id=item_id,
     )
+
+
+# @router.post("/order/", response_model=OrderShow, tags=["Order"])
+# async def create_order(
+#     order_data: OrderCreate,
+#     authorization: authorization,
+#     uow: uowDEP,
+#     basket_token: str = None,
+# ) -> OrderShow:
+#     return await OrderService(uow).create_order(
+#         order_data=order_data,
+#         authorization=authorization,
+#         basket_token=basket_token,
+#     )
