@@ -95,6 +95,7 @@ class ItemMixin(BaseModelMixin):
 
     quantity: Mapped[int] = mapped_column(
         nullable=False,
+        default=1,
         doc="Quantity",
     )
 
