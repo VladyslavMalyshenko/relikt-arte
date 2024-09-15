@@ -154,3 +154,6 @@ class OrderUpdate(MainSchema):
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
     status: Optional[OrderStatusEnum] = None
+
+
+OrderListSchema = BaseListSchema[OrderShow]

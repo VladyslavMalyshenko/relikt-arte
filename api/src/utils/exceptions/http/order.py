@@ -52,3 +52,54 @@ class BasketItemRemoveException(HTTPException):
             detail=f"Failed to remove item with id {item_id}",
             headers=headers,
         )
+
+
+class OrderCreateException(HTTPException):
+    def __init__(
+        self,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to create order",
+            headers=headers,
+        )
+
+
+class OrderUpdateException(HTTPException):
+    def __init__(
+        self,
+        order_id: int,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to update order with id {order_id}",
+            headers=headers,
+        )
+
+
+class OrderDeleteException(HTTPException):
+    def __init__(
+        self,
+        order_id: int,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to delete order with id {order_id}",
+            headers=headers,
+        )
+
+
+class OrderGetException(HTTPException):
+    def __init__(
+        self,
+        order_id: int,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Order with id {order_id} not found",
+            headers=headers,
+        )

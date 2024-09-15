@@ -2,9 +2,15 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from typing import Optional
+
+from ..core.dependencies import PaginationParams
 from ..core.db.service import BaseService
 from ..user.service import UserService
 from ..product.service import ProductService
+
+from ..utils.processors.filters.decoder import FiltersDecoder
+from ..utils.processors.filters.order import OrderFilterProcessor
 
 from ..utils.exceptions.http.user import (
     InvalidCredentialsException,
@@ -15,6 +21,10 @@ from ..utils.exceptions.http.order import (
     BasketItemAddException,
     BasketItemUpdateException,
     BasketItemRemoveException,
+    OrderCreateException,
+    OrderUpdateException,
+    OrderGetException,
+    OrderDeleteException,
 )
 
 from .models import Basket, Order
@@ -30,6 +40,7 @@ from .schemas import (
     OrderItemShow,
     OrderItemList,
     OrderUpdate,
+    OrderListSchema,
 )
 from .utils import generate_basket_token
 
@@ -220,6 +231,9 @@ class BasketService(BaseService):
 
 
 class OrderService(BaseService):
+    filter_processor = OrderFilterProcessor
+    list_schema = OrderListSchema
+
     async def get_show_scheme(self, obj: Order) -> OrderShow:
         return OrderShow(
             id=obj.id,
@@ -292,18 +306,18 @@ class OrderService(BaseService):
                 return await self.get_show_scheme(order)
         except SQLAlchemyError as e:
             log.exception(e)
-            raise BasketItemRemoveException(item_id=1)
+            raise OrderCreateException()
 
     async def get_order(self, order_id: int):
         try:
             async with self.uow:
                 order = await self.uow.order.get_by_id(obj_id=order_id)
                 if not order:
-                    raise BasketGetException()
+                    raise OrderGetException(order_id=order_id)
                 return await self.get_show_scheme(order)
         except SQLAlchemyError as e:
             log.exception(e)
-            raise BasketGetException()
+            raise OrderGetException(order_id=order_id)
 
     async def update_order(
         self,
@@ -319,7 +333,7 @@ class OrderService(BaseService):
                 )
         except SQLAlchemyError as e:
             log.exception(e)
-            raise BasketGetException()
+            raise OrderUpdateException(order_id=order_id)
 
     async def delete_order(
         self,
@@ -332,4 +346,21 @@ class OrderService(BaseService):
                 return True
         except SQLAlchemyError as e:
             log.exception(e)
-            return False
+            raise OrderDeleteException(order_id=order_id)
+
+    async def get_order_list(
+        self,
+        pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
+    ):
+        try:
+            async with self.uow:
+                return await self.get_obj_list(
+                    repo=self.uow.order,
+                    options=await self.uow.order._add_default_options(),
+                    pagination_params=pagination,
+                    filters_decoder=filters_decoder,
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise OrderGetException()

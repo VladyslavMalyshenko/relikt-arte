@@ -1,7 +1,9 @@
 from fastapi import APIRouter
 
 from ..core.db.dependencies import uowDEP
+from ..core.dependencies import pagination_params
 from ..user.dependencies import authorization
+from ..utils.processors.filters.dependencies import filters_decoder
 
 from .schemas import (
     BasketShow,
@@ -10,6 +12,7 @@ from .schemas import (
     OrderCreate,
     OrderShow,
     OrderUpdate,
+    OrderListSchema,
 )
 from .service import BasketService, OrderService
 
@@ -85,6 +88,21 @@ async def create_order(
     return await OrderService(uow).create_order(
         data=order_data,
         authorization=authorization,
+    )
+
+
+@router.get(
+    "/list/",
+    tags=["Order"],
+)
+async def get_order_list(
+    pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
+    uow: uowDEP = uowDEP,
+) -> OrderListSchema | list[OrderShow]:
+    return await OrderService(uow).get_order_list(
+        pagination=pagination,
+        filters_decoder=filters_decoder,
     )
 
 
