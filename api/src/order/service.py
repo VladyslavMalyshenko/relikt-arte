@@ -17,7 +17,7 @@ from ..utils.exceptions.http.order import (
     BasketItemRemoveException,
 )
 
-from .models import Basket
+from .models import Basket, Order
 from .schemas import (
     BasketShow,
     BasketCreate,
@@ -25,6 +25,11 @@ from .schemas import (
     BasketItemShow,
     BasketItemCreate,
     BasketItemUpdate,
+    OrderCreate,
+    OrderShow,
+    OrderItemShow,
+    OrderItemList,
+    OrderUpdate,
 )
 from .utils import generate_basket_token
 
@@ -215,5 +220,116 @@ class BasketService(BaseService):
 
 
 class OrderService(BaseService):
-    async def create_order(self):
-        pass
+    async def get_show_scheme(self, obj: Order) -> OrderShow:
+        return OrderShow(
+            id=obj.id,
+            user_id=obj.user_id,
+            full_name=obj.full_name,
+            phone=obj.phone,
+            email=obj.email,
+            region=obj.region,
+            city_or_settlement=obj.city_or_settlement,
+            warehouse=obj.warehouse,
+            items=OrderItemList(
+                objects_count=obj.total_items,
+                results=[
+                    OrderItemShow(
+                        id=item.id,
+                        product_id=item.product_id,
+                        color_id=item.color_id,
+                        size_id=item.size_id,
+                        covering_id=item.covering_id,
+                        glass_color_id=item.glass_color_id,
+                        material=item.material,
+                        type_of_platband=item.type_of_platband,
+                        orientation=item.orientation,
+                        with_glass=item.with_glass,
+                        quantity=item.quantity,
+                        total_price=item.total_price,
+                        product=await ProductService(self.uow).get_show_scheme(
+                            item.product,
+                        ),
+                    )
+                    for item in obj.items
+                ],
+            ),
+            created_at=obj.created_at,
+            updated_at=obj.updated_at,
+            total_items=obj.total_items,
+            total_value=obj.total_value,
+            status=obj.status,
+        )
+
+    async def create_order(
+        self,
+        data: OrderCreate,
+        authorization: str | None = None,
+    ):
+        try:
+            async with self.uow:
+                order = await self.uow.order.create(obj_in=data)
+                if authorization:
+                    user_id = await UserService(self.uow)._user_id_from_jwt(
+                        authorization
+                    )
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException()
+                    order.user_id = user.id
+                await self.uow.add(order)
+                await self.uow.flush()
+
+                for item_data in data.items:
+                    order_item = await self.uow.order_item.create(
+                        obj_in=item_data,
+                        order_id=order.id,
+                    )
+                    await self.uow.add(order_item)
+                await self.uow.commit()
+                order = await self.uow.order.get_by_id(obj_id=order.id)
+                return await self.get_show_scheme(order)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise BasketItemRemoveException(item_id=1)
+
+    async def get_order(self, order_id: int):
+        try:
+            async with self.uow:
+                order = await self.uow.order.get_by_id(obj_id=order_id)
+                if not order:
+                    raise BasketGetException()
+                return await self.get_show_scheme(order)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise BasketGetException()
+
+    async def update_order(
+        self,
+        order_id: int,
+        data: OrderUpdate,
+    ):
+        try:
+            async with self.uow:
+                return await self.update_obj(
+                    repo=self.uow.order,
+                    data=data,
+                    obj_id=order_id,
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise BasketGetException()
+
+    async def delete_order(
+        self,
+        order_id: int,
+    ) -> bool:
+        try:
+            async with self.uow:
+                await self.uow.order.delete_by_id(obj_id=order_id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False

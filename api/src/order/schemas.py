@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from typing import Optional
 
@@ -101,8 +102,8 @@ class OrderShow(MainSchema):
     status: OrderStatusEnum
     total_value: int
     total_items: int
-    created_at: str
-    updated_at: str
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
 
 class OrderItemCreate(MainSchema):
@@ -140,8 +141,7 @@ class OrderCreate(MainSchema):
     warehouse: Optional[str] = None
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
-    items: Optional[OrderItemCreate] = None
-    status: OrderStatusEnum
+    items: Optional[list[OrderItemCreate]] = None
 
 
 class OrderUpdate(MainSchema):
