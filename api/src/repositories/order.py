@@ -93,7 +93,7 @@ class OrderRepository(GenericRepository[Order, OrderCreate, OrderUpdate]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Order)
 
-    async def _add_default_options(self, options: list | None) -> list:
+    async def _add_default_options(self, options: list | None = None) -> list:
         default_options = (
             selectinload(self.model.items).options(
                 selectinload(
