@@ -181,7 +181,7 @@ class BasketService(BaseService):
                     basket = await self.uow.basket.get_by_user_id(user.id)
                 else:
                     basket = await self.uow.basket.get_by_token(
-                        basket_token=basket_token
+                        token=basket_token
                     )
                 if not basket:
                     raise BasketGetException()
