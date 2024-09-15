@@ -9,6 +9,7 @@ from .schemas import (
     BasketItemUpdate,
     OrderCreate,
     OrderShow,
+    OrderUpdate,
 )
 from .service import BasketService, OrderService
 
@@ -75,15 +76,45 @@ async def remove_item_from_basket(
     )
 
 
-# @router.post("/order/", response_model=OrderShow, tags=["Order"])
-# async def create_order(
-#     order_data: OrderCreate,
-#     authorization: authorization,
-#     uow: uowDEP,
-#     basket_token: str = None,
-# ) -> OrderShow:
-#     return await OrderService(uow).create_order(
-#         order_data=order_data,
-#         authorization=authorization,
-#         basket_token=basket_token,
-#     )
+@router.post("/create/", response_model=OrderShow, tags=["Order"])
+async def create_order(
+    order_data: OrderCreate,
+    authorization: authorization,
+    uow: uowDEP,
+) -> int:
+    return await OrderService(uow).create_order(
+        data=order_data,
+        authorization=authorization,
+    )
+
+
+@router.get("/{order_id}/", response_model=OrderShow, tags=["Order"])
+async def get_order(
+    order_id: int,
+    uow: uowDEP,
+) -> OrderShow:
+    return await OrderService(uow).get_order(
+        order_id=order_id,
+    )
+
+
+@router.put("/update/{order_id}/", response_model=OrderShow, tags=["Order"])
+async def update_order(
+    order_id: int,
+    order_data: OrderUpdate,
+    uow: uowDEP,
+) -> OrderShow:
+    return await OrderService(uow).update_order(
+        order_id=order_id,
+        data=order_data,
+    )
+
+
+@router.delete("/delete/{order_id}/", response_model=bool, tags=["Order"])
+async def delete_order(
+    order_id: int,
+    uow: uowDEP,
+) -> bool:
+    return await OrderService(uow).delete_order(
+        order_id=order_id,
+    )

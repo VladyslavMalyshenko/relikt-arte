@@ -51,6 +51,10 @@ class AbstractUnitOfWork(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    async def flush(self):
+        raise NotImplementedError()
+
+    @abstractmethod
     async def rollback(self):
         raise NotImplementedError()
 
@@ -99,6 +103,9 @@ class UnitOfWork(AbstractUnitOfWork):
 
     async def commit(self):
         await self.session.commit()
+
+    async def flush(self):
+        await self.session.flush()
 
     async def rollback(self):
         await self.session.rollback()
