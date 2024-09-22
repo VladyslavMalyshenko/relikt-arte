@@ -132,7 +132,7 @@ async def update_order(
 async def delete_order(
     order_id: int,
     uow: uowDEP,
-) -> bool:
+) -> list[OrderShow]:
     return await OrderService(uow).delete_order(
         order_id=order_id,
     )

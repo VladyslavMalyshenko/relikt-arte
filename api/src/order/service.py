@@ -157,9 +157,11 @@ class BasketService(BaseService):
                     raise BasketItemAddException(
                         product_id=item_data.product_id
                     )
-                if await self.uow.basket_item.exists_by_attr(
-                    self.uow.basket_item.model.product_id,
-                    item_data.product_id,
+                if await self.uow.basket_item.exists_by_attrs(
+                    attrs={
+                        self.uow.basket_item.model.product_id: item_data.product_id,
+                        self.uow.basket_item.model.basket_id: basket.id,
+                    }
                 ):
                     basket_item = await self.uow.basket_item.get_by_attrs(
                         {
@@ -352,7 +354,7 @@ class OrderService(BaseService):
         self,
         pagination: Optional[PaginationParams] = None,
         filters_decoder: Optional[FiltersDecoder] = None,
-    ):
+    ) -> OrderListSchema | list[OrderShow]:
         try:
             async with self.uow:
                 return await self.get_obj_list(

@@ -52,6 +52,11 @@ class UserUpdate(BaseModel):
     new_email: Optional[EmailStr] = None
 
 
+class UserUpdateFromAdmin(UserUpdate):
+    is_active: Optional[bool] = None
+    is_admin: Optional[bool] = None
+
+
 class UserShow(MainSchema):
     id: uuid.UUID
     email: EmailStr

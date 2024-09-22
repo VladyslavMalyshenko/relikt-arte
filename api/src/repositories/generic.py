@@ -177,6 +177,13 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         res = await self.session.execute(query.select())
         return res.scalar_one()
 
+    async def exists_by_attrs(self, attrs: dict) -> bool:
+        query = exists(self.model).where(
+            and_(*[attr == value for attr, value in attrs.items()])
+        )
+        res = await self.session.execute(query.select())
+        return res.scalar_one()
+
     async def delete_by_id(self, *, obj_id: int | uuid.UUID) -> None:
         stmt = delete(self.model).where(self.model.id == obj_id)
         await self.session.execute(stmt)

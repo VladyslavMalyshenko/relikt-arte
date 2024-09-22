@@ -2,9 +2,15 @@ import logging
 import uuid
 import datetime
 
+from typing import Optional
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..core.db.service import BaseService
+from ..core.dependencies import PaginationParams
+
+from ..utils.processors.filters.decoder import FiltersDecoder
+from ..utils.processors.filters.user import UserFilterProcessor
 
 from ..utils.exceptions.user import UserByEmailAlreadyExistsException
 from ..utils.exceptions.http.base import (  # noqa: F401
@@ -37,6 +43,7 @@ from .schemas import (
     AuthTokenShow,
     JWTTokensSchema,
     TokenVerifyOrRefreshSchema,
+    UserUpdateFromAdmin,
 )
 from .enums import AuthTokenType
 from .tasks import send_registration_email
@@ -74,6 +81,7 @@ class AuthTokenService(BaseService):
 
 class UserService(JWTTokensMixin, BaseService):
     list_schema = UserListSchema
+    filter_processor = UserFilterProcessor
 
     async def get_show_scheme(self, obj: User) -> UserShow:
         return UserShow(
@@ -235,3 +243,35 @@ class UserService(JWTTokensMixin, BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise InvalidTokenException(data.token)
+
+    async def update_user_from_admin(
+        self,
+        data: UserUpdateFromAdmin,
+        user_id: uuid.UUID,
+    ) -> UserShow:
+        try:
+            async with self.uow:
+                return await self.update_obj(
+                    self.uow.user,
+                    data,
+                    user_id,
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("User")
+
+    async def get_user_list(
+        self,
+        pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
+    ) -> UserListSchema | list[UserShow]:
+        try:
+            async with self.uow:
+                return await self.get_obj_list(
+                    repo=self.uow.user,
+                    pagination_params=pagination,
+                    filters_decoder=filters_decoder,
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return []
