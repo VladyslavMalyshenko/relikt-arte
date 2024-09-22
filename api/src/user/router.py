@@ -1,9 +1,13 @@
+import uuid
+
 from fastapi import APIRouter, status
 
 from ..core.db.dependencies import uowDEP
+from ..core.dependencies import pagination_params
 
 from ..utils.exceptions.user import UserByEmailAlreadyExistsException
 from ..utils.exceptions.http.base import ObjectCreateException
+from ..utils.processors.filters.dependencies import filters_decoder
 
 from .service import UserService
 from .schemas import (
@@ -12,6 +16,8 @@ from .schemas import (
     UserAuth,
     JWTTokensSchema,
     TokenVerifyOrRefreshSchema,
+    UserUpdateFromAdmin,
+    UserListSchema,
 )
 
 
@@ -87,4 +93,32 @@ async def access_token_from_refresh(
     return await UserService(uow).get_user_access_from_refresh(
         token_data,
         as_admin,
+    )
+
+
+@router.put(
+    "/update_from_admin/{user_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserShow,
+)
+async def update_user_from_admin(
+    uow: uowDEP,
+    user_id: uuid.UUID,
+    data: UserUpdateFromAdmin,
+) -> UserShow:
+    return await UserService(uow).update_user_from_admin(user_id, data)
+
+
+@router.get(
+    "/list/",
+    status_code=status.HTTP_200_OK,
+)
+async def get_user_list(
+    pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
+    uow: uowDEP = uowDEP,
+) -> UserListSchema | list[UserShow]:
+    return await UserService(uow).get_user_list(
+        pagination=pagination,
+        filters_decoder=filters_decoder,
     )
