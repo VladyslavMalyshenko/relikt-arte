@@ -47,11 +47,15 @@ from .schemas import (
     UserUpdateFromAdmin,
     UserUpdate,
     UserChangeEmail,
+    UserPasswordReset,
+    UserPasswordResetConfirm,
+    UserPasswordChange,
 )
 from .enums import AuthTokenType
 from .tasks import (
     send_registration_email,
     send_email_change_confirmation_email,
+    send_password_reset_email,
 )
 from .mixins import JWTTokensMixin
 
@@ -402,6 +406,85 @@ class UserService(JWTTokensMixin, BaseService):
                 user.email = token_obj.owner_new_email
                 await self.uow.add(user)
                 await self.uow.auth_token.delete_by_id(obj_id=token_obj.id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
+
+    async def user_password_reset(
+        self,
+        data: UserPasswordReset,
+    ) -> bool:
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_email(data.email)
+                if not user:
+                    raise UserNotFoundByEmailException(data.email)
+
+                # Send confirmation email
+                token_data = await AuthTokenService(
+                    self.uow
+                ).create_auth_token(
+                    AuthTokenCreate(
+                        token_type=AuthTokenType.PASSWORD_RESET,
+                        owner_email=user.email,
+                    )
+                )
+                await self.uow.commit()
+                send_password_reset_email.delay(token_data.model_dump_json())
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
+
+    async def confirm_password_reset(
+        self,
+        token: str,
+        data: UserPasswordResetConfirm,
+    ) -> bool:
+        try:
+            async with self.uow:
+                token_obj = await self.uow.auth_token.get_by_token(token)
+                if not token_obj:
+                    raise TokenNotFoundException(token)
+                if token_obj.expires_at < datetime.datetime.now():
+                    raise TokenExpiredException(token)
+                if token_obj.token_type != AuthTokenType.PASSWORD_RESET:
+                    raise InvalidTokenTypeException(
+                        token, token_obj.token_type.value
+                    )
+                user = await self.uow.user.get_by_email(token_obj.owner_email)
+                if not user:
+                    raise UserNotFoundByEmailException(token_obj.owner_email)
+                user.password = data.new_password
+                await self.uow.add(user)
+                await self.uow.auth_token.delete_by_id(obj_id=token_obj.id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
+
+    async def change_password(
+        self,
+        data: UserPasswordChange,
+        authorization: str,
+    ) -> bool:
+        try:
+            async with self.uow:
+                user_id = await self._user_id_from_jwt(authorization)
+                if not user_id:
+                    raise InvalidCredentialsException()
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                if not user.is_active:
+                    raise UserInactiveException(user.email)
+                if not user.check_password(data.old_password):
+                    raise UserInvalidPasswordException(user.email)
+                user.password = data.new_password
+                await self.uow.add(user)
                 await self.uow.commit()
                 return True
         except SQLAlchemyError as e:
