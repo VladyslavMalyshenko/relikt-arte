@@ -20,6 +20,9 @@ from .schemas import (
     UserListSchema,
     UserUpdate,
     UserChangeEmail,
+    UserPasswordReset,
+    UserPasswordResetConfirm,
+    UserPasswordChange,
 )
 from .dependencies import authorization
 
@@ -198,3 +201,41 @@ async def confirm_change_email(
     token: str,
 ) -> bool:
     return await UserService(uow).confirm_email_change(token)
+
+
+@router.post(
+    "/password_reset/",
+    status_code=status.HTTP_200_OK,
+    response_model=bool,
+)
+async def password_reset(
+    uow: uowDEP,
+    data: UserPasswordReset,
+) -> bool:
+    return await UserService(uow).user_password_reset(data)
+
+
+@router.post(
+    "/password_reset_confirm/",
+    status_code=status.HTTP_200_OK,
+    response_model=bool,
+)
+async def password_reset_confirm(
+    uow: uowDEP,
+    token: str,
+    data: UserPasswordResetConfirm,
+) -> bool:
+    return await UserService(uow).confirm_password_reset(token, data)
+
+
+@router.post(
+    "/password_change/",
+    status_code=status.HTTP_200_OK,
+    response_model=bool,
+)
+async def password_change(
+    uow: uowDEP,
+    data: UserPasswordChange,
+    auth_data: authorization,
+) -> bool:
+    return await UserService(uow).change_password(data, auth_data)

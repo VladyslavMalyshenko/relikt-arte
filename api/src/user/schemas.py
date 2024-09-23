@@ -60,6 +60,49 @@ class UserChangeEmail(BaseModel):
     new_email: EmailStr
 
 
+class UserPasswordReset(BaseModel):
+    email: EmailStr
+
+
+class UserPasswordResetConfirm(BaseModel):
+    new_password: str
+    new_password_confirm: str
+
+    @field_validator("new_password")
+    def validate_password(cls, value):
+        try:
+            validate_password(value)
+        except PasswordValidationException as e:
+            raise HTTPException(detail=e, status_code=400)
+        return value
+
+    @field_validator("new_password_confirm")
+    def validate_password_confirm(cls, value, values):
+        if value != values.data.get("new_password"):
+            raise HTTPException(status_code=400, detail="Password mismatch!")
+        return value
+
+
+class UserPasswordChange(BaseModel):
+    old_password: str
+    new_password: str
+    new_password_confirm: str
+
+    @field_validator("new_password")
+    def validate_password(cls, value):
+        try:
+            validate_password(value)
+        except PasswordValidationException as e:
+            raise HTTPException(detail=e, status_code=400)
+        return value
+
+    @field_validator("new_password_confirm")
+    def validate_password_confirm(cls, value, values):
+        if value != values.data.get("new_password"):
+            raise HTTPException(status_code=400, detail="Password mismatch!")
+        return value
+
+
 class UserShow(MainSchema):
     id: uuid.UUID
     email: EmailStr
