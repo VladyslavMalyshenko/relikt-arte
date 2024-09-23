@@ -1,25 +1,21 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class BaseNovaPostDataObj:
+class BaseNovaPostDataObj(BaseModel):
     ref: str
     description: str
 
 
-@dataclass
 class NovaPostArea(BaseNovaPostDataObj):
     pass
 
 
-@dataclass
 class NovaPostCity(BaseNovaPostDataObj):
     city_id: str
     settlement_type: str
     settlement_type_description: str
 
 
-@dataclass
 class NovaPostWarehouse(BaseNovaPostDataObj):
     short_address: str
     type_of_warehouse: str

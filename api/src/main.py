@@ -18,6 +18,7 @@ from .admin.model_views import get_model_views
 from .user.router import router as user_router
 from .product.router import router as product_router
 from .order.router import router as order_router
+from .nova_post.router import router as nova_post_router
 
 
 # Lifespan events
@@ -49,6 +50,7 @@ routers: list[APIRouter] = [
     user_router,
     product_router,
     order_router,
+    nova_post_router,
 ]
 for router in routers:
     app.include_router(router, prefix=f"/api/v{settings.app_version}")
