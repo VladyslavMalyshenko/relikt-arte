@@ -280,6 +280,7 @@ class OrderService(BaseService):
         self,
         data: OrderCreate,
         authorization: str | None = None,
+        basket_token: str | None = None,
     ):
         try:
             async with self.uow:
@@ -294,7 +295,15 @@ class OrderService(BaseService):
                     if not user:
                         raise UserNotFoundByIdException()
                     order.user_id = user.id
-                await self.uow.add(order)
+                    basket = await self.uow.basket.get_by_user_id(user.id)
+                else:
+                    basket = await self.uow.basket.get_by_token(
+                        token=basket_token
+                    )
+                if not basket:
+                    raise BasketGetException()
+                basket.clear()
+                await self.uow.add_all([order, basket])
                 await self.uow.flush()
 
                 for item_data in data.items:

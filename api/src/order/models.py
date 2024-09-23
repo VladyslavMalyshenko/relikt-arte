@@ -21,6 +21,9 @@ class Basket(BasketAndOrderMixin, Base):
         cascade="all, delete-orphan",
     )
 
+    def clear(self) -> None:
+        self.items.clear()
+
     def __str__(self) -> str:
         return f"Basket {self.id}. Total items: {self.total_items}. Total value: {self.total_value}"
 
