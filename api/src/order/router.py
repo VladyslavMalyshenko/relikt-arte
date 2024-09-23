@@ -84,10 +84,12 @@ async def create_order(
     order_data: OrderCreate,
     authorization: authorization,
     uow: uowDEP,
+    basket_token: str = None,
 ) -> int:
     return await OrderService(uow).create_order(
         data=order_data,
         authorization=authorization,
+        basket_token=basket_token,
     )
 
 
