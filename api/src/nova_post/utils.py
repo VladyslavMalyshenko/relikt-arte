@@ -1,11 +1,11 @@
 import requests
 
 
-from ....core.config import settings
-from .dataclasses import NovaPostArea, NovaPostCity, NovaPostWarehouse
+from ..core.config import settings
+from .schemas import NovaPostArea, NovaPostCity, NovaPostWarehouse
 
 
-class NovaPostAPIProcessor:
+class NovaPostAPIManager:
     @property
     def base_data(self):
         return {
