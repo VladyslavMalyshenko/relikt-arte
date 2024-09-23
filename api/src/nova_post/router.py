@@ -30,6 +30,5 @@ async def get_cities_by_area(area_ref: str) -> list[NovaPostCity]:
     "/warehouses/{city_ref}/",
     response_model=list[NovaPostWarehouse],
 )
-@cache(expire=3600)
 async def get_warehouses_by_city(city_ref: str) -> list[NovaPostWarehouse]:
     return NovaPostAPIManager().get_warehouses_by_city(city_ref)
