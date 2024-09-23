@@ -18,7 +18,10 @@ from .schemas import (
     TokenVerifyOrRefreshSchema,
     UserUpdateFromAdmin,
     UserListSchema,
+    UserUpdate,
+    UserChangeEmail,
 )
+from .dependencies import authorization
 
 
 router = APIRouter(
@@ -122,3 +125,76 @@ async def get_user_list(
         pagination=pagination,
         filters_decoder=filters_decoder,
     )
+
+
+@router.get(
+    "/get/{user_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserShow,
+)
+async def get_user_by_id(
+    uow: uowDEP,
+    user_id: uuid.UUID,
+) -> UserShow:
+    return await UserService(uow).get_user_by_id(user_id)
+
+
+@router.delete(
+    "/delete/{user_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_user(
+    uow: uowDEP,
+    user_id: uuid.UUID,
+) -> None:
+    await UserService(uow).delete_user_by_id(user_id)
+
+
+@router.get(
+    "/profile/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserShow,
+)
+async def get_user_profile(
+    uow: uowDEP,
+    auth_data: authorization,
+) -> UserShow:
+    return await UserService(uow).get_user_profile(auth_data)
+
+
+@router.put(
+    "/update/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserShow,
+)
+async def update_user(
+    uow: uowDEP,
+    data: UserUpdate,
+    auth_data: authorization,
+) -> UserShow:
+    return await UserService(uow).update_user(data, auth_data)
+
+
+@router.put(
+    "/change_email/",
+    status_code=status.HTTP_200_OK,
+    response_model=bool,
+)
+async def change_user_email(
+    uow: uowDEP,
+    data: UserChangeEmail,
+    auth_data: authorization,
+) -> bool:
+    return await UserService(uow).user_change_email(data, auth_data)
+
+
+@router.post(
+    "/confirm_change_email/",
+    status_code=status.HTTP_200_OK,
+    response_model=bool,
+)
+async def confirm_change_email(
+    uow: uowDEP,
+    token: str,
+) -> bool:
+    return await UserService(uow).confirm_email_change(token)

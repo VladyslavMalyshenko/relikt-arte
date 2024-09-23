@@ -28,6 +28,7 @@ from ..utils.exceptions.http.user import (
     InvalidTokenException,
     InvalidTokenUserException,
     TokenExpiredException,
+    InvalidCredentialsException,
 )
 
 from ..utils.token import generate_token
@@ -44,9 +45,14 @@ from .schemas import (
     JWTTokensSchema,
     TokenVerifyOrRefreshSchema,
     UserUpdateFromAdmin,
+    UserUpdate,
+    UserChangeEmail,
 )
 from .enums import AuthTokenType
-from .tasks import send_registration_email
+from .tasks import (
+    send_registration_email,
+    send_email_change_confirmation_email,
+)
 from .mixins import JWTTokensMixin
 
 
@@ -274,4 +280,130 @@ class UserService(JWTTokensMixin, BaseService):
                 )
         except SQLAlchemyError as e:
             log.exception(e)
-            return []
+            raise ObjectCreateException("User")
+
+    async def get_user_by_id(self, user_id: uuid.UUID) -> UserShow:
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                return await self.get_show_scheme(user)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise UserNotFoundByIdException(user_id)
+
+    async def delete_user_by_id(self, user_id: uuid.UUID) -> bool:
+        try:
+            async with self.uow:
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    return False
+                await self.uow.user.delete_by_id(obj_id=user_id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False
+
+    async def update_user(
+        self,
+        data: UserUpdate,
+        authorization: str,
+    ) -> UserShow:
+        try:
+            async with self.uow:
+                user_id = await self._user_id_from_jwt(authorization)
+                if not user_id:
+                    raise InvalidCredentialsException()
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                if not user.is_active:
+                    raise UserInactiveException(user.email)
+                return await self.update_obj(
+                    self.uow.user,
+                    data,
+                    user.id,
+                )
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("User")
+
+    async def get_user_profile(self, authorization: str) -> UserShow:
+        try:
+            async with self.uow:
+                user_id = await self._user_id_from_jwt(authorization)
+                if not user_id:
+                    raise InvalidCredentialsException()
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                if not user.is_active:
+                    raise UserInactiveException(user.email)
+                return await self.get_show_scheme(user)
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise UserNotFoundByIdException(user_id)
+
+    async def user_change_email(
+        self,
+        data: UserChangeEmail,
+        authorization: str,
+    ) -> bool:
+        try:
+            async with self.uow:
+                user_id = await self._user_id_from_jwt(authorization)
+                if not user_id:
+                    raise InvalidCredentialsException()
+                user = await self.uow.user.get_by_id(obj_id=user_id)
+                if not user:
+                    raise UserNotFoundByIdException(user_id)
+                if not user.is_active:
+                    raise UserInactiveException(user.email)
+
+                if await self.uow.user.exists_by_email(data.new_email):
+                    raise UserByEmailAlreadyExistsException()
+
+                # Send confirmation email
+                token_data = await AuthTokenService(
+                    self.uow
+                ).create_auth_token(
+                    AuthTokenCreate(
+                        token_type=AuthTokenType.EMAIL_CHANGE_CONFIRM,
+                        owner_email=user.email,
+                        owner_new_email=data.new_email,
+                    )
+                )
+                await self.uow.commit()
+                send_email_change_confirmation_email.delay(
+                    token_data.model_dump_json()
+                )
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise ObjectUpdateException("User")
+
+    async def confirm_email_change(self, token: str) -> bool:
+        try:
+            async with self.uow:
+                token_obj = await self.uow.auth_token.get_by_token(token)
+                if not token_obj:
+                    raise TokenNotFoundException(token)
+                if token_obj.expires_at < datetime.datetime.now():
+                    raise TokenExpiredException(token)
+                if token_obj.token_type != AuthTokenType.EMAIL_CHANGE_CONFIRM:
+                    raise InvalidTokenTypeException(
+                        token, token_obj.token_type.value
+                    )
+                user = await self.uow.user.get_by_email(token_obj.owner_email)
+                if not user:
+                    raise UserNotFoundByEmailException(token_obj.owner_email)
+                user.email = token_obj.owner_new_email
+                await self.uow.add(user)
+                await self.uow.auth_token.delete_by_id(obj_id=token_obj.id)
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False

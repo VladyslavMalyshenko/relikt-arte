@@ -118,6 +118,12 @@ class FrontendSettings(BaseSettings):
     registration_confirm_path: str = Field(
         alias="frontend_registration_confirm_path",
     )
+    password_reset_path: str = Field(
+        alias="frontend_password_reset_path",
+    )
+    email_change_confirm_path: str = Field(
+        alias="frontend_email_change_confirm_path",
+    )
 
     @property
     def base_url(self) -> str:
