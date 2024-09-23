@@ -69,6 +69,11 @@ class AuthToken(BaseModelMixin, Base):
         index=True,
         doc="Owner email",
     )
+    owner_new_email: Mapped[str] = mapped_column(
+        nullable=True,
+        index=True,
+        doc="Owner new email",
+    )
     token_type: Mapped[PyEnum] = mapped_column(
         ENUM(AuthTokenType, name="auth_token_type"),
         nullable=False,

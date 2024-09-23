@@ -49,12 +49,15 @@ class AdminUserCreate(BaseUserCreate):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
-    new_email: Optional[EmailStr] = None
 
 
 class UserUpdateFromAdmin(UserUpdate):
     is_active: Optional[bool] = None
     is_admin: Optional[bool] = None
+
+
+class UserChangeEmail(BaseModel):
+    new_email: EmailStr
 
 
 class UserShow(MainSchema):
@@ -72,6 +75,7 @@ class AuthTokenCreate(BaseModel):
     token: Optional[str] = None
     token_type: AuthTokenType
     owner_email: EmailStr
+    owner_new_email: Optional[EmailStr] = None
 
 
 class AuthTokenUpdate(AuthTokenCreate):
