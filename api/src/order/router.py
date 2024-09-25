@@ -108,6 +108,20 @@ async def get_order_list(
     )
 
 
+@router.get("/for_user/", tags=["Order"])
+async def get_orders_for_user(
+    authorization: authorization,
+    pagination: pagination_params,
+    filters_decoder: filters_decoder = None,
+    uow: uowDEP = uowDEP,
+) -> OrderListSchema | list[OrderShow]:
+    return await OrderService(uow).get_orders_for_user(
+        authorization=authorization,
+        pagination=pagination,
+        filters_decoder=filters_decoder,
+    )
+
+
 @router.get("/{order_id}/", response_model=OrderShow, tags=["Order"])
 async def get_order(
     order_id: int,
