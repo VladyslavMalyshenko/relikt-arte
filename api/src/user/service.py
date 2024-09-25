@@ -317,19 +317,22 @@ class UserService(JWTTokensMixin, BaseService):
     ) -> UserShow:
         try:
             async with self.uow:
-                user_id = await self._user_id_from_jwt(authorization)
-                if not user_id:
+                if authorization:
+                    user_id = await self._user_id_from_jwt(authorization)
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException(user_id)
+                    if not user.is_active:
+                        raise UserInactiveException(user.email)
+                    return await self.update_obj(
+                        self.uow.user,
+                        data,
+                        user.id,
+                    )
+                else:
                     raise InvalidCredentialsException()
-                user = await self.uow.user.get_by_id(obj_id=user_id)
-                if not user:
-                    raise UserNotFoundByIdException(user_id)
-                if not user.is_active:
-                    raise UserInactiveException(user.email)
-                return await self.update_obj(
-                    self.uow.user,
-                    data,
-                    user.id,
-                )
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("User")
@@ -337,15 +340,18 @@ class UserService(JWTTokensMixin, BaseService):
     async def get_user_profile(self, authorization: str) -> UserShow:
         try:
             async with self.uow:
-                user_id = await self._user_id_from_jwt(authorization)
-                if not user_id:
+                if authorization:
+                    user_id = await self._user_id_from_jwt(authorization)
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException(user_id)
+                    if not user.is_active:
+                        raise UserInactiveException(user.email)
+                    return await self.get_show_scheme(user)
+                else:
                     raise InvalidCredentialsException()
-                user = await self.uow.user.get_by_id(obj_id=user_id)
-                if not user:
-                    raise UserNotFoundByIdException(user_id)
-                if not user.is_active:
-                    raise UserInactiveException(user.email)
-                return await self.get_show_scheme(user)
         except SQLAlchemyError as e:
             log.exception(e)
             raise UserNotFoundByIdException(user_id)
@@ -357,33 +363,36 @@ class UserService(JWTTokensMixin, BaseService):
     ) -> bool:
         try:
             async with self.uow:
-                user_id = await self._user_id_from_jwt(authorization)
-                if not user_id:
-                    raise InvalidCredentialsException()
-                user = await self.uow.user.get_by_id(obj_id=user_id)
-                if not user:
-                    raise UserNotFoundByIdException(user_id)
-                if not user.is_active:
-                    raise UserInactiveException(user.email)
+                if authorization:
+                    user_id = await self._user_id_from_jwt(authorization)
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException(user_id)
+                    if not user.is_active:
+                        raise UserInactiveException(user.email)
 
-                if await self.uow.user.exists_by_email(data.new_email):
-                    raise UserByEmailAlreadyExistsException()
+                    if await self.uow.user.exists_by_email(data.new_email):
+                        raise UserByEmailAlreadyExistsException()
 
-                # Send confirmation email
-                token_data = await AuthTokenService(
-                    self.uow
-                ).create_auth_token(
-                    AuthTokenCreate(
-                        token_type=AuthTokenType.EMAIL_CHANGE_CONFIRM,
-                        owner_email=user.email,
-                        owner_new_email=data.new_email,
+                    # Send confirmation email
+                    token_data = await AuthTokenService(
+                        self.uow
+                    ).create_auth_token(
+                        AuthTokenCreate(
+                            token_type=AuthTokenType.EMAIL_CHANGE_CONFIRM,
+                            owner_email=user.email,
+                            owner_new_email=data.new_email,
+                        )
                     )
-                )
-                await self.uow.commit()
-                send_email_change_confirmation_email.delay(
-                    token_data.model_dump_json()
-                )
-                return True
+                    await self.uow.commit()
+                    send_email_change_confirmation_email.delay(
+                        token_data.model_dump_json()
+                    )
+                    return True
+                else:
+                    raise InvalidCredentialsException()
         except SQLAlchemyError as e:
             log.exception(e)
             raise ObjectUpdateException("User")
@@ -473,20 +482,23 @@ class UserService(JWTTokensMixin, BaseService):
     ) -> bool:
         try:
             async with self.uow:
-                user_id = await self._user_id_from_jwt(authorization)
-                if not user_id:
+                if authorization:
+                    user_id = await self._user_id_from_jwt(authorization)
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException(user_id)
+                    if not user.is_active:
+                        raise UserInactiveException(user.email)
+                    if not user.check_password(data.old_password):
+                        raise UserInvalidPasswordException(user.email)
+                    user.password = data.new_password
+                    await self.uow.add(user)
+                    await self.uow.commit()
+                    return True
+                else:
                     raise InvalidCredentialsException()
-                user = await self.uow.user.get_by_id(obj_id=user_id)
-                if not user:
-                    raise UserNotFoundByIdException(user_id)
-                if not user.is_active:
-                    raise UserInactiveException(user.email)
-                if not user.check_password(data.old_password):
-                    raise UserInvalidPasswordException(user.email)
-                user.password = data.new_password
-                await self.uow.add(user)
-                await self.uow.commit()
-                return True
         except SQLAlchemyError as e:
             log.exception(e)
             return False
