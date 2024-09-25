@@ -26,7 +26,6 @@ from .nova_post.router import router as nova_post_router
 async def lifespan(app: FastAPI):  # noqa
     # Initialize the cache backend
     init_caching()
-    # send_registration_email.delay()
     yield
 
 
@@ -36,6 +35,8 @@ app = FastAPI(
     debug=settings.debug,
     version=str(settings.app_version),
     lifespan=lifespan,
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
 )
 app.add_middleware(
     CORSMiddleware,
