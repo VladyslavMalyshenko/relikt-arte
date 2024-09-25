@@ -375,3 +375,33 @@ class OrderService(BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise OrderGetException()
+
+    async def get_orders_for_user(
+        self,
+        authorization: str,
+        pagination: Optional[PaginationParams] = None,
+        filters_decoder: Optional[FiltersDecoder] = None,
+    ) -> OrderListSchema | list[OrderShow]:
+        try:
+            async with self.uow:
+                if authorization:
+                    user_id = await UserService(self.uow)._user_id_from_jwt(
+                        authorization
+                    )
+                    if not user_id:
+                        raise InvalidCredentialsException()
+                    user = await self.uow.user.get_by_id(obj_id=user_id)
+                    if not user:
+                        raise UserNotFoundByIdException()
+                    return await self.get_obj_list(
+                        repo=self.uow.order,
+                        options=await self.uow.order._add_default_options(),
+                        pagination_params=pagination,
+                        filters_decoder=filters_decoder,
+                        filters=[self.uow.order.model.user_id == user.id],
+                    )
+                else:
+                    raise InvalidCredentialsException()
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise InvalidCredentialsException()
