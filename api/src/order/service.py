@@ -169,7 +169,7 @@ class BasketService(BaseService):
                             self.uow.basket_item.model.basket_id: basket.id,
                         }
                     )
-                    basket_item.quantity += item_data.quantity
+                    basket_item.quantity += item_data.quantity if item_data.quantity else 1
                 else:
                     await self.uow.basket_item.create(obj_in=item_data)
                 await self.uow.commit()
