@@ -31,7 +31,7 @@ class UserCreate(BaseUserCreate):
         try:
             validate_password(value)
         except PasswordValidationException as e:
-            raise HTTPException(detail=e, status_code=400)
+            raise HTTPException(detail=e.message, status_code=400)
         return value
 
     @field_validator("password_confirm")
@@ -73,7 +73,7 @@ class UserPasswordResetConfirm(BaseModel):
         try:
             validate_password(value)
         except PasswordValidationException as e:
-            raise HTTPException(detail=e, status_code=400)
+            raise HTTPException(detail=e.message, status_code=400)
         return value
 
     @field_validator("new_password_confirm")
@@ -93,7 +93,7 @@ class UserPasswordChange(BaseModel):
         try:
             validate_password(value)
         except PasswordValidationException as e:
-            raise HTTPException(detail=e, status_code=400)
+            raise HTTPException(detail=e.message, status_code=400)
         return value
 
     @field_validator("new_password_confirm")
