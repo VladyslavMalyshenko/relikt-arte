@@ -72,10 +72,10 @@ class ProductCreate(BaseModel):
     sku: Optional[str] = None
     price: int
     description: Optional[ProductDescription] = None
-    have_glass: bool
-    material_choice: bool
-    type_of_platband_choice: bool
-    orientation_choice: bool
+    have_glass: Optional[bool] = False
+    material_choice: Optional[bool] = False
+    type_of_platband_choice: Optional[bool] = False
+    orientation_choice: Optional[bool] = False
     category_id: int
     covering_id: Optional[int] = None
 

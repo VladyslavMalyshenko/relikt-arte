@@ -121,22 +121,22 @@ class Product(BaseModelMixin, Base):
         doc="Description",
     )
     have_glass: Mapped[bool] = mapped_column(
-        nullable=False,
+        nullable=True,
         default=False,
         doc="Does product have glass",
     )
     material_choice: Mapped[bool] = mapped_column(
-        nullable=False,
+        nullable=True,
         default=False,
         doc="Is material choice available",
     )
     type_of_platband_choice: Mapped[bool] = mapped_column(
-        nullable=False,
+        nullable=True,
         default=False,
         doc="Is type of platband choice available",
     )
     orientation_choice: Mapped[bool] = mapped_column(
-        nullable=False,
+        nullable=True,
         default=False,
         doc="Is orientation choice available",
     )
