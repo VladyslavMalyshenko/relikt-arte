@@ -376,7 +376,7 @@ class CategoryService(BaseService):
         try:
             async with self.uow:
                 sizes = await self.uow.product_size.get_by_ids(
-                    obj_ids=data.allowed_sizes
+                    obj_ids=data.allowed_sizes if data.allowed_sizes else []
                 )
                 category = await self.uow.category.create(
                     obj_in=data, allowed_sizes=sizes
