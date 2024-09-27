@@ -12,7 +12,6 @@ from ..core.dependencies import PaginationParams
 from ..utils.processors.filters.decoder import FiltersDecoder
 from ..utils.processors.filters.user import UserFilterProcessor
 
-from ..utils.exceptions.user import UserByEmailAlreadyExistsException
 from ..utils.exceptions.http.base import (  # noqa: F401
     ObjectCreateException,
     ObjectUpdateException,
@@ -29,6 +28,7 @@ from ..utils.exceptions.http.user import (
     InvalidTokenUserException,
     TokenExpiredException,
     InvalidCredentialsException,
+    UserByEmailAlreadyExistsException,
 )
 
 from ..utils.token import generate_token
@@ -374,7 +374,7 @@ class UserService(JWTTokensMixin, BaseService):
                         raise UserInactiveException(user.email)
 
                     if await self.uow.user.exists_by_email(data.new_email):
-                        raise UserByEmailAlreadyExistsException()
+                        raise UserByEmailAlreadyExistsException(data.new_email)
 
                     # Send confirmation email
                     token_data = await AuthTokenService(
