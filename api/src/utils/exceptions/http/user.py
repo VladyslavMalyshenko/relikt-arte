@@ -80,6 +80,19 @@ class UserIsNotAdminException(HTTPException):
         )
 
 
+class UserByEmailAlreadyExistsException(HTTPException):
+    def __init__(
+        self,
+        email: str,
+        headers: Optional[dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User with email: {email} already exists",
+            headers=headers,
+        )
+
+
 class TokenNotFoundException(HTTPException):
     def __init__(
         self,
