@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { paths } from "../../router/paths";
 import "../../styles/components/UI/CartModal.scss";
+import { deleteCartItem, getCart } from "../../utils/handleCart";
 import Button from "./Button";
+import CheckoutProduct from "./CheckoutProduct";
+import Loader from "./Loader";
 
 type CartModalProps = {
     closeModal: () => void;
@@ -8,7 +13,47 @@ type CartModalProps = {
 
 const CartModal = ({ closeModal }: CartModalProps) => {
     const stopPropagation = (e: any) => e.stopPropagation();
-    const [products, setProducts] = useState([]);
+    const navigate = useNavigate();
+    const [products, setProducts] = useState<any>([]); // checkout product type needed
+    const [itemsInfo, setItemsInfo] = useState<any>({});
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [cart, setCart] = useState<any>({});
+
+    useEffect(() => {
+        const setUpCart = async () => {
+            setIsLoaded(false);
+
+            const cart = await getCart().finally(() => {
+                setIsLoaded(true);
+            });
+
+            if (cart) {
+                setCart(cart);
+                setItemsInfo(cart.items);
+                setProducts(cart.items.results);
+            }
+        };
+
+        setUpCart();
+    }, []);
+
+    useEffect(() => {
+        console.log(products);
+    }, [products]);
+
+    const deleteItem = async (id: number) => {
+        setIsLoaded(false);
+
+        const cart = await deleteCartItem(id).finally(() => [
+            setIsLoaded(true),
+        ]);
+
+        if (cart) {
+            setCart(cart);
+            setItemsInfo(cart.items);
+            setProducts(cart.items.results);
+        }
+    };
 
     return (
         <div className="cart-modal" onClick={closeModal}>
@@ -32,28 +77,57 @@ const CartModal = ({ closeModal }: CartModalProps) => {
                     </svg>
                 </div>
 
-                <div className="cart-modal-inner-products">
-                    <p className="black pre-small">
-                        {products.length > 0
-                            ? "Ваше замовлення:"
-                            : "Тут поки що нічого немає ;("}
-                    </p>
+                <div className="cart-modal-inner-products-container">
+                    {isLoaded ? (
+                        <>
+                            <p className="black pre-small">
+                                {products.length > 0
+                                    ? "Ваше замовлення:"
+                                    : "Тут поки що нічого немає ;("}
+                            </p>
+
+                            {products.length > 0 && (
+                                <div className="cart-modal-inner-products">
+                                    {products.map((product: any) => (
+                                        <CheckoutProduct
+                                            product={product}
+                                            setValue={(
+                                                a: any,
+                                                b: any,
+                                                c: any
+                                            ) => {
+                                                console.log(product);
+
+                                                console.log(a, b, c);
+                                            }}
+                                            deleteItem={deleteItem}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <Loader />
+                    )}
                 </div>
 
                 <div className="cart-modal-inner-buttons">
-                    {products.length > 0 && (
+                    {products.length > 0 && isLoaded ? (
                         <div className="cart-modal-inner-payment">
-                            <p className="black mid upper bold">2905 ₴</p>
+                            <p className="black mid upper bold">
+                                {cart.total_value} ₴
+                            </p>
 
                             <Button
                                 inversed={true}
                                 borderless={false}
                                 additionalClasses={["upper"]}
+                                onClickCallback={() => navigate(paths.checkout)}
                             >
                                 перейти до сплати
                             </Button>
                         </div>
-                    )}
+                    ) : null}
 
                     <Button
                         colorScheme={"grey"}

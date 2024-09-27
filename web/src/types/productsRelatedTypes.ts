@@ -32,6 +32,8 @@ export type ProductType = {
     };
     have_glass?: boolean;
     orientation_choice?: boolean;
+    material_choice?: boolean;
+    type_of_platband_choice?: boolean;
     category_id: number;
     covering_id: number;
     photos: ProductPhotoType[];

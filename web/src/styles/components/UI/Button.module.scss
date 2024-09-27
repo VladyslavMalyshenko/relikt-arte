@@ -13,7 +13,7 @@
     border-radius: 6px;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875em;
     aspect-ratio: 3/1;
     transition: 0.3s;
 
@@ -44,6 +44,11 @@
     &.inverse {
         --primary: var(--dark-grey);
         --secondary: var(--white);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 

@@ -10,6 +10,7 @@ type ButtonProps = {
     borderless?: boolean;
     style?: React.CSSProperties;
     colorScheme?: string;
+    disabled?: boolean;
 };
 
 const Button = ({
@@ -21,6 +22,7 @@ const Button = ({
     borderless = true,
     style = {},
     colorScheme,
+    disabled,
 }: ButtonProps) => {
     const [buttonClassName, setButtonClassName] = useState(styles.button);
 
@@ -40,11 +42,16 @@ const Button = ({
         setButtonClassName(updatedClassName);
     }, [additionalClasses, inversed, borderless, colorScheme]);
 
+    const onClickFunc = (e: any) => {
+        if (!disabled) onClickCallback(e);
+    };
+
     return (
         <button
             className={buttonClassName}
             style={style}
-            onClick={onClickCallback}
+            onClick={onClickFunc}
+            disabled={disabled}
         >
             {!colorScheme || colorScheme !== "facebook" ? (
                 text || Children.map(children, (child) => child)

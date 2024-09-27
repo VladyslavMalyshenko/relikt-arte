@@ -58,39 +58,3 @@ export const validateToken = async () => {
 
     return isValid;
 };
-
-export const registerUser = async (data: any) => {
-    return await axios
-        .post(generateUrl("api/v1/user/create"), {
-            ...data,
-        })
-        .then(() => true)
-        .catch((err) => ({
-            error: err.response.data.detail || "Щось пішло не так.",
-        }));
-};
-
-export const singInAccount = async (data: any) => {
-    return await axios
-        .post(generateUrl("api/v1/user/auth"), {
-            ...data,
-        })
-        .then((res) => {
-            setAccessToken(res.data.access_token);
-            setRefreshToken(res.data.refresh_token);
-
-            return true;
-        })
-        .catch((err) => ({
-            error: err.response.data.detail || "Щось пішло не так.",
-        }));
-};
-
-export const confirmRegistration = async (token: string) => {
-    const response = await axios
-        .post(generateUrl(`api/v1/user/confirm_registration/${token}`))
-        .then(() => true)
-        .catch(() => false);
-
-    return response;
-};

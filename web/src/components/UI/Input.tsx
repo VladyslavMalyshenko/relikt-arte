@@ -1,29 +1,43 @@
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import "../../styles/components/UI/Input.scss";
+import DropDown, { DefaultDropDownValue } from "./DropDown";
+
+export type InputOptions = {
+    labelField: string;
+    valueField: string;
+    options: any;
+    default?: DefaultDropDownValue;
+};
 
 type InputProps = {
     type: string;
     placeholder: string;
     name: string;
+    options?: InputOptions;
     control: Control<any>;
     errors: FieldErrors<any>;
     rules?: any;
     hasLabel?: boolean;
+    onChosen?: any;
+    readOnly?: boolean;
 };
 
 const Input = ({
     type,
     placeholder,
     name,
+    options,
     control,
     errors,
     rules,
     hasLabel,
+    onChosen,
+    readOnly,
 }: InputProps) => {
     const configureInput = (field: any) => {
         const className = `input-field${errors[name] ? " invalid" : ""}`;
 
-        return (
+        return type !== "dropdown" ? (
             <input
                 type={type}
                 value={field.value || ""}
@@ -38,6 +52,47 @@ const Input = ({
                 maxLength={type === "phone" ? 10 : undefined}
                 className={className}
                 placeholder={placeholder}
+                readOnly={readOnly || false}
+            />
+        ) : (
+            <DropDown
+                label={placeholder}
+                options={options?.options?.map((option: any) => {
+                    const labelField = Array.isArray(options.labelField)
+                        ? options.labelField
+                              .reduce(
+                                  (acc, curr) => acc + ` ${option[curr]}`,
+                                  ""
+                              )
+                              .trim()
+                        : option[options.labelField];
+
+                    const key = `${
+                        !Array.isArray(options.labelField)
+                            ? option[options.labelField]
+                            : options.labelField
+                                  .reduce(
+                                      (acc, curr) => acc + ` ${option[curr]}`,
+                                      ""
+                                  )
+                                  .trim()
+                    }-${option[options.valueField]}`;
+
+                    const value = option[options.valueField];
+
+                    return {
+                        name: labelField,
+                        key,
+                        value,
+                    };
+                })}
+                field={name}
+                onChosen={(field: any, value: any, label?: string) => {
+                    onChosen(field, value, label);
+                }}
+                defaultValue={options?.default}
+                borderless={false}
+                needSearch={true}
             />
         );
     };
@@ -48,10 +103,6 @@ const Input = ({
         } else if (type === "email") {
             return {
                 required: "Email є обов'язковим",
-                pattern: {
-                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                    message: "Неправильний email",
-                },
             };
         } else if (type === "phone") {
             return {

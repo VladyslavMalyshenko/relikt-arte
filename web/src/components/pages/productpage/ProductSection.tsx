@@ -22,7 +22,8 @@ const ProductSection = () => {
     const [currentPhoto, setCurrentPhoto] = useState<string>("");
     const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
     const navigate = useNavigate();
-    const { setValue, handleSubmit } = useForm();
+    const { getValues, setValue, handleSubmit } = useForm();
+    const [currentValues, setCurrentValues] = useState<any>({});
     const [allowedSizes, setAllowedSizes] = useState<any>([]);
     const dispatch = useDispatch();
 
@@ -104,6 +105,7 @@ const ProductSection = () => {
         }
 
         setValue(fieldName, value);
+        setCurrentValues(getValues());
     };
 
     return (
@@ -190,7 +192,7 @@ const ProductSection = () => {
                                     <DropDown
                                         borderless={false}
                                         label="колір"
-                                        field="color"
+                                        field="color_id"
                                         options={{
                                             url: "api/v1/product/related/product_color/list/",
                                             labelKey: "name",
@@ -211,7 +213,7 @@ const ProductSection = () => {
                                         <DropDown
                                             borderless={false}
                                             label="розмір"
-                                            field="size"
+                                            field="size_id"
                                             options={{
                                                 value: allowedSizes,
                                                 labelKey: "dimensions",
@@ -230,38 +232,62 @@ const ProductSection = () => {
                                     ) : null}
 
                                     {product?.have_glass && (
-                                        <DropDown
-                                            borderless={false}
-                                            label="наявність скла"
-                                            field="have_glass"
-                                            options={[
-                                                {
-                                                    name: "Присутнє",
-                                                    value: true,
-                                                },
-                                                {
-                                                    name: "Відсутнє",
-                                                    value: false,
-                                                },
-                                            ]}
-                                            onChosen={(
-                                                fieldName: string,
-                                                value: any
-                                            ) =>
-                                                onChosen(
-                                                    fieldName,
-                                                    value,
-                                                    "with_glass"
-                                                )
-                                            }
-                                        />
+                                        <>
+                                            <DropDown
+                                                borderless={false}
+                                                label="наявність скла"
+                                                field="with_glass"
+                                                options={[
+                                                    {
+                                                        name: "Присутнє",
+                                                        value: true,
+                                                    },
+                                                    {
+                                                        name: "Відсутнє",
+                                                        value: false,
+                                                    },
+                                                ]}
+                                                onChosen={(
+                                                    fieldName: string,
+                                                    value: any
+                                                ) =>
+                                                    onChosen(
+                                                        fieldName,
+                                                        value,
+                                                        "have_glass"
+                                                    )
+                                                }
+                                            />
+
+                                            {currentValues.with_glass && (
+                                                <DropDown
+                                                    borderless={false}
+                                                    label="колір скла"
+                                                    field="glass_color_id"
+                                                    options={{
+                                                        url: "api/v1/product/related/product_glass_color/list/",
+                                                        labelKey: "name",
+                                                    }}
+                                                    onChosen={(
+                                                        fieldName: string,
+                                                        value: any
+                                                    ) =>
+                                                        onChosen(
+                                                            fieldName,
+                                                            value,
+                                                            "color_id"
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </>
                                     )}
 
                                     {product?.orientation_choice && (
                                         <DropDown
                                             borderless={false}
                                             label="сторона петель"
-                                            field="orientation_choice"
+                                            field="orientation"
                                             options={[
                                                 { name: "Ліва", value: "left" },
                                                 {
@@ -276,7 +302,35 @@ const ProductSection = () => {
                                                 onChosen(
                                                     fieldName,
                                                     value,
-                                                    "type_of_platband"
+                                                    "have_orientation_choice"
+                                                )
+                                            }
+                                        />
+                                    )}
+
+                                    {product?.type_of_platband_choice && (
+                                        <DropDown
+                                            borderless={false}
+                                            label="тип лиштви"
+                                            field="type_of_platband"
+                                            options={[
+                                                {
+                                                    name: "Звичайний",
+                                                    value: "default",
+                                                },
+                                                {
+                                                    name: "Г-подібний",
+                                                    value: "L-shaped",
+                                                },
+                                            ]}
+                                            onChosen={(
+                                                fieldName: string,
+                                                value: any
+                                            ) =>
+                                                onChosen(
+                                                    fieldName,
+                                                    value,
+                                                    "type_of_platband_choice"
                                                 )
                                             }
                                         />

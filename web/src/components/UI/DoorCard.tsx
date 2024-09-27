@@ -9,6 +9,7 @@ import {
     ProductType,
 } from "../../types/productsRelatedTypes";
 import { getItems } from "../../utils/getItems";
+import { addCartItem } from "../../utils/handleCart";
 import Button from "./Button";
 
 type DoorCardProps = {
@@ -18,6 +19,7 @@ type DoorCardProps = {
 const DoorCard = ({ product }: DoorCardProps) => {
     const navigate = useNavigate();
     const [tags, setTags] = useState<any>([]);
+    const [values, setValues] = useState<any>([]);
     const { setValue, getValues } = useForm();
 
     const stopPropagation = (e: any) => e.stopPropagation();
@@ -25,21 +27,33 @@ const DoorCard = ({ product }: DoorCardProps) => {
     useEffect(() => {
         const setUpTags = async () => {
             const newTags = [];
+            const newValues = [];
+            console.log(product);
 
-            if (product.have_glass !== null) {
+            if (product.have_glass) {
                 newTags.push({
                     name: product.have_glass
                         ? "Скло присутнє"
                         : "Скло відсутнє",
-                    field: "have_glass",
+                    field: "with_glass",
+                    value: product.have_glass,
+                });
+
+                newValues.push({
+                    field: "with_glass",
                     value: product.have_glass,
                 });
             }
 
-            if (product.orientation_choice !== null) {
+            if (product.orientation_choice) {
                 newTags.push({
                     name: "Петлі зліва",
                     field: "orientation_choice",
+                    value: "left",
+                });
+
+                newValues.push({
+                    field: "orientation",
                     value: "left",
                 });
             }
@@ -58,13 +72,51 @@ const DoorCard = ({ product }: DoorCardProps) => {
 
                     newTags.push({
                         name: sizeObject.dimensions,
-                        field: "size",
+                        field: "size_id",
+                        value: sizeObject.id,
+                    });
+
+                    newValues.push({
+                        field: "size_id",
                         value: sizeObject.id,
                     });
                 }
             }
 
+            if (product.id !== null) {
+                newValues.push({
+                    field: "product_id",
+                    value: product.id,
+                });
+            }
+
+            if (product.material_choice) {
+                newValues.push({
+                    field: "material",
+                    value: "wood",
+                });
+            }
+
+            if (product.type_of_platband_choice) {
+                newValues.push({
+                    field: "type_of_platband",
+                    value: "default",
+                });
+            }
+
+            const color = await getItems(
+                "/api/v1/product/related/product_color/list/?page=1&size=1"
+            );
+
+            if (color.length > 0) {
+                newValues.push({
+                    field: "color_id",
+                    value: color[0].id,
+                });
+            }
+
             setTags(newTags);
+            setValues(newValues);
         };
 
         setUpTags();
@@ -72,21 +124,22 @@ const DoorCard = ({ product }: DoorCardProps) => {
 
     useEffect(() => {
         const setDefaultValues = () => {
-            if (tags.length > 0) {
-                tags.forEach((tag: any) => {
-                    setValue(tag.field, tag.value);
+            if (values.length > 0) {
+                values.forEach((values: any) => {
+                    setValue(values.field, values.value);
                 });
             }
         };
 
         setDefaultValues();
-    }, [tags]);
+    }, [values]);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.stopPropagation();
         const data = getValues();
 
         console.log(data);
+        await addCartItem(data);
     };
 
     return (

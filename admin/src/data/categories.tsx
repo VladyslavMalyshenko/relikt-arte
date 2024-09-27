@@ -507,6 +507,15 @@ export const categoriesData: (MainCategory | Category)[] = [
                     { name: "Відсутній", value: false },
                 ],
             },
+            {
+                name: "вибір матеріалу",
+                field: "material_choice",
+                type: "radio",
+                choices: [
+                    { name: "Присутній", value: true },
+                    { name: "Відсутній", value: false },
+                ],
+            },
         ],
         fields: [
             "id",
@@ -519,6 +528,14 @@ export const categoriesData: (MainCategory | Category)[] = [
             {
                 name: "вибір сторони",
                 field: "orientation_choice",
+            },
+            {
+                name: "вибір матеріалу",
+                field: "material_choice",
+            },
+            {
+                name: "вибір типу лиштви",
+                field: "type_of_platband_choice",
             },
         ],
         addItemFields: [
@@ -581,6 +598,18 @@ export const categoriesData: (MainCategory | Category)[] = [
                 required: true,
             },
             {
+                name: "вибір матеріалу",
+                field_name: "material_choice",
+                type: "checkbox",
+                required: true,
+            },
+            {
+                name: "вибір типу лиштви",
+                field_name: "type_of_platband_choice",
+                type: "checkbox",
+                required: true,
+            },
+            {
                 name: "категорія товару",
                 field_name: "category_id",
                 type: "list-radio",
@@ -594,6 +623,14 @@ export const categoriesData: (MainCategory | Category)[] = [
                     {
                         dependOn: "have_orientation_choice",
                         target: "orientation_choice",
+                    },
+                    {
+                        dependOn: "have_material_choice",
+                        target: "material_choice",
+                    },
+                    {
+                        dependOn: "have_type_of_platband_choice",
+                        target: "type_of_platband_choice",
                     },
                 ],
                 labelField: "name",
@@ -671,6 +708,18 @@ export const categoriesData: (MainCategory | Category)[] = [
                 required: true,
             },
             {
+                name: "вибір матеріалу",
+                field_name: "material_choice",
+                type: "checkbox",
+                required: true,
+            },
+            {
+                name: "вибір типу лиштви",
+                field_name: "type_of_platband_choice",
+                type: "checkbox",
+                required: true,
+            },
+            {
                 name: "категорія товару",
                 field_name: "category_id",
                 type: "list-radio",
@@ -684,6 +733,14 @@ export const categoriesData: (MainCategory | Category)[] = [
                     {
                         dependOn: "have_orientation_choice",
                         target: "orientation_choice",
+                    },
+                    {
+                        dependOn: "have_material_choice",
+                        target: "material_choice",
+                    },
+                    {
+                        dependOn: "have_type_of_platband_choice",
+                        target: "type_of_platband_choice",
                     },
                 ],
                 labelField: "name",

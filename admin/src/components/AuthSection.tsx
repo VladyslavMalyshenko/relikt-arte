@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { SetAuth } from "../redux/actions/authActions";
 import "../styles/components/AuthSection.scss";
 import { singInAccount } from "../utils/tokenUtils";
 
@@ -7,6 +9,7 @@ const AuthSection = () => {
     const [message, setMessage] = useState("");
     const [previousData, setPreviousData] = useState({});
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const dispatch = useDispatch();
 
     const defaultValues = {
         email: "",
@@ -28,11 +31,14 @@ const AuthSection = () => {
 
             setButtonDisabled(false);
 
+            setPreviousData(data);
+
             if (response?.error) {
                 setMessage(response.error);
+                return;
             }
 
-            setPreviousData(data);
+            dispatch(SetAuth(response));
         }
     };
 
@@ -44,10 +50,6 @@ const AuthSection = () => {
                     <input
                         {...register("email", {
                             required: "Email є обов'язковим",
-                            pattern: {
-                                value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                                message: "Неправильний email",
-                            },
                         })}
                         placeholder="Логін"
                     />
@@ -64,10 +66,6 @@ const AuthSection = () => {
                     <input
                         {...register("password", {
                             required: "Пароль є обов'язковим",
-                            minLength: {
-                                value: 6,
-                                message: "Пароль занадто короткий",
-                            },
                         })}
                         type="password"
                         placeholder="Пароль"

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
-import { singInAccount } from "../../../utils/tokenUtils";
+import { singInAccount } from "../../../utils/handleUser";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 
@@ -71,10 +71,6 @@ const SingInSection = () => {
                             name="password"
                             rules={{
                                 required: "Пароль є обов'язковим",
-                                minLength: {
-                                    value: 6,
-                                    message: "Пароль занадто короткий",
-                                },
                             }}
                         />
 

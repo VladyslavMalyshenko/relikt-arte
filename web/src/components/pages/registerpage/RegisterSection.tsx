@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
-import { registerUser } from "../../../utils/tokenUtils";
+import { registerUser } from "../../../utils/handleUser";
 import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 

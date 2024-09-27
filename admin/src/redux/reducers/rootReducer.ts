@@ -1,4 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
+import { authReducer } from "./authReducer";
 import { currentActionReducer } from "./currentActionReducer";
 import { currentCategoryReducer } from "./currentCategoryReducer";
 import { currentDeleteObjectReducer } from "./currentDeleteObjectReducer";
@@ -13,4 +14,5 @@ export const rootReducer = combineReducers({
     notificationsReducer,
     deleteObjectReducer: currentDeleteObjectReducer,
     pageReducer: currentPageReducer,
+    authReducer,
 });

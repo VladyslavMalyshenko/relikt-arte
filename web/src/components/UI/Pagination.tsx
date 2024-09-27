@@ -1,14 +1,10 @@
-type BuyProductsPaginationProps = {
+type PaginationProps = {
     currentPage: number;
     changePage: (page: number) => void;
     pages: number;
 };
 
-const BuyProductsPagination = ({
-    currentPage,
-    changePage,
-    pages,
-}: BuyProductsPaginationProps) => {
+const Pagination = ({ currentPage, changePage, pages }: PaginationProps) => {
     return (
         <div className="buy-products-pagination">
             <div
@@ -144,4 +140,4 @@ const BuyProductsPagination = ({
     );
 };
 
-export default BuyProductsPagination;
+export default Pagination;
