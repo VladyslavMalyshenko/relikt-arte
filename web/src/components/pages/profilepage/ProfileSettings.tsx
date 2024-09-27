@@ -1,31 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import "../../../styles/components/pages/profilepage/ProfileSection.scss";
+import { getProfile } from "../../../utils/handleUser";
 import ProfileCategory from "../../UI/ProfileCategory";
 import ProfileSettingsWindow from "../../UI/ProfileSettingsWindow";
 
 const defaultValues = {
-    username: "",
+    full_name: "",
+    phone: "",
     email: "",
-    newEmail: "",
-    phoneNumber: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    new_email: "",
+    old_password: "",
+    new_password: "",
+    new_password_confirm: "",
 };
 
 const ProfileSettings = () => {
-    const {
-        handleSubmit,
-        reset,
-        formState: { errors },
-        control,
-        watch,
-        setValue,
-    } = useForm({ defaultValues });
+    const formController = useForm({ defaultValues });
+    const { setValue } = formController;
+
     const [currentCategory, setCurrentCategory] = useState("профіль");
-    const [username, setUsername] = useState("");
+    const [profileInfo, setProfileInfo] = useState<any>({});
     const currentWidth = useSelector(
         (state: any) => state.ScreenPropertiesReducer.width
     );
@@ -48,16 +44,29 @@ const ProfileSettings = () => {
             buttonRefClasslist.toggle("active");
         }
     };
-    // Example of setting data correctly
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            const newValue = "анастасія брижа";
-            setValue("username", newValue);
-            setUsername(newValue);
-        }, 1000);
 
-        return () => clearTimeout(timeout);
+    const setUpProfileInfoValues = (profileInfo: any) => {
+        setValue("full_name", profileInfo.full_name);
+        setValue("phone", profileInfo.phone);
+        setValue("email", profileInfo.email);
+    };
+
+    useEffect(() => {
+        const setUpProfileInfo = async () => {
+            const profileInfo = await getProfile();
+
+            if (!profileInfo) return;
+
+            setProfileInfo(profileInfo);
+            setUpProfileInfoValues(profileInfo);
+        };
+
+        setUpProfileInfo();
     }, [setValue]);
+
+    useEffect(() => {
+        setUpProfileInfoValues(profileInfo);
+    }, [currentCategory]);
 
     const categories = [
         "профіль",
@@ -92,7 +101,7 @@ const ProfileSettings = () => {
                 </div>
             )}
             <div className="profile-settings-sidebar" ref={sidebarRef}>
-                <p className="upper black pre-small">{username}</p>
+                <p className="upper black pre-small">{profileInfo.full_name}</p>
 
                 <div className="profile-settings-sidebar-categories">
                     {categories &&
@@ -112,16 +121,13 @@ const ProfileSettings = () => {
                     <p className="upper black mid">{currentCategory}</p>
                 </div>
 
-                <ProfileSettingsWindow
-                    options={{
-                        control,
-                        errors,
-                        currentCategory,
-                        handleSubmit,
-                        watch,
-                        reset,
-                    }}
-                />
+                <FormProvider {...formController}>
+                    <ProfileSettingsWindow
+                        currentCategory={currentCategory}
+                        profileInfo={profileInfo}
+                        setProfileInfo={setProfileInfo}
+                    />
+                </FormProvider>
             </div>
         </div>
     );

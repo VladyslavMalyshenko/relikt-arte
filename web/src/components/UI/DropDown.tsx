@@ -3,6 +3,11 @@ import "../../styles/components/UI/BuySectionFilters.scss";
 import { getItems } from "../../utils/getItems";
 import FilterInput from "./FilterInput";
 
+export type DefaultDropDownValue = {
+    defaultFieldName: string;
+    defaultValue: any;
+};
+
 type DropDownOption = {
     name: string;
     value: any;
@@ -20,7 +25,9 @@ type DropDownProps = {
     options: DropDownOption[] | DropDownAsyncOption;
     field: string;
     borderless?: boolean;
-    onChosen: any;
+    onChosen: (field: string, value: any, label?: string) => void;
+    defaultValue?: DefaultDropDownValue;
+    needSearch?: boolean;
 };
 
 const DropDown = ({
@@ -29,75 +36,76 @@ const DropDown = ({
     field,
     onChosen,
     borderless = true,
+    needSearch,
+    defaultValue,
 }: DropDownProps) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
-    const [currentOptions, setCurrentOptions] = useState<any>([]);
-    const [optionsProps, setOptionsProps] = useState(options);
+    const [currentOptions, setCurrentOptions] = useState<DropDownOption[]>([]);
+    const [filteredOptions, setFilteredOptions] = useState<DropDownOption[]>(
+        []
+    );
+    const [searchPrompt, setSearchPrompt] = useState("");
+
+    const handleOptionSelect = (
+        value: any,
+        identifier: string,
+        label: string
+    ) => {
+        if (selectedOption !== identifier) {
+            setSelectedOption(identifier);
+            onChosen(field, value, label);
+        }
+    };
 
     useEffect(() => {
-        const getOptions = async () => {
-            let newCurrentOptions: DropDownAsyncOption | DropDownOption[] =
-                optionsProps;
+        console.log(options);
 
-            if (Array.isArray(newCurrentOptions)) {
-                setCurrentOptions(newCurrentOptions);
-            } else if (newCurrentOptions.url && newCurrentOptions.labelKey) {
-                let newOptions = await getItems(newCurrentOptions.url);
+        const fetchOptions = async () => {
+            let newOptions: DropDownOption[] = [];
 
-                newOptions = newOptions.map((item: any) => ({
-                    name: item[
-                        (newCurrentOptions as DropDownAsyncOption).labelKey
-                    ],
-                    key: `${
-                        item[
-                            (newCurrentOptions as DropDownAsyncOption).labelKey
-                        ]
-                    }-${item.id}`,
+            if (Array.isArray(options)) {
+                newOptions = options;
+            } else if (options?.url && options?.labelKey) {
+                const fetchedItems = await getItems(options.url);
+                newOptions = fetchedItems.map((item: any) => ({
+                    name: item[options.labelKey],
+                    key: `${item[options.labelKey]}-${item.id}`,
                     value: item.id,
                 }));
-
-                newCurrentOptions = newOptions;
-            } else if (
-                !newCurrentOptions.url &&
-                (newCurrentOptions.value !== null ||
-                    newCurrentOptions.value !== undefined) &&
-                newCurrentOptions.labelKey
-            ) {
-                const newOptions = newCurrentOptions.value.map((item: any) => {
-                    const itemName =
-                        item[
-                            (newCurrentOptions as DropDownAsyncOption).labelKey
-                        ];
-
-                    return {
-                        name: itemName,
-                        key: `${itemName}-${item.id}`,
-                        value: item.id,
-                    };
-                });
-
-                newCurrentOptions = newOptions;
             }
 
-            if (
-                newCurrentOptions &&
-                (newCurrentOptions as DropDownOption[]).length > 0
-            ) {
-                const option = (newCurrentOptions as DropDownOption[])[0];
-                const targetValue = option.value;
+            setCurrentOptions(newOptions);
+            setFilteredOptions(newOptions);
 
-                const currentIdentifier = `option-${option.key || option.name}`;
+            if (defaultValue) {
+                const defaultOption = newOptions.find(
+                    (opt: any) =>
+                        opt[defaultValue.defaultFieldName] ===
+                        defaultValue.defaultValue
+                );
 
-                onChosen(field, targetValue);
-                setSelectedOption(currentIdentifier);
+                if (defaultOption) {
+                    handleOptionSelect(
+                        defaultOption.value,
+                        `option-${defaultOption.key || defaultOption.name}`,
+                        defaultOption.name
+                    );
+                }
             }
-
-            setCurrentOptions(newCurrentOptions);
         };
 
-        getOptions();
-    }, [optionsProps]);
+        fetchOptions();
+    }, [options, defaultValue]); // Ensure defaultValue is a dependency
+
+    useEffect(() => {
+        const lowerCasedPrompt = searchPrompt.toLowerCase();
+        setFilteredOptions(
+            currentOptions.filter((option) =>
+                option.name.toLowerCase().includes(lowerCasedPrompt)
+            )
+        );
+    }, [searchPrompt, currentOptions]);
 
     return (
         <div className="filters-filter">
@@ -108,19 +116,10 @@ const DropDown = ({
                 onClick={() => setFiltersOpened(!filtersOpened)}
             >
                 {label}
-
-                <svg
-                    width="14"
-                    height="6"
-                    viewBox="0 0 14 6"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="14" height="6" viewBox="0 0 14 6" fill="none">
                     <path
                         d="M12.833 5.33334L6.99967 0.666676L1.16634 5.33334"
                         stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     />
                 </svg>
             </p>
@@ -130,30 +129,42 @@ const DropDown = ({
                     filtersOpened ? " opened" : ""
                 }`}
             >
-                {currentOptions.length > 0 &&
-                    currentOptions.map((option: DropDownOption) => {
+                {needSearch && (
+                    <input
+                        value={searchPrompt}
+                        onChange={(e) => setSearchPrompt(e.target.value)}
+                        className="filters-filter-options-search"
+                        placeholder="Пошук"
+                    />
+                )}
+
+                {filteredOptions.length > 0 ? (
+                    filteredOptions.map((option) => {
                         const currentIdentifier = `option-${
                             option.key || option.name
                         }`;
-
-                        const targetValue = option.value;
-
                         return (
                             <FilterInput
                                 type="radio"
                                 key={currentIdentifier}
-                                label={
-                                    (option as DropDownOption).name as string
-                                }
+                                label={option.name}
                                 groupName={field}
                                 isChecked={selectedOption === currentIdentifier}
-                                onChange={() => {
-                                    setSelectedOption(currentIdentifier);
-                                    onChosen(field, targetValue);
-                                }}
+                                onChange={() =>
+                                    handleOptionSelect(
+                                        option.value,
+                                        currentIdentifier,
+                                        option.name
+                                    )
+                                }
                             />
                         );
-                    })}
+                    })
+                ) : (
+                    <p className="black small">
+                        Пов'язаного з вашим запитом немає у списку ;(
+                    </p>
+                )}
             </div>
         </div>
     );

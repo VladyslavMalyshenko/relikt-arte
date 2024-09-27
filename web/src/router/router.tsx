@@ -2,7 +2,9 @@ import { Route, Routes } from "react-router-dom";
 import BuyPage from "../pages/BuyPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import ContactsPage from "../pages/ContactsPage";
+import EmailChangeConfirmationPage from "../pages/EmailChangeConfirmationPage";
 import HomePage from "../pages/HomePage";
+import OrderPage from "../pages/OrderPage";
 import PasswordRecoveryPage from "../pages/PasswordRecoveryPage";
 import ProductPage from "../pages/ProductPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -30,6 +32,11 @@ const Router = () => {
                 path={paths.registerConfirmation}
                 element={<RegisterConformationPage />}
             />
+            <Route
+                path={paths.passwordResetConfirmation}
+                element={<EmailChangeConfirmationPage />}
+            />
+            <Route path={paths.order} element={<OrderPage />} />
         </Routes>
     );
 };

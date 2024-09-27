@@ -47,23 +47,23 @@ body,
 }
 
 .biggest {
-    font-size: 76px;
+    font-size: 4.75em;
 }
 
 .big {
-    font-size: 52px;
+    font-size: 3.25em;
 }
 
 .mid {
-    font-size: 36px;
+    font-size: 2.25em;
 }
 
 .pre-small {
-    font-size: 18px;
+    font-size: 1.125em;
 }
 
 .small {
-    font-size: 15px;
+    font-size: 0.9375em;
 }
 
 .extra-bold {
@@ -125,64 +125,64 @@ p {
 
 @media (min-width: 651px) and (max-width: 1300px) {
     .biggest {
-        font-size: 66px;
+        font-size: 4.125em;
     }
 }
 
 @media (min-width: 461px) and (max-width: 650px) {
     .biggest {
-        font-size: 56px;
+        font-size: 3.5em;
     }
 
     .big {
-        font-size: 45px;
+        font-size: 2.8125em;
     }
 
     .mid {
-        font-size: 28px;
+        font-size: 1.75em;
     }
 }
 
 @media (min-width: 301px) and (max-width: 460px) {
     .biggest {
-        font-size: 40px;
+        font-size: 2.5em;
     }
 
     .big {
-        font-size: 26px;
+        font-size: 1.625em;
     }
 
     .mid {
-        font-size: 20px;
+        font-size: 1.25em;
     }
 
     .pre-small {
-        font-size: 18px;
+        font-size: 1.125em;
     }
 
     .small {
-        font-size: 13px;
+        font-size: 0.8125em;
     }
 }
 
 @media (max-width: 300px) {
     .biggest {
-        font-size: 32px;
+        font-size: 2em;
     }
 
     .big {
-        font-size: 23px;
+        font-size: 1.4375em;
     }
 
     .mid {
-        font-size: 19px;
+        font-size: 1.1875em;
     }
 
     .pre-small {
-        font-size: 17px;
+        font-size: 1.0625em;
     }
 
     .small {
-        font-size: 12px;
+        font-size: 0.75em;
     }
 }

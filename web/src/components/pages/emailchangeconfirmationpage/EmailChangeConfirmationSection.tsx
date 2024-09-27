@@ -3,10 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/UI/Auth.scss";
 import "../../../styles/components/pages/passwordrecoverypage/PasswordRecoverySection.scss";
-import { confirmRegistration } from "../../../utils/handleUser";
+import { confirmEmailChange } from "../../../utils/handleUser";
 import Button from "../../UI/Button";
 
-const RegisterConformationSection = () => {
+const EmailChangeConfirmationSection = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [success, setSuccess] = useState(false);
     const { token } = useParams();
@@ -14,7 +14,7 @@ const RegisterConformationSection = () => {
 
     useEffect(() => {
         const confirmRegistrationFunc = async () => {
-            const result = await confirmRegistration(token as string);
+            const result = await confirmEmailChange(token as string);
 
             if (result !== undefined) {
                 setIsLoaded(true);
@@ -38,14 +38,14 @@ const RegisterConformationSection = () => {
                             className="upper big black"
                             style={{ color: "var(--green)" }}
                         >
-                            Ви успішно підтвердили реєстрацію
+                            Ви успішно змінили пошту
                         </p>
                     ) : (
                         <p
                             className="upper big black"
                             style={{ color: "var(--red)" }}
                         >
-                            Невдалося підтвердити реєстрацію
+                            Невдалося змінити Вашу пошту ;(
                         </p>
                     )}
 
@@ -70,4 +70,4 @@ const RegisterConformationSection = () => {
     );
 };
 
-export default RegisterConformationSection;
+export default EmailChangeConfirmationSection;

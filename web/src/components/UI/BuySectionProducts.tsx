@@ -6,9 +6,9 @@ import { SetCurrentPage } from "../../redux/actions/PageActions";
 import "../../styles/components/UI/BuySectionProducts.scss";
 import { ProductType } from "../../types/productsRelatedTypes";
 import { getItems } from "../../utils/getItems";
-import BuyProductsPagination from "./BuyProductsPagination";
 import DoorCard from "./DoorCard";
 import Loader from "./Loader";
+import Pagination from "./Pagination";
 
 const BuySectionProducts = () => {
     const currentPage = useSelector(
@@ -131,7 +131,7 @@ const BuySectionProducts = () => {
                             ))}
                     </div>
 
-                    <BuyProductsPagination
+                    <Pagination
                         currentPage={currentPage}
                         pages={availablePages}
                         changePage={changePage}

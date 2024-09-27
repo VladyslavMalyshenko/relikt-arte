@@ -1,27 +1,38 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AuthSection from "./components/AuthSection";
 import Content from "./components/Content";
 import Header from "./components/Header";
+import Loader from "./components/Loader";
 import Notifications from "./components/Notifications";
 import Sidebar from "./components/Sidebar";
+import { SetAuth } from "./redux/actions/authActions";
 import "./styles/App.scss";
 import { validateToken } from "./utils/tokenUtils";
 
 const App = () => {
-    const [isAuth, setIsAuth] = useState(false);
+    const isAuth = useSelector((state: any) => state.authReducer.auth);
+    const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const handleUserAuth = async () => {
-            const response = await validateToken();
+            setIsLoading(true);
+            const response = await validateToken().then((res) => {
+                setIsLoading(false);
+                return res;
+            });
 
-            setIsAuth(response);
+            dispatch(SetAuth(response));
         };
 
         handleUserAuth();
     }, []);
     return (
         <div className="App">
-            {isAuth ? (
+            {isLoading ? (
+                <Loader />
+            ) : isAuth ? (
                 <>
                     <Header />
 
