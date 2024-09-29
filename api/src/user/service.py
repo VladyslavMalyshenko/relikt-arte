@@ -113,7 +113,7 @@ class UserService(JWTTokensMixin, BaseService):
         try:
             async with self.uow:
                 if await self.uow.user.exists_by_email(data.email):
-                    raise UserByEmailAlreadyExistsException()
+                    raise UserByEmailAlreadyExistsException(data.email)
                 user = await self.uow.user.create(obj_in=data)
                 await self.uow.add(user)
                 if send_confirmation_email:
