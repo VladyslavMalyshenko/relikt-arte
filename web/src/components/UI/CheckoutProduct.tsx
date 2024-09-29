@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import ProductStaticImage from "../../assets/staticProductImage.webp";
+import noImage from "../../assets/no_image.png";
 import "../../styles/components/UI/CheckoutProduct.scss";
 import { ProductPhotoType } from "../../types/productsRelatedTypes";
 import { getItem } from "../../utils/getItem";
@@ -147,7 +147,7 @@ const CheckoutProduct = ({
             <div className="checkout-product">
                 <img
                     className="checkout-product-cell"
-                    src={currentPhoto || ProductStaticImage}
+                    src={currentPhoto || noImage}
                     alt={`door-${currentProduct.price}-${currentProduct.id}`}
                 />
                 <div className="checkout-product-count checkout-product-cell">

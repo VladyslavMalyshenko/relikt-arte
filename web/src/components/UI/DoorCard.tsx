@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import ProductStaticImage from "../../assets/staticProductImage.webp";
+import noImage from "../../assets/no_image.png";
 import { paths } from "../../router/paths";
 import "../../styles/components/UI/DoorCard.scss";
 import {
@@ -25,10 +25,11 @@ const DoorCard = ({ product }: DoorCardProps) => {
     const stopPropagation = (e: any) => e.stopPropagation();
 
     useEffect(() => {
+        setTags([]);
+
         const setUpTags = async () => {
             const newTags = [];
             const newValues = [];
-            console.log(product);
 
             if (product.have_glass) {
                 newTags.push({
@@ -138,7 +139,6 @@ const DoorCard = ({ product }: DoorCardProps) => {
         e.stopPropagation();
         const data = getValues();
 
-        console.log(data);
         await addCartItem(data);
     };
 
@@ -151,18 +151,16 @@ const DoorCard = ({ product }: DoorCardProps) => {
                 src={
                     product.photos.find(
                         (photo: ProductPhotoType) => photo.is_main
-                    )?.photo || ProductStaticImage
+                    )?.photo || noImage
                 }
                 alt={`door-${product.price}-${product.id}`}
             />
-            <div className="door-card-inner" onClick={stopPropagation}></div>
-            {/* <p className="pre-small upper model" onClick={stopPropagation}>
-        {product.model}
-      </p> */}
+
             <p className="mid black bold" onClick={stopPropagation}>
                 {product.price} ₴
             </p>
-            {tags && (
+
+            {tags.length > 0 && (
                 <div className="tags" onClick={stopPropagation}>
                     {tags.map((tag: any, index: number) => (
                         <p key={`tag[${index}]`} className="pre-small gray">

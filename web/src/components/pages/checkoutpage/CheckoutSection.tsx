@@ -12,6 +12,7 @@ import Button from "../../UI/Button";
 import CheckoutModal from "../../UI/CheckoutModal";
 import CheckoutProduct from "../../UI/CheckoutProduct";
 import Form from "../../UI/Form";
+import Loader from "../../UI/Loader";
 
 const CheckoutSection = () => {
     const navigate = useNavigate();
@@ -20,10 +21,14 @@ const CheckoutSection = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOrderSuccess, setIsOrderSuccess] = useState(false);
     const [orderInfo, setOrderInfo] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState<any>(false);
 
     useEffect(() => {
+        setIsLoading(true);
         const getCartProducts = async () => {
-            const cart = await getCart().catch(() => false);
+            const cart = await getCart()
+                .catch(() => false)
+                .finally(() => setIsLoading(false));
 
             if (cart) {
                 setTotalValue(cart.total_value);
@@ -260,36 +265,44 @@ const CheckoutSection = () => {
                         </Button>
                     </div>
                     <div className="checkout-section-inner-products">
-                        {cartProducts.length > 0 ? (
-                            <>
-                                {cartProducts.map((product: ProductType) => (
-                                    <CheckoutProduct
-                                        key={product.id}
-                                        product={product}
-                                        onQuantityChange={onQuantityChange}
-                                    />
-                                ))}
-                                <div className="checkout-section-inner-products-checkout">
-                                    <p className="upper black pre-small bold">
-                                        доставка
-                                        <span className="regular">
-                                            за тарифами перевезника
-                                        </span>
-                                    </p>
+                        {!isLoading ? (
+                            cartProducts.length > 0 ? (
+                                <>
+                                    {cartProducts.map(
+                                        (product: ProductType) => (
+                                            <CheckoutProduct
+                                                key={product.id}
+                                                product={product}
+                                                onQuantityChange={
+                                                    onQuantityChange
+                                                }
+                                            />
+                                        )
+                                    )}
+                                    <div className="checkout-section-inner-products-checkout">
+                                        <p className="upper black pre-small bold">
+                                            доставка
+                                            <span className="regular">
+                                                за тарифами перевезника
+                                            </span>
+                                        </p>
 
-                                    <p className="upper black pre-small bold">
-                                        загальна сума
-                                        <span className="regular">
-                                            {totalValue} ₴
-                                        </span>
-                                    </p>
-                                </div>
-                            </>
+                                        <p className="upper black pre-small bold">
+                                            загальна сума
+                                            <span className="regular">
+                                                {totalValue} ₴
+                                            </span>
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="black small">
+                                    Ви ще не вибрали жодного товару для
+                                    оформлення замовлення
+                                </p>
+                            )
                         ) : (
-                            <p className="black small">
-                                Ви ще не вибрали жодного товару для оформлення
-                                замовлення
-                            </p>
+                            <Loader />
                         )}
                     </div>
                 </div>

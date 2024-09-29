@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ProductStaticImage from "../../assets/staticProductImage.webp";
+import noImage from "../../assets/no_image.png";
 import "../../styles/components/UI/CheckoutProduct.scss";
 import { generateUrl } from "../../utils/generateUrl";
 
@@ -32,7 +32,6 @@ const OrderProduct = ({ product }: OrderProductProps) => {
 
     useEffect(() => {
         getProductInfo(product);
-        console.log(product);
 
         const setChosenOptions = async () => {
             if (product.color_id) {
@@ -80,6 +79,15 @@ const OrderProduct = ({ product }: OrderProductProps) => {
             }
         };
 
+        const setImage = () => {
+            setCurrentPhoto(
+                product.product?.photos?.find((photo: any) => photo.is_main)
+                    ?.photo || ""
+            );
+        };
+
+        setImage();
+
         setChosenOptions();
     }, [product]);
 
@@ -88,7 +96,7 @@ const OrderProduct = ({ product }: OrderProductProps) => {
             <div className="checkout-product">
                 <img
                     className="checkout-product-cell"
-                    src={currentPhoto || ProductStaticImage}
+                    src={currentPhoto || noImage}
                     alt={`door-${currentProduct.price}-${currentProduct.id}`}
                 />
                 <div className="checkout-product-count checkout-product-cell">
