@@ -904,25 +904,25 @@ export const categoriesData: (MainCategory | Category)[] = [
                     height="17"
                     rx="2"
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                 />
                 <path
                     d="M9 9H15"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                 />
                 <path
                     d="M9 13H15"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                 />
                 <path
                     d="M9 17H13"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                 />
             </svg>
         ),
