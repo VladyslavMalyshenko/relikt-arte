@@ -112,7 +112,7 @@ async def update_user_from_admin(
     user_id: uuid.UUID,
     data: UserUpdateFromAdmin,
 ) -> UserShow:
-    return await UserService(uow).update_user_from_admin(user_id, data)
+    return await UserService(uow).update_user_from_admin(data, user_id)
 
 
 @router.get(
