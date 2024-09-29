@@ -32,7 +32,7 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
             password=obj_in.password,
             is_active=(
                 obj_in.is_active
-                if hasattr(obj_in, "is_active") or obj_in.as_admin
+                if any([hasattr(obj_in, "is_active"), obj_in.as_admin])
                 else False
             ),
             role=UserRole.ADMIN if obj_in.as_admin else UserRole.CUSTOMER,
