@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ProductStaticImage from "../assets/staticProductImage.webp";
+import noImage from "../assets/no_image.png";
 import "../styles/components/OrderItem.scss";
 import { generateUrl } from "../utils/generateUrl";
 
@@ -23,8 +23,6 @@ const OrderItem = ({ product }: OrderItemProps) => {
     const [withGlass, setWithGlass] = useState<boolean | string>(false);
 
     const getProductInfo = async (product: any) => {
-        console.log(product);
-
         setCurrentProduct(product.product);
         setProductQuantity(product.quantity);
         setTotalValue(product.total_price);
@@ -32,7 +30,6 @@ const OrderItem = ({ product }: OrderItemProps) => {
 
     useEffect(() => {
         getProductInfo(product);
-        console.log(product);
 
         const setChosenOptions = async () => {
             if (product.color_id) {
@@ -80,6 +77,15 @@ const OrderItem = ({ product }: OrderItemProps) => {
             }
         };
 
+        const setImage = () => {
+            setCurrentPhoto(
+                product.product?.photos?.find((photo: any) => photo.is_main)
+                    ?.photo || ""
+            );
+        };
+
+        setImage();
+
         setChosenOptions();
     }, [product]);
 
@@ -88,7 +94,7 @@ const OrderItem = ({ product }: OrderItemProps) => {
             <div className="checkout-product">
                 <img
                     className="checkout-product-cell"
-                    src={currentPhoto || ProductStaticImage}
+                    src={currentPhoto || noImage}
                     alt={`door-${currentProduct.price}-${currentProduct.id}`}
                 />
                 <div className="checkout-product-count checkout-product-cell">

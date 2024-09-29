@@ -27,6 +27,8 @@ const BuySectionProducts = () => {
     };
 
     useEffect(() => {
+        setProducts([]);
+
         if (currentPage < 1) {
             changePage(1);
         }
@@ -122,20 +124,28 @@ const BuySectionProducts = () => {
             {isLoaded ? (
                 <div className="buy-products">
                     <div className="buy-products-wrapper">
-                        {products &&
+                        {products.length > 0 ? (
                             products.map((product: ProductType, index) => (
                                 <DoorCard
                                     key={`product[${index}]`}
                                     product={product}
                                 />
-                            ))}
+                            ))
+                        ) : (
+                            <p className="black small">
+                                Ми не змогли найти товари зі встановленими
+                                параметрами ;(
+                            </p>
+                        )}
                     </div>
 
-                    <Pagination
-                        currentPage={currentPage}
-                        pages={availablePages}
-                        changePage={changePage}
-                    />
+                    {products.length > 0 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            pages={availablePages}
+                            changePage={changePage}
+                        />
+                    )}
                 </div>
             ) : (
                 <Loader />
