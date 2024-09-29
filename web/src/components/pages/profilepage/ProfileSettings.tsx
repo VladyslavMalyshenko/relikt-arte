@@ -3,6 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import "../../../styles/components/pages/profilepage/ProfileSection.scss";
 import { getProfile } from "../../../utils/handleUser";
+import Loader from "../../UI/Loader";
 import ProfileCategory from "../../UI/ProfileCategory";
 import ProfileSettingsWindow from "../../UI/ProfileSettingsWindow";
 
@@ -22,6 +23,7 @@ const ProfileSettings = () => {
 
     const [currentCategory, setCurrentCategory] = useState("профіль");
     const [profileInfo, setProfileInfo] = useState<any>({});
+    const [isLoading, setIsLoading] = useState(false);
     const currentWidth = useSelector(
         (state: any) => state.ScreenPropertiesReducer.width
     );
@@ -53,10 +55,12 @@ const ProfileSettings = () => {
 
     useEffect(() => {
         const setUpProfileInfo = async () => {
+            setIsLoading(true);
             const profileInfo = await getProfile();
 
             if (!profileInfo) return;
 
+            setIsLoading(false);
             setProfileInfo(profileInfo);
             setUpProfileInfoValues(profileInfo);
         };
@@ -100,35 +104,43 @@ const ProfileSettings = () => {
                     </svg>
                 </div>
             )}
-            <div className="profile-settings-sidebar" ref={sidebarRef}>
-                <p className="upper black pre-small">{profileInfo.full_name}</p>
+            {!isLoading ? (
+                <>
+                    <div className="profile-settings-sidebar" ref={sidebarRef}>
+                        <p className="upper black pre-small">
+                            {profileInfo.full_name}
+                        </p>
 
-                <div className="profile-settings-sidebar-categories">
-                    {categories &&
-                        categories.map((category, index) => (
-                            <ProfileCategory
-                                key={`category[${index}]`}
-                                category={category}
+                        <div className="profile-settings-sidebar-categories">
+                            {categories &&
+                                categories.map((category, index) => (
+                                    <ProfileCategory
+                                        key={`category[${index}]`}
+                                        category={category}
+                                        currentCategory={currentCategory}
+                                        set={() => setCurrentCategory(category)}
+                                        onClick={() => handleSidebar(true)}
+                                    />
+                                ))}
+                        </div>
+                    </div>
+                    <div className="profile-settings-main">
+                        <div className="profile-settings-main-category">
+                            <p className="upper black mid">{currentCategory}</p>
+                        </div>
+
+                        <FormProvider {...formController}>
+                            <ProfileSettingsWindow
                                 currentCategory={currentCategory}
-                                set={() => setCurrentCategory(category)}
-                                onClick={() => handleSidebar(true)}
+                                profileInfo={profileInfo}
+                                setProfileInfo={setProfileInfo}
                             />
-                        ))}
-                </div>
-            </div>
-            <div className="profile-settings-main">
-                <div className="profile-settings-main-category">
-                    <p className="upper black mid">{currentCategory}</p>
-                </div>
-
-                <FormProvider {...formController}>
-                    <ProfileSettingsWindow
-                        currentCategory={currentCategory}
-                        profileInfo={profileInfo}
-                        setProfileInfo={setProfileInfo}
-                    />
-                </FormProvider>
-            </div>
+                        </FormProvider>
+                    </div>
+                </>
+            ) : (
+                <Loader />
+            )}
         </div>
     );
 };

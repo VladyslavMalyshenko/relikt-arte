@@ -13,6 +13,7 @@ import { editItem } from "../utils/editItem";
 import { getItemWithNoDispatch } from "../utils/getItem";
 import { getItems } from "../utils/getItems";
 import Loader from "./Loader";
+import OrderItem from "./OrderItem";
 import ProductImageInput from "./ProductImageInput";
 
 const ActionModal = () => {
@@ -159,15 +160,23 @@ const ActionModal = () => {
 
         const initializeFields = async (): Promise<void> => {
             if (!category.main && action !== "" && action !== "delete") {
-                const lists = category.addItemFields.filter(
+                const lists = Array.from(
+                    new Set([
+                        ...category.inputFields,
+                        ...category.addItemFields,
+                    ])
+                ).filter(
                     (field: InputField) =>
                         (field.type === "list" ||
                             field.type === "list-radio") &&
-                        field.getUrl
+                        (field.getUrl || field.value)
                 );
 
                 for (const list of lists) {
-                    const options = await getItems(list.getUrl);
+                    const options = list.getUrl
+                        ? await getItems(list.getUrl)
+                        : list.value;
+
                     setSelectOptions((prev: any) => ({
                         ...prev,
                         [list.field_name || list.name]: [...options],
@@ -186,17 +195,24 @@ const ActionModal = () => {
                             const input = child.querySelector("input") as any;
 
                             if (input) {
-                                const id = +input
+                                const inputIdNumberValue = +input
                                     .parentNode!.id.split("[")[1]
                                     .split("]")[0];
+                                const value = !isNaN(inputIdNumberValue)
+                                    ? inputIdNumberValue
+                                    : input
+                                          .parentNode!.id.split("[")[1]
+                                          .split("]")[0];
+
                                 const isSingleValue =
                                     typeof item[fieldName] === "number";
-                                const isIdSelected = isSingleValue
+
+                                const isValueSelected = isSingleValue
                                     ? item[fieldName] !== undefined &&
                                       item[fieldName] !== null &&
-                                      item[fieldName] === id
+                                      item[fieldName] === value
                                     : getNestedValue(item, fieldName)?.includes(
-                                          id
+                                          value
                                       );
 
                                 setSelectedItems((prev: any) => {
@@ -205,11 +221,15 @@ const ActionModal = () => {
                                         updated[fieldName] = [];
                                     }
 
-                                    if (isIdSelected) {
+                                    if (isValueSelected) {
                                         if (isSingleValue) {
-                                            updated[fieldName] = id;
+                                            updated[fieldName] = value;
                                         } else {
-                                            updated[fieldName].push(id);
+                                            if (fieldName === "status") {
+                                                updated[fieldName] = value;
+                                            } else {
+                                                updated[fieldName].push(value);
+                                            }
                                         }
                                     } else {
                                         if (
@@ -219,13 +239,13 @@ const ActionModal = () => {
                                             updated[fieldName] = updated[
                                                 fieldName
                                             ].filter(
-                                                (objectId: any) =>
-                                                    objectId !== id
+                                                (objectValue: any) =>
+                                                    objectValue !== value
                                             );
                                         }
                                     }
 
-                                    input.checked = isIdSelected;
+                                    input.checked = isValueSelected;
                                     setValue(fieldName, updated[fieldName]);
                                     return updated;
                                 });
@@ -288,6 +308,8 @@ const ActionModal = () => {
                                     fieldObject.type === "list" ||
                                     fieldObject.type === "list-radio"
                                 ) {
+                                    console.log(fieldObject);
+
                                     await setCheckboxes(fieldObject);
                                 }
 
@@ -604,11 +626,14 @@ const ActionModal = () => {
 
         return (fieldObject.type === "list" ||
             fieldObject.type === "list-radio") &&
-            fieldObject.getUrl ? (
+            (fieldObject.getUrl || fieldObject.value) ? (
             <ul className="list-input" id={fieldName}>
                 {selectOptions[fieldName]?.length > 0 &&
                     selectOptions[fieldName].map((option: any) => (
-                        <li key={option.id} id={`${fieldName}[${option.id}]`}>
+                        <li
+                            key={option.id || option.value}
+                            id={`${fieldName}[${option.id || option.value}]`}
+                        >
                             <input
                                 name={fieldObject.field_name}
                                 type={
@@ -685,8 +710,9 @@ const ActionModal = () => {
                                                 updated[fieldName] = updated[
                                                     fieldName
                                                 ].filter(
-                                                    (id: any) =>
-                                                        id !== option.id
+                                                    (value: any) =>
+                                                        value !== option.id ||
+                                                        option.value
                                                 );
                                             }
                                         } else {
@@ -694,7 +720,8 @@ const ActionModal = () => {
                                                 updated[fieldName] = 0;
                                             }
                                             if (e.target.checked) {
-                                                updated[fieldName] = option.id;
+                                                updated[fieldName] =
+                                                    option.id || option.value;
                                             }
                                         }
 
@@ -709,6 +736,14 @@ const ActionModal = () => {
                         </li>
                     ))}
             </ul>
+        ) : fieldObject.type === "order-items" ? (
+            item?.items?.results.length > 0 ? (
+                item?.items?.results.map((item: any) => (
+                    <OrderItem product={item} />
+                ))
+            ) : (
+                <p>Сталася помилка. Ми не змогли завантажити товари ;(</p>
+            )
         ) : fieldObject.type === "multiple-field" ? (
             <>
                 {fields[fieldName]?.length > 0 &&
@@ -741,7 +776,10 @@ const ActionModal = () => {
                                         fieldName
                                     ].map((prevField: any) => {
                                         return prevField.id === field.id
-                                            ? { ...prevField, value: newValue }
+                                            ? {
+                                                  ...prevField,
+                                                  value: newValue,
+                                              }
                                             : prevField;
                                     });
 
@@ -1058,6 +1096,8 @@ const ActionModal = () => {
         const handleErrors = async () => {
             await trigger();
 
+            console.log(getValues());
+
             let invalidFieldsElements = [
                 ...category.addItemFields.map((field: InputField) => {
                     const fieldName = field.field_name || field.name;
@@ -1091,6 +1131,9 @@ const ActionModal = () => {
                     return;
                 }),
             ];
+
+            console.log(invalidFieldsElements);
+            console.log(errors);
 
             if (errors && Object.keys(errors).length > 0) {
                 invalidFieldsElements.push(
@@ -1216,6 +1259,8 @@ const ActionModal = () => {
                     ) => {
                         const cleanObj = { ...obj };
 
+                        console.log("CLEAN: ", cleanObj);
+
                         const handleProductPhotos = async () => {
                             if (originalItem?.photos) {
                                 const photos = productImages.map(
@@ -1331,6 +1376,11 @@ const ActionModal = () => {
                                         `label[for="${fullPath}"]`
                                     ) as any;
 
+                                    console.log(
+                                        fullPath,
+                                        isFieldInCategory(fullPath)
+                                    );
+
                                     if (
                                         !isFieldInCategory(fullPath) ||
                                         (value === originalItem?.[fullPath] &&
@@ -1393,7 +1443,12 @@ const ActionModal = () => {
 
                     const newItem = await prepareItem(
                         data,
-                        category.addItemFields,
+                        Array.from(
+                            new Set([
+                                ...category.addItemFields,
+                                ...category.inputFields,
+                            ])
+                        ),
                         item
                     );
 
@@ -1604,28 +1659,31 @@ const ActionModal = () => {
                         }
                     );
 
-                    await addItem(
-                        category.addUrl,
-                        newItem,
-                        null,
-                        async (data: any) => {
-                            const fieldObject = category.inputFields.find(
-                                (field: any) => field.type === "product-image"
-                            );
-
-                            if (fieldObject) {
-                                const newItem = await addItem(
-                                    fieldObject.postUrl as string,
-                                    addImagesFormDataRef.current,
-                                    { id: data.id }
+                    if (category.addUrl) {
+                        await addItem(
+                            category.addUrl,
+                            newItem,
+                            null,
+                            async (data: any) => {
+                                const fieldObject = category.inputFields.find(
+                                    (field: any) =>
+                                        field.type === "product-image"
                                 );
 
-                                if (newItem) {
-                                    closeProductPhotoAddWindow();
+                                if (fieldObject) {
+                                    const newItem = await addItem(
+                                        fieldObject.postUrl as string,
+                                        addImagesFormDataRef.current,
+                                        { id: data.id }
+                                    );
+
+                                    if (newItem) {
+                                        closeProductPhotoAddWindow();
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
             }
         };

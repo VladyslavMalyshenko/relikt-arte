@@ -354,7 +354,7 @@ const Content = () => {
                     <p className="category-title">
                         {category.label}
 
-                        {!category.main && (
+                        {!category.main && category.addUrl && (
                             <button
                                 className="add-item"
                                 onClick={() => {

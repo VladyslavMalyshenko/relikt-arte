@@ -19,6 +19,7 @@ export type InputField = {
     postUrl?: string;
     updateUrl?: string;
     required?: boolean;
+    value?: any;
     locked?: boolean;
 };
 
@@ -26,7 +27,7 @@ export type Category = {
     icon: JSX.Element;
     label: string;
     link: string;
-    addUrl: string;
+    addUrl?: string;
     getUrl: string;
     editUrl: string;
     deleteUrl: string;

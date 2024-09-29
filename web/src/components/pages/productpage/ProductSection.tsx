@@ -108,6 +108,22 @@ const ProductSection = () => {
         setCurrentValues(getValues());
     };
 
+    const handleData = (data: any) => {
+        if (product) {
+            data.product_id = product.id;
+
+            if (
+                data?.with_glass !== undefined &&
+                !data.with_glass &&
+                data?.glass_color_id
+            ) {
+                delete data.glass_color_id;
+            }
+
+            console.log(data);
+        }
+    };
+
     return (
         <div className="product-section">
             <Path
@@ -157,7 +173,7 @@ const ProductSection = () => {
                                         borderless={false}
                                         additionalClasses={["upper"]}
                                         onClickCallback={handleSubmit(
-                                            (data: any) => console.log(data)
+                                            handleData
                                         )}
                                     >
                                         <svg

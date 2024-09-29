@@ -64,13 +64,44 @@ const DropDown = ({
         const fetchOptions = async () => {
             let newOptions: DropDownOption[] = [];
 
-            if (Array.isArray(options)) {
-                newOptions = options;
-            } else if (options?.url && options?.labelKey) {
-                const fetchedItems = await getItems(options.url);
+            if (
+                Array.isArray(
+                    (options as DropDownAsyncOption)?.value || options
+                )
+            ) {
+                if (
+                    (options as any)?.value &&
+                    (options as DropDownAsyncOption).labelKey &&
+                    (options as any)?.value.some(
+                        (item: any) =>
+                            item[(options as DropDownAsyncOption).labelKey]
+                    )
+                ) {
+                    const value = (options as DropDownAsyncOption).value;
+                    const labelKey = (options as DropDownAsyncOption).labelKey;
+
+                    newOptions = value.map((item: any) => ({
+                        name: item[labelKey],
+                        value: item.id,
+                        key: `${item[labelKey]}-${item.id}`,
+                    }));
+                } else {
+                    const value = options as any[];
+                    if (value.every((item: any) => item.key)) {
+                        newOptions = value;
+                    } else {
+                        newOptions = value.map((item: any) => ({
+                            ...item,
+                            key: `${item.name}-${item.value}`,
+                        }));
+                        console.log("H: ", newOptions);
+                    }
+                }
+            } else if ((options as any)?.url && (options as any)?.labelKey) {
+                const fetchedItems = await getItems((options as any)?.url);
                 newOptions = fetchedItems.map((item: any) => ({
-                    name: item[options.labelKey],
-                    key: `${item[options.labelKey]}-${item.id}`,
+                    name: item[(options as any)?.labelKey],
+                    key: `${item[(options as any)?.labelKey]}-${item.id}`,
                     value: item.id,
                 }));
             }
@@ -78,12 +109,14 @@ const DropDown = ({
             setCurrentOptions(newOptions);
             setFilteredOptions(newOptions);
 
-            if (defaultValue) {
-                const defaultOption = newOptions.find(
-                    (opt: any) =>
-                        opt[defaultValue.defaultFieldName] ===
-                        defaultValue.defaultValue
-                );
+            if (!selectedOption) {
+                const defaultOption = defaultValue
+                    ? newOptions.find(
+                          (opt: any) =>
+                              opt[defaultValue.defaultFieldName] ===
+                              defaultValue.defaultValue
+                      )
+                    : newOptions[0];
 
                 if (defaultOption) {
                     handleOptionSelect(
@@ -96,7 +129,7 @@ const DropDown = ({
         };
 
         fetchOptions();
-    }, [options, defaultValue]); // Ensure defaultValue is a dependency
+    }, [options, defaultValue]);
 
     useEffect(() => {
         const lowerCasedPrompt = searchPrompt.toLowerCase();
