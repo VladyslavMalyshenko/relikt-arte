@@ -19,6 +19,7 @@ from .enums import AuthTokenType
 class BaseUserCreate(BaseModel):
     email: EmailStr
     as_admin: Optional[bool] = False
+    is_active: Optional[bool] = False
     phone: str
     password: str
 
