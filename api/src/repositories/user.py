@@ -37,6 +37,13 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
             ),
             role=UserRole.ADMIN if obj_in.as_admin else UserRole.CUSTOMER,
         )
+        if hasattr(obj_in, "is_active") and obj_in.is_active:
+            user.is_active = True
+        else:
+            if obj_in.as_admin:
+                user.is_active = True
+            else:
+                user.is_active = False
         return user
 
     async def exists_by_email(self, email: str) -> bool:
