@@ -30,20 +30,9 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             phone=obj_in.phone,
             password=obj_in.password,
-            is_active=(
-                obj_in.is_active
-                if any([hasattr(obj_in, "is_active"), obj_in.as_admin])
-                else False
-            ),
+            is_active=obj_in.is_active,
             role=UserRole.ADMIN if obj_in.as_admin else UserRole.CUSTOMER,
         )
-        if hasattr(obj_in, "is_active") and obj_in.is_active:
-            user.is_active = True
-        else:
-            if obj_in.as_admin:
-                user.is_active = True
-            else:
-                user.is_active = False
         return user
 
     async def exists_by_email(self, email: str) -> bool:
