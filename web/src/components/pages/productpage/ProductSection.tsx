@@ -34,11 +34,13 @@ const ProductSection = () => {
     useEffect(() => {
         const getCurrentProduct = async () => {
             try {
-                const newProduct = await getItem("api/v1/product/$id", {
-                    id: product_id,
-                });
+                if (!product) {
+                    const newProduct = await getItem("api/v1/product/$id", {
+                        id: product_id,
+                    });
 
-                setProduct(newProduct);
+                    setProduct(newProduct);
+                }
             } catch {
                 navigate(paths.buy);
             }
@@ -52,30 +54,33 @@ const ProductSection = () => {
 
         const getAllowedSizes = async () => {
             if (product && product?.category_id !== null) {
-                let currentSizes: any = [];
+                if (allowedSizes.length < 1) {
+                    let currentSizes: any = [];
 
-                const currentCategory = await getItem(
-                    `api/v1/product/category/${product.category_id}/`
-                );
+                    const currentCategory = await getItem(
+                        `api/v1/product/category/${product.category_id}/`
+                    );
 
-                const allowedSizes = currentCategory.allowed_sizes;
+                    const currentAllowedSizes = currentCategory.allowed_sizes;
 
-                if (allowedSizes && allowedSizes.length > 0) {
-                    for (const sizeId of allowedSizes) {
-                        const sizeObject = await getItem(
-                            "api/v1/product/size/$id",
-                            {
-                                id: sizeId,
+                    if (currentAllowedSizes && currentAllowedSizes.length > 0) {
+                        for (const sizeId of currentAllowedSizes) {
+                            const sizeObject = await getItem(
+                                "api/v1/product/size/$id",
+                                {
+                                    id: sizeId,
+                                }
+                            );
+
+                            if (sizeObject) {
+                                currentSizes.push(sizeObject);
                             }
-                        );
-
-                        if (sizeObject) {
-                            currentSizes.push(sizeObject);
                         }
                     }
+
+                    setAllowedSizes(currentSizes);
                 }
 
-                setAllowedSizes(currentSizes);
                 setIsLoaded(true);
             }
         };

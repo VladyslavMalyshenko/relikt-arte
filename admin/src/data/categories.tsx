@@ -934,21 +934,16 @@ export const categoriesData: (MainCategory | Category)[] = [
         getItemUrl: "/api/v1/order/$id/",
         filters: [
             {
-                name: "Чи адмнін",
-                field: "is_admin",
+                name: "Статус замовлення",
+                field: "status",
                 type: "radio",
                 choices: [
-                    { name: "Так", value: true },
-                    { name: "Ні", value: false },
-                ],
-            },
-            {
-                name: "Чи активний",
-                field: "is_active",
-                type: "radio",
-                choices: [
-                    { name: "Так", value: true },
-                    { name: "Ні", value: false },
+                    { name: "Щойно створений", value: "new" },
+                    { name: "Прийнятий", value: "accepted" },
+                    {
+                        name: "Готовий до відправки",
+                        value: "ready_for_shipment",
+                    },
                 ],
             },
         ],

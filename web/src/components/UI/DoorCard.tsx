@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import noImage from "../../assets/no_image.png";
@@ -11,12 +11,14 @@ import {
 import { getItems } from "../../utils/getItems";
 import { addCartItem } from "../../utils/handleCart";
 import Button from "./Button";
+import { SavedObjectsContext } from "./BuySectionProducts";
 
 type DoorCardProps = {
     product: ProductType;
 };
 
 const DoorCard = ({ product }: DoorCardProps) => {
+    const savedObjects = useContext(SavedObjectsContext);
     const navigate = useNavigate();
     const [tags, setTags] = useState<any>([]);
     const [values, setValues] = useState<any>([]);
@@ -28,8 +30,8 @@ const DoorCard = ({ product }: DoorCardProps) => {
         setTags([]);
 
         const setUpTags = async () => {
-            const newTags = [];
-            const newValues = [];
+            const newTags: any = [];
+            const newValues: any = [];
 
             if (product.have_glass) {
                 newTags.push({
@@ -59,30 +61,72 @@ const DoorCard = ({ product }: DoorCardProps) => {
                 });
             }
 
-            if (product.category_id) {
-                const categoryObject = await getItems(
-                    `api/v1/product/category/${product.category_id}`
-                );
+            async function processProductCategory() {
+                if (product.category_id) {
+                    let categoryObject;
 
-                const categoryAllowedSize = categoryObject.allowed_sizes[0];
+                    const currentCategoryInSavedObjects =
+                        savedObjects?.categories?.find(
+                            (category: any) =>
+                                category.id === product.category_id
+                        );
 
-                if (categoryAllowedSize) {
-                    const sizeObject = await getItems(
-                        `api/v1/product/size/${categoryAllowedSize}`
-                    );
+                    if (!currentCategoryInSavedObjects) {
+                        categoryObject = await getItems(
+                            `/api/v1/product/category/${product.category_id}`
+                        );
 
-                    newTags.push({
-                        name: sizeObject.dimensions,
-                        field: "size_id",
-                        value: sizeObject.id,
-                    });
+                        if (!savedObjects?.categories)
+                            savedObjects.categories = [];
 
-                    newValues.push({
-                        field: "size_id",
-                        value: sizeObject.id,
-                    });
+                        savedObjects.categories.push(categoryObject);
+                    } else {
+                        categoryObject = currentCategoryInSavedObjects;
+                    }
+
+                    const categoryAllowedSize = categoryObject.allowed_sizes[0];
+
+                    if (categoryAllowedSize) {
+                        const savedObjectSize = savedObjects?.sizes?.find(
+                            (size: any) => size.id === categoryAllowedSize
+                        );
+
+                        if (savedObjectSize) {
+                            newTags.push({
+                                name: savedObjectSize.dimensions,
+                                field: "size_id",
+                                value: savedObjectSize.id,
+                            });
+
+                            newValues.push({
+                                field: "size_id",
+                                value: savedObjectSize.id,
+                            });
+                        } else {
+                            const sizeObject = await getItems(
+                                `/api/v1/product/size/${categoryAllowedSize}`
+                            );
+
+                            newTags.push({
+                                name: sizeObject.dimensions,
+                                field: "size_id",
+                                value: sizeObject.id,
+                            });
+
+                            newValues.push({
+                                field: "size_id",
+                                value: sizeObject.id,
+                            });
+
+                            if (!savedObjects?.sizes) savedObjects.sizes = [];
+
+                            savedObjects.sizes.push(sizeObject);
+                        }
+                    }
                 }
             }
+
+            await processProductCategory();
 
             if (product.id !== null) {
                 newValues.push({
@@ -105,16 +149,29 @@ const DoorCard = ({ product }: DoorCardProps) => {
                 });
             }
 
-            const color = await getItems(
-                "/api/v1/product/related/product_color/list/?page=1&size=1"
-            );
+            const processColor = async () => {
+                if (savedObjects?.color) {
+                    newValues.push({
+                        field: "color_id",
+                        value: savedObjects.color.id,
+                    });
+                } else {
+                    const color = await getItems(
+                        "/api/v1/product/related/product_color/list/?page=1&size=1"
+                    );
 
-            if (color.length > 0) {
-                newValues.push({
-                    field: "color_id",
-                    value: color[0].id,
-                });
-            }
+                    if (color.length > 0 && color[0]) {
+                        savedObjects.color = color[0];
+
+                        newValues.push({
+                            field: "color_id",
+                            value: savedObjects.color.id,
+                        });
+                    }
+                }
+            };
+
+            await processColor();
 
             setTags(newTags);
             setValues(newValues);

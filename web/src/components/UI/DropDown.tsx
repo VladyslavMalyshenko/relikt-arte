@@ -59,8 +59,6 @@ const DropDown = ({
     };
 
     useEffect(() => {
-        console.log(options);
-
         const fetchOptions = async () => {
             let newOptions: DropDownOption[] = [];
 
@@ -98,12 +96,16 @@ const DropDown = ({
                     }
                 }
             } else if ((options as any)?.url && (options as any)?.labelKey) {
-                const fetchedItems = await getItems((options as any)?.url);
-                newOptions = fetchedItems.map((item: any) => ({
-                    name: item[(options as any)?.labelKey],
-                    key: `${item[(options as any)?.labelKey]}-${item.id}`,
-                    value: item.id,
-                }));
+                if (currentOptions.length < 1) {
+                    const fetchedItems = await getItems((options as any)?.url);
+                    newOptions = fetchedItems.map((item: any) => ({
+                        name: item[(options as any)?.labelKey],
+                        key: `${item[(options as any)?.labelKey]}-${item.id}`,
+                        value: item.id,
+                    }));
+                } else {
+                    newOptions = currentOptions;
+                }
             }
 
             setCurrentOptions(newOptions);
