@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EQUALS, VALUE_IN } from "../../data/operations";
 import { SetIsLoaded } from "../../redux/actions/LoadActions";
@@ -10,6 +10,8 @@ import DoorCard from "./DoorCard";
 import Loader from "./Loader";
 import Pagination from "./Pagination";
 
+export const SavedObjectsContext = createContext<any>({});
+
 const BuySectionProducts = () => {
     const currentPage = useSelector(
         (state: any) => state.PageReducer.currentPage
@@ -18,7 +20,8 @@ const BuySectionProducts = () => {
         (state: any) => state.PageReducer.availablePages
     );
     const isLoaded = useSelector((state: any) => state.LoadReducer.isLoaded);
-    const [products, setProducts] = useState<ProductType[]>([]);
+    const [products, setProducts] = useState<ProductType[] | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const filters = useSelector((state: any) => state.FiltersReducer.filters);
     const dispatch = useDispatch();
 
@@ -100,20 +103,24 @@ const BuySectionProducts = () => {
                 return newFilters.filter((item: any) => item);
             };
 
-            let readyFilters = filtersProcessor(filters);
+            if (!isLoading && !products) {
+                setIsLoading(true);
 
-            if (readyFilters && readyFilters.length < 1) {
-                readyFilters = undefined;
+                let readyFilters = filtersProcessor(filters);
+
+                if (readyFilters && readyFilters.length < 1) {
+                    readyFilters = undefined;
+                }
+
+                const newProducts = await getItems(
+                    `/api/v1/product/list`,
+                    readyFilters,
+                    true
+                ).finally(() => setIsLoading(false));
+
+                dispatch(SetIsLoaded(true));
+                setProducts(newProducts || []);
             }
-
-            const newProducts = await getItems(
-                `/api/v1/product/list`,
-                readyFilters,
-                true
-            );
-
-            dispatch(SetIsLoaded(true));
-            setProducts(newProducts || []);
         };
 
         getProducts();
@@ -124,12 +131,16 @@ const BuySectionProducts = () => {
             {isLoaded ? (
                 <div className="buy-products">
                     <div className="buy-products-wrapper">
-                        {products.length > 0 ? (
+                        {Array.isArray(products) && products.length > 0 ? (
                             products.map((product: ProductType, index) => (
-                                <DoorCard
-                                    key={`product[${index}]`}
-                                    product={product}
-                                />
+                                <SavedObjectsContext.Provider
+                                    value={SavedObjectsContext}
+                                >
+                                    <DoorCard
+                                        key={`product[${index}]`}
+                                        product={product}
+                                    />
+                                </SavedObjectsContext.Provider>
                             ))
                         ) : (
                             <p className="black small">
@@ -139,7 +150,7 @@ const BuySectionProducts = () => {
                         )}
                     </div>
 
-                    {products.length > 0 && (
+                    {Array.isArray(products) && products.length > 0 && (
                         <Pagination
                             currentPage={currentPage}
                             pages={availablePages}
