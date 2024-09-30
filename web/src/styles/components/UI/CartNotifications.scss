@@ -21,12 +21,14 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
-    background: var(--background-color);
+    background: var(--white);
     border: 1px solid rgba(72, 48, 24, 0.04);
+    color: var(--black);
     right: -110%;
     box-sizing: border-box;
     padding: 0 0 0 50px;
     border-radius: 6px;
+    flex-shrink: 0;
     animation: notificationAppear forwards;
 
     svg {
@@ -50,5 +52,25 @@
     }
     100% {
         transform: translateX(0);
+    }
+}
+
+@media (max-width: 560px) {
+    .notifications {
+        width: 95%;
+        height: 80px;
+        max-width: unset;
+        align-items: unset;
+        top: auto;
+        bottom: 0;
+        left: 50%;
+        right: unset;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transform: translateX(-50%);
+    }
+
+    .notification {
+        width: 100%;
     }
 }

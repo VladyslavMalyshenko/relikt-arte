@@ -131,23 +131,23 @@ const BuySectionProducts = () => {
             {isLoaded ? (
                 <div className="buy-products">
                     <div className="buy-products-wrapper">
-                        {Array.isArray(products) && products.length > 0 ? (
-                            products.map((product: ProductType, index) => (
-                                <SavedObjectsContext.Provider
-                                    value={SavedObjectsContext}
-                                >
+                        <SavedObjectsContext.Provider
+                            value={SavedObjectsContext}
+                        >
+                            {Array.isArray(products) && products.length > 0 ? (
+                                products.map((product: ProductType, index) => (
                                     <DoorCard
                                         key={`product[${index}]`}
                                         product={product}
                                     />
-                                </SavedObjectsContext.Provider>
-                            ))
-                        ) : (
-                            <p className="black small">
-                                Ми не змогли найти товари зі встановленими
-                                параметрами ;(
-                            </p>
-                        )}
+                                ))
+                            ) : (
+                                <p className="black small">
+                                    Ми не змогли найти товари зі встановленими
+                                    параметрами ;(
+                                </p>
+                            )}
+                        </SavedObjectsContext.Provider>
                     </div>
 
                     {Array.isArray(products) && products.length > 0 && (

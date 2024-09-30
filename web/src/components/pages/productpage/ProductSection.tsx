@@ -10,6 +10,7 @@ import {
     ProductType,
 } from "../../../types/productsRelatedTypes";
 import { getItem } from "../../../utils/getItem";
+import { addCartItem } from "../../../utils/handleCart";
 import Button from "../../UI/Button";
 import DropDown from "../../UI/DropDown";
 import Loader from "../../UI/Loader";
@@ -113,7 +114,7 @@ const ProductSection = () => {
         setCurrentValues(getValues());
     };
 
-    const handleData = (data: any) => {
+    const handleData = async (data: any) => {
         if (product) {
             data.product_id = product.id;
 
@@ -125,7 +126,7 @@ const ProductSection = () => {
                 delete data.glass_color_id;
             }
 
-            console.log(data);
+            await addCartItem(data);
         }
     };
 

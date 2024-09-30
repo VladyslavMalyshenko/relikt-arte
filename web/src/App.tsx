@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import CartNotifications from "./components/UI/CartNotifications";
 import { SetIsLoaded } from "./redux/actions/LoadActions";
 import { SetDimensions } from "./redux/actions/ScreenPropertiesActions";
 import { paths } from "./router/paths";
@@ -68,6 +69,7 @@ const App = () => {
             <Navbar />
             <Router />
             <Footer />
+            <CartNotifications />
         </div>
     );
 };

@@ -1,4 +1,6 @@
 import axios from "axios";
+import { AddNotification } from "../redux/actions/CartActions";
+import { RootStore } from "../redux/Stores/RootStore";
 import { generateUrl } from "./generateUrl";
 import { getAccessToken, validateToken } from "./tokenUtils";
 
@@ -82,7 +84,24 @@ export const addCartItem = async (item: any) => {
 
     const response: any = await axios
         .post(generateUrl(url), { ...item }, { headers })
-        .then((res) => res.data);
+        .then((res) => {
+            const success = {
+                message: `Предмет був доданий до кошику!`,
+                type: "success",
+            };
+
+            RootStore.dispatch(AddNotification(success));
+
+            return res.data;
+        })
+        .catch(() => {
+            const error = {
+                message: `Не вдалося додати предмет до кошику ;(`,
+                type: "error",
+            };
+
+            RootStore.dispatch(AddNotification(error));
+        });
 
     return response.items;
 };
