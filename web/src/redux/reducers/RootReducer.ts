@@ -1,5 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { AuthReducer } from "./AuthReducer";
+import { CartReducer } from "./CartReducer";
 import { FiltersReducer } from "./FiltersReducer";
 import { LoadReducer } from "./LoadReducer";
 import { PageReducer } from "./PageReducer";
@@ -11,4 +12,5 @@ export const RootReducer = combineReducers({
     PageReducer,
     LoadReducer,
     FiltersReducer,
+    CartReducer,
 });
