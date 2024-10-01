@@ -70,6 +70,7 @@ class AuthTokenService(BaseService):
             token=obj.token,
             token_type=obj.token_type,
             owner_email=obj.owner_email,
+            owner_new_email=obj.owner_new_email,
             expires_at=obj.expires_at,
             created_at=obj.created_at,
             updated_at=obj.updated_at,
