@@ -269,7 +269,7 @@ const ProfileSettingsWindow = ({
                         additionalClasses={["upper"]}
                         onClickCallback={handleSubmit(handleData)}
                     >
-                        змініти
+                        змінити
                     </Button>
                 </>
             )}
@@ -327,7 +327,7 @@ const ProfileSettingsWindow = ({
                         additionalClasses={["upper"]}
                         onClickCallback={handleSubmit(handleData)}
                     >
-                        змініти
+                        змінити
                     </Button>
                 </>
             )}
@@ -481,7 +481,7 @@ const ProfileSettingsWindow = ({
                     ))
                 )
             ) : (
-                <p>Ви поки що нічого не замовляли ;(</p>
+                <p className="black small">Ви поки що нічого не замовляли ;(</p>
             )}
         </div>
     );

@@ -1,10 +1,10 @@
-import RegisterConformationSection from "../components/pages/registerconformationpage/RegisterConformationSection";
+import EmailChangeConfirmationSection from "../components/pages/emailchangeconfirmationpage/EmailChangeConfirmationSection";
 import "../styles/pages/Page.scss";
 
 const EmailChangeConfirmationPage = () => {
     return (
         <div className="page bottom centered">
-            <RegisterConformationSection />
+            <EmailChangeConfirmationSection />
         </div>
     );
 };
