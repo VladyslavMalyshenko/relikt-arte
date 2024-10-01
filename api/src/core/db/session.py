@@ -13,8 +13,8 @@ def get_async_engine() -> AsyncEngine:
         echo=True if settings.debug else False,
         future=True,
         pool_pre_ping=True,
-        pool_size=100,
-        max_overflow=15,
+        pool_size=1000,
+        max_overflow=150,
     )
 
 
