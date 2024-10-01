@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../router/paths";
+import "../../styles/components/UI/OrderHistory.scss";
 import {
     changeEmail,
     changeMainInfo,
     changePassword,
+    getUserOrders,
 } from "../../utils/handleUser";
 import Button from "./Button";
 import Input from "./Input";
@@ -25,6 +28,7 @@ const ProfileSettingsWindow = ({
     const navigate = useNavigate();
     const [successMessage, setSuccessMessage] = useState("");
     const [previousValues, setPreviousValues] = useState<any>({});
+    const [orders, setOrders] = useState<any[] | undefined>(undefined);
     const {
         watch,
         handleSubmit,
@@ -35,6 +39,10 @@ const ProfileSettingsWindow = ({
         clearErrors,
         formState: { errors },
     } = useFormContext();
+
+    const currentWidth = useSelector(
+        (state: any) => state.ScreenPropertiesReducer.width
+    );
 
     const setPreviousValue = (key: string, value: any) => {
         setPreviousValues((prev: any) => ({ ...prev, [key]: value }));
@@ -53,6 +61,20 @@ const ProfileSettingsWindow = ({
 
         setProfileInfo((prev: any) => ({ ...prev, ...changedValuesObject }));
     };
+
+    useEffect(() => {
+        const setUpOrders = async () => {
+            if (orders) return;
+
+            const newOrders = await getUserOrders();
+
+            if (newOrders) {
+                setOrders(newOrders);
+            }
+        };
+
+        setUpOrders();
+    }, []);
 
     useEffect(() => {
         setSuccessMessage("");
@@ -96,7 +118,7 @@ const ProfileSettingsWindow = ({
                     clearErrors("new_email");
                     setValue("new_email", "");
                     setSuccessMessage(
-                        `На ${profileInfo.email} було надіслано повідомлення для підтвердження зміни відповідної адреси на ${data.new_email}.`
+                        `На Вашу нову поштову скриньку - ${data.new_email}, було надіслано повідомлення для підтвердження зміни відповідної пошти.`
                     );
                 } else if (currentEmail?.error || currentEmail.new_email) {
                     setError("new_email", {
@@ -172,7 +194,11 @@ const ProfileSettingsWindow = ({
     };
 
     return (
-        <div className="profile-settings-main-content">
+        <div
+            className={`profile-settings-main-content${
+                currentCategory === "історія замовлень" ? " no-limit" : ""
+            }`}
+        >
             {currentCategory === "профіль" && (
                 <>
                     <Input
@@ -341,6 +367,121 @@ const ProfileSettingsWindow = ({
                         видалити
                     </Button>
                 </>
+            )}
+
+            {currentCategory === "історія замовлень" &&
+            orders &&
+            orders?.length > 0 ? (
+                currentWidth > 875 ? (
+                    <>
+                        <div className="order black small">
+                            <span className=" cell">№</span>
+                            <span className=" cell">Замовник</span>
+                            <span className=" cell">Адреса</span>
+                            <span className="cell">Ціна</span>
+                            <span className="cell">Статус</span>
+                            <span className="cell"> </span>
+                        </div>
+
+                        {orders.map((order: any) => (
+                            <div className="order black small">
+                                <span className="cell">{order.id}</span>
+                                <span className="cell">{order.full_name}</span>
+                                <span className="cell">
+                                    {order.region}, {order.city_or_settlement}
+                                </span>
+                                <span className="cell">
+                                    {order.total_value} ₴
+                                </span>
+                                <span className="cell">
+                                    {order.status === "new"
+                                        ? "Очікує обробки"
+                                        : order.status === "accepted"
+                                        ? "В обробці"
+                                        : "Готовий до відправки"}
+                                    <span
+                                        className="status"
+                                        style={{
+                                            backgroundColor:
+                                                order.status === "new"
+                                                    ? "var(--red)"
+                                                    : order.status ===
+                                                      "ready_for_shipment"
+                                                    ? "var(--green)"
+                                                    : "var(--yellow)",
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="cell">
+                                    <Button
+                                        text="Детальна інформація"
+                                        colorScheme="grey"
+                                        onClickCallback={() => {
+                                            navigate(
+                                                paths.order.replace(
+                                                    ":order_id",
+                                                    order.id
+                                                )
+                                            );
+                                        }}
+                                    />
+                                </span>
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    orders.map((order: any) => (
+                        <div className="order black small">
+                            <span className="cell">№ {order.id}</span>
+                            <span className="cell">
+                                Замовник: {order.full_name}
+                            </span>
+                            <span className="cell">
+                                Адреса: {order.region},{" "}
+                                {order.city_or_settlement}
+                            </span>
+                            <span className="cell">
+                                Ціна: {order.total_value} ₴
+                            </span>
+                            <span className="cell">
+                                Статус:{" "}
+                                {order.status === "new"
+                                    ? "Очікує обробки"
+                                    : order.status === "accepted"
+                                    ? "В обробці"
+                                    : "Готовий до відправки"}
+                                <span
+                                    className="status"
+                                    style={{
+                                        backgroundColor:
+                                            order.status === "new"
+                                                ? "var(--red)"
+                                                : order.status ===
+                                                  "ready_for_shipment"
+                                                ? "var(--green)"
+                                                : "var(--yellow)",
+                                    }}
+                                ></span>
+                            </span>
+                            <span className="cell">
+                                <Button
+                                    text="Детальна інформація"
+                                    colorScheme="grey"
+                                    onClickCallback={() => {
+                                        navigate(
+                                            paths.order.replace(
+                                                ":order_id",
+                                                order.id
+                                            )
+                                        );
+                                    }}
+                                />
+                            </span>
+                        </div>
+                    ))
+                )
+            ) : (
+                <p>Ви поки що нічого не замовляли ;(</p>
             )}
         </div>
     );

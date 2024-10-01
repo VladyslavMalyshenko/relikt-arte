@@ -497,6 +497,26 @@ const Content = () => {
                                                                             ? fieldObject
                                                                             : fieldObject.field;
 
+                                                                    const valueNames =
+                                                                        (
+                                                                            fieldObject as any
+                                                                        )
+                                                                            ?.valueNames;
+
+                                                                    const displayedValue =
+                                                                        valueNames
+                                                                            ? valueNames[
+                                                                                  product[
+                                                                                      fieldName
+                                                                                  ]
+                                                                              ] ||
+                                                                              product[
+                                                                                  fieldName
+                                                                              ]
+                                                                            : product[
+                                                                                  fieldName
+                                                                              ];
+
                                                                     return (
                                                                         <td
                                                                             key={
@@ -519,9 +539,7 @@ const Content = () => {
                                                                                     }
                                                                                 />
                                                                             ) : (
-                                                                                product[
-                                                                                    fieldName
-                                                                                ]
+                                                                                displayedValue
                                                                             )}
                                                                         </td>
                                                                     );

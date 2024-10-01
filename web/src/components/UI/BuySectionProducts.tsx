@@ -31,6 +31,7 @@ const BuySectionProducts = () => {
 
     useEffect(() => {
         setProducts([]);
+        const controller = new AbortController();
 
         if (currentPage < 1) {
             changePage(1);
@@ -103,27 +104,36 @@ const BuySectionProducts = () => {
                 return newFilters.filter((item: any) => item);
             };
 
-            if (!isLoading && !products) {
-                setIsLoading(true);
+            let readyFilters = filtersProcessor(filters);
 
-                let readyFilters = filtersProcessor(filters);
+            if (readyFilters && readyFilters.length < 1) {
+                readyFilters = undefined;
+            }
 
-                if (readyFilters && readyFilters.length < 1) {
-                    readyFilters = undefined;
+            const newProducts = await getItems(
+                `/api/v1/product/list`,
+                readyFilters,
+                true,
+                {
+                    signal: controller.signal,
                 }
+            );
 
-                const newProducts = await getItems(
-                    `/api/v1/product/list`,
-                    readyFilters,
-                    true
-                ).finally(() => setIsLoading(false));
-
+            if (!controller.signal.aborted) {
                 dispatch(SetIsLoaded(true));
                 setProducts(newProducts || []);
             }
         };
 
-        getProducts();
+        const debounceTimeout = setTimeout(() => {
+            getProducts();
+        }, 750);
+
+        return () => {
+            dispatch(SetIsLoaded(false));
+            clearTimeout(debounceTimeout);
+            controller.abort();
+        };
     }, [currentPage, filters]);
 
     return (
@@ -159,7 +169,7 @@ const BuySectionProducts = () => {
                     )}
                 </div>
             ) : (
-                <Loader />
+                <Loader style={{ width: "100%", textAlign: "center" }} />
             )}
         </>
     );

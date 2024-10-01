@@ -49,28 +49,23 @@ const CheckoutProduct = ({
             return;
         }
 
-        const setNewQuantity = async () => {
-            if (previousQuantity === productQuantity) return;
-
-            if (productQuantity < 1) {
-                setProductQuantity(1);
-                setPreviousQuantity(1);
+        const setNewQuantity = () => {
+            if (previousQuantity === productQuantity || productQuantity <= 1)
                 return;
-            }
 
             setPreviousQuantity(productQuantity);
         };
 
         const delayDebounceFn = setTimeout(async () => {
-            await setNewQuantity();
+            setNewQuantity();
 
             await changeCartItem(product.id, {
                 quantity: productQuantity,
-            }).then(async () => {
+            }).then(async (res) => {
                 setTotalValue(currentPrice * productQuantity);
 
                 if (onQuantityChange) {
-                    await onQuantityChange();
+                    await onQuantityChange(res);
                 }
             });
         }, 1000);
@@ -153,7 +148,11 @@ const CheckoutProduct = ({
                 <div className="checkout-product-count checkout-product-cell">
                     <div
                         className="buy-products-pagination-button"
-                        onClick={() => setProductQuantity((prev) => prev - 1)}
+                        onClick={() =>
+                            setProductQuantity((prev) =>
+                                prev > 1 ? prev - 1 : prev
+                            )
+                        }
                     >
                         -
                     </div>

@@ -1,6 +1,10 @@
 import "../../styles/components/UI/Loader.scss";
 
-const Loader = () => {
-    return <p className="loader">Завантаження...</p>;
+const Loader = (style?: any) => {
+    return (
+        <p className="loader" style={style?.style || style}>
+            Завантаження...
+        </p>
+    );
 };
 export default Loader;

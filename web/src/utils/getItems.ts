@@ -7,7 +7,8 @@ import { generateUrl } from "./generateUrl";
 export const getItems = async (
     url_part: string,
     data?: string,
-    usePagination?: boolean
+    usePagination?: boolean,
+    options?: any
 ) => {
     let validUrl = generateUrl(url_part);
 
@@ -28,7 +29,7 @@ export const getItems = async (
     }
 
     return await axios
-        .get(validUrl)
+        .get(validUrl, options)
         .then((res) => {
             if (res.data.pages_count && usePagination) {
                 RootStore.dispatch(

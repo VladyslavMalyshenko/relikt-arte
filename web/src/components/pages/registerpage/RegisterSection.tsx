@@ -18,6 +18,7 @@ const RegisterSection = () => {
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
+    const [shopPassword, setShowPassword] = useState(false);
 
     const defaultValues = {
         email: "",
@@ -88,6 +89,11 @@ const RegisterSection = () => {
                                         message: "Пароль занадто короткий",
                                     },
                                 }}
+                                passwordOptions={{
+                                    value: shopPassword,
+                                    toggle: () =>
+                                        setShowPassword(!shopPassword),
+                                }}
                             />
 
                             <Input
@@ -101,6 +107,11 @@ const RegisterSection = () => {
                                     validate: (value: string) =>
                                         value === watch("password") ||
                                         "Паролі не співпадають",
+                                }}
+                                passwordOptions={{
+                                    value: shopPassword,
+                                    toggle: () =>
+                                        setShowPassword(!shopPassword),
                                 }}
                             />
                         </div>
