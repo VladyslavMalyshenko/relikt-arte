@@ -6,6 +6,7 @@ import EmailChangeConfirmationPage from "../pages/EmailChangeConfirmationPage";
 import HomePage from "../pages/HomePage";
 import OrderPage from "../pages/OrderPage";
 import PasswordRecoveryPage from "../pages/PasswordRecoveryPage";
+import PasswordResetPage from "../pages/PasswordResetPage";
 import ProductPage from "../pages/ProductPage";
 import ProfilePage from "../pages/ProfilePage";
 import RegisterConformationPage from "../pages/RegisterConformationPage";
@@ -35,6 +36,10 @@ const Router = () => {
             <Route
                 path={paths.emailChangeConfirmation}
                 element={<EmailChangeConfirmationPage />}
+            />
+            <Route
+                path={paths.passwordResetConfirmation}
+                element={<PasswordResetPage />}
             />
             <Route path={paths.order} element={<OrderPage />} />
         </Routes>
