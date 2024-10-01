@@ -54,18 +54,19 @@ class AuthTokenEmailManager(BaseEmailManager):
 
     async def send_email_change_confirmation(self, token_data: AuthTokenShow):
         body_message = f"""
-            <p>Вітаємо!</p>
-            <p>Ми отримали запит на зміну електронної пошти для вашого облікового запису на платформі Relict Arte.</p>
-            <p>Щоб підтвердити зміну електронної пошти, будь ласка, натисніть на посилання нижче:</p>
-            <p>
-                <a href="{settings.frontend_app.base_url}/{settings.frontend_app.email_change_confirm_path}/{token_data.token}"
-                style="background-color:#007bff;color:#ffffff;padding:10px 20px;border-radius:5px;text-decoration:none;">
-                Підтвердити зміну електронної пошти
-                </a>
-            </p>
-            <br/>
-            <p>Якщо ви не ініціювали цей запит, просто проігноруйте це повідомлення.</p>
-            <p>З повагою, команда Relict Arte</p>
+            <div style="line-height:1.5;">
+                <p>Вітаємо!</p>
+                <p>Ми отримали запит на зміну електронної пошти для вашого облікового запису на платформі Relict Arte.</p>
+                <p>Щоб підтвердити зміну електронної пошти, будь ласка, натисніть на посилання нижче:</p>
+                <p>
+                    <a href="{settings.frontend_app.base_url}/{settings.frontend_app.email_change_confirm_path}/{token_data.token}"
+                    style="background-color:#007bff;color:#ffffff;padding:10px 20px;border-radius:5px;text-decoration:none;">
+                    Підтвердити зміну електронної пошти
+                    </a>
+                </p>
+                <p>Якщо ви не ініціювали цей запит, просто проігноруйте це повідомлення.</p>
+                <p>З повагою, команда Relict Arte</p>
+            </div>
         """
         context = AuthTokenEmailMessageContext(
             subject="Relict Arte - Підтвердження зміни електронної пошти",
