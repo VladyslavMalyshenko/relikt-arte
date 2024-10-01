@@ -131,6 +131,7 @@ class AuthTokenShow(MainSchema):
     token: str
     token_type: AuthTokenType
     owner_email: EmailStr
+    owner_new_email: Optional[EmailStr] = None
     expires_at: datetime.datetime
     created_at: datetime.datetime
     updated_at: datetime.datetime

@@ -71,4 +71,4 @@ class AuthTokenEmailManager(BaseEmailManager):
             subject="Relict Arte - Підтвердження зміни електронної пошти",
             body_message=body_message,
         )
-        await self.send_email(context, token_data.owner_email)
+        await self.send_email(context, token_data.owner_new_email)
