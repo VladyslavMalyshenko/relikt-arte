@@ -42,6 +42,29 @@ const OrderSection = () => {
                 Замовлення №{order.id}
             </p>
 
+            <p className="black small header upper bold">
+                Статус:{" "}
+                {order.status === "new"
+                    ? "Очікує обробки"
+                    : order.status === "accepted"
+                    ? "В обробці"
+                    : "Готовий до відправки"}
+                <span
+                    style={{
+                        width: "20px",
+                        height: "20px",
+                        display: "flex",
+                        borderRadius: "50%",
+                        backgroundColor:
+                            order.status === "new"
+                                ? "var(--red)"
+                                : order.status === "accepted"
+                                ? "var(--yellow)"
+                                : "var(--green)",
+                    }}
+                ></span>
+            </p>
+
             <div className="order-inner-wrapper">
                 <div className="order-items">
                     {order.items.results.length > 0 &&
@@ -77,7 +100,11 @@ const OrderSection = () => {
             </div>
         </div>
     ) : (
-        <p>На жаль ми не змогли знайти замовлення за даним номером ;(</p>
+        <div className="order-container">
+            <p className="black small">
+                На жаль ми не змогли знайти замовлення за даним номером ;(
+            </p>
+        </div>
     );
 };
 

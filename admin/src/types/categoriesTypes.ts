@@ -1,6 +1,7 @@
 export type TableField = {
     name: string;
     field: string;
+    valueNames?: any;
 };
 
 export type InputFieldDependency = {

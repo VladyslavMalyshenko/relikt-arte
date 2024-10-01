@@ -96,6 +96,14 @@
             color: var(--dark-grey);
             background: transparent;
             cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+
+            span {
+                max-width: 90%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 
             svg {
                 transform: rotate(180deg);

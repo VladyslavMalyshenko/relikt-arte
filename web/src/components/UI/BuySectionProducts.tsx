@@ -103,10 +103,12 @@ const BuySectionProducts = () => {
                 return newFilters.filter((item: any) => item);
             };
 
-            if (!isLoading && !products) {
+            if (!isLoading) {
                 setIsLoading(true);
 
                 let readyFilters = filtersProcessor(filters);
+
+                console.log(readyFilters);
 
                 if (readyFilters && readyFilters.length < 1) {
                     readyFilters = undefined;
