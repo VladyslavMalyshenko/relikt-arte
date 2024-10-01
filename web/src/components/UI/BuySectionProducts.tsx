@@ -104,32 +104,34 @@ const BuySectionProducts = () => {
                 return newFilters.filter((item: any) => item);
             };
 
-            if (!isLoading) {
-                setIsLoading(true);
+            let readyFilters = filtersProcessor(filters);
 
-                let readyFilters = filtersProcessor(filters);
+            if (readyFilters && readyFilters.length < 1) {
+                readyFilters = undefined;
+            }
 
-                if (readyFilters && readyFilters.length < 1) {
-                    readyFilters = undefined;
+            const newProducts = await getItems(
+                `/api/v1/product/list`,
+                readyFilters,
+                true,
+                {
+                    signal: controller.signal,
                 }
+            );
 
-                const newProducts = await getItems(
-                    `/api/v1/product/list`,
-                    readyFilters,
-                    true,
-                    {
-                        signal: controller.signal,
-                    }
-                ).finally(() => setIsLoading(false));
-
+            if (!controller.signal.aborted) {
                 dispatch(SetIsLoaded(true));
                 setProducts(newProducts || []);
             }
         };
 
-        getProducts();
+        const debounceTimeout = setTimeout(() => {
+            getProducts();
+        }, 750);
 
         return () => {
+            dispatch(SetIsLoaded(false));
+            clearTimeout(debounceTimeout);
             controller.abort();
         };
     }, [currentPage, filters]);
