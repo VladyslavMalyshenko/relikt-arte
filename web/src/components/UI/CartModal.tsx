@@ -37,10 +37,6 @@ const CartModal = ({ closeModal }: CartModalProps) => {
         setUpCart();
     }, []);
 
-    useEffect(() => {
-        console.log(products);
-    }, [products]);
-
     const deleteItem = async (id: number) => {
         setIsLoaded(false);
 
@@ -91,15 +87,7 @@ const CartModal = ({ closeModal }: CartModalProps) => {
                                     {products.map((product: any) => (
                                         <CheckoutProduct
                                             product={product}
-                                            setValue={(
-                                                a: any,
-                                                b: any,
-                                                c: any
-                                            ) => {
-                                                console.log(product);
-
-                                                console.log(a, b, c);
-                                            }}
+                                            setValue={() => false}
                                             deleteItem={deleteItem}
                                         />
                                     ))}
@@ -122,7 +110,10 @@ const CartModal = ({ closeModal }: CartModalProps) => {
                                 inversed={true}
                                 borderless={false}
                                 additionalClasses={["upper"]}
-                                onClickCallback={() => navigate(paths.checkout)}
+                                onClickCallback={() => {
+                                    closeModal();
+                                    navigate(paths.checkout);
+                                }}
                             >
                                 перейти до сплати
                             </Button>
