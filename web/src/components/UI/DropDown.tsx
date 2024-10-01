@@ -116,7 +116,8 @@ const DropDown = ({
                     ? newOptions.find(
                           (opt: any) =>
                               opt[defaultValue.defaultFieldName] ===
-                              defaultValue.defaultValue
+                              (defaultValue.defaultValue?.value ||
+                                  defaultValue.defaultValue)
                       )
                     : newOptions[0];
 
@@ -134,12 +135,31 @@ const DropDown = ({
     }, [options, defaultValue]);
 
     useEffect(() => {
-        const lowerCasedPrompt = searchPrompt.toLowerCase();
-        setFilteredOptions(
-            currentOptions.filter((option) =>
-                option.name.toLowerCase().includes(lowerCasedPrompt)
-            )
-        );
+        const filterByPrompt = () => {
+            const lowerCasedPrompt = searchPrompt.toLowerCase();
+
+            return currentOptions
+                .map((option) => {
+                    const lowerCasedName = option.name.toLowerCase();
+                    const matchIndex = lowerCasedName.indexOf(lowerCasedPrompt);
+
+                    let accuracy = 0;
+                    if (matchIndex !== -1) {
+                        accuracy =
+                            (lowerCasedPrompt.length * 100) /
+                            lowerCasedName.length;
+                    }
+
+                    return {
+                        ...option,
+                        accuracy,
+                    };
+                })
+                .filter((option) => option.accuracy > 0)
+                .sort((a, b) => b.accuracy - a.accuracy);
+        };
+
+        setFilteredOptions(searchPrompt ? filterByPrompt() : currentOptions);
     }, [searchPrompt, currentOptions]);
 
     return (

@@ -23,13 +23,9 @@
         overflow-x: hidden;
 
         &-products {
-            max-height: 25vh;
-            min-height: 200px;
             display: flex;
             flex-direction: column;
             gap: 25px;
-            overflow-y: auto;
-            overflow-x: hidden;
 
             &-container {
                 max-height: 50%;
