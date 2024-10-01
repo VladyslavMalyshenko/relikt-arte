@@ -13,42 +13,62 @@ class AuthTokenEmailManager(BaseEmailManager):
 
     async def send_registration_confirmation(self, token_data: AuthTokenShow):
         body_message = f"""
-            <p>This is the registration confirmation email.
-            Please click the link below to confirm your registration:</p>
+            <p>Вітаємо у спільноті Relict Arte!</p>
+            <p>Дякуємо за реєстрацію на нашій платформі. Для завершення процесу реєстрації, будь ласка, підтвердьте свою електронну пошту, натиснувши на посилання нижче:</p>
+            <p>
+                <a href="{self.registration_confirmation_link}/{token_data.token}"
+                style="background-color:#007bff;color:#ffffff;padding:10px 20px;border-radius:5px;text-decoration:none;">
+                Підтвердити реєстрацію
+                </a>
+            </p>
             <br/>
-            <br/>
-            <a href="{self.registration_confirmation_link}/{token_data.token}">Confirm Registration</a>
+            <p>Якщо ви не реєструвалися на нашій платформі, просто проігноруйте це повідомлення.</p>
+            <p>З повагою, команда Relict Arte</p>
         """
         context = AuthTokenEmailMessageContext(
-            subject="Relict Arte - Registration Confirmation",
+            subject="Relict Arte - Підтвердження реєстрації",
             body_message=body_message,
         )
         await self.send_email(context, token_data.owner_email)
 
     async def send_password_reset(self, token_data: AuthTokenShow):
         body_message = f"""
-            <p>This is the password reset email.
-            Please click the link below to reset your password:</p>
+            <p>Вітаємо!</p>
+            <p>Ми отримали запит на скидання пароля для вашого облікового запису на платформі Relict Arte.</p>
+            <p>Для відновлення пароля, будь ласка, натисніть на посилання нижче:</p>
+            <p>
+                <a href="{settings.frontend_app.base_url}/{settings.frontend_app.password_reset_path}/{token_data.token}"
+                style="background-color:#007bff;color:#ffffff;padding:10px 20px;border-radius:5px;text-decoration:none;">
+                Скинути пароль
+                </a>
+            </p>
             <br/>
-            <br/>
-            <a href="{settings.frontend_app.base_url}/{settings.frontend_app.password_reset_path}/{token_data.token}">Reset Password</a>
+            <p>Якщо ви не робили цього запиту, просто проігноруйте це повідомлення.</p>
+            <p>З повагою, команда Relict Arte</p>
         """
         context = AuthTokenEmailMessageContext(
-            subject="Relict Arte - Password Reset",
+            subject="Relict Arte - Скидання пароля",
             body_message=body_message,
         )
         await self.send_email(context, token_data.owner_email)
 
     async def send_email_change_confirmation(self, token_data: AuthTokenShow):
         body_message = f"""
-            <p>This is the email change confirmation email.
-            Please click the link below to confirm your email change:</p>
+            <p>Вітаємо!</p>
+            <p>Ми отримали запит на зміну електронної пошти для вашого облікового запису на платформі Relict Arte.</p>
+            <p>Щоб підтвердити зміну електронної пошти, будь ласка, натисніть на посилання нижче:</p>
+            <p>
+                <a href="{settings.frontend_app.base_url}/{settings.frontend_app.email_change_confirm_path}/{token_data.token}"
+                style="background-color:#007bff;color:#ffffff;padding:10px 20px;border-radius:5px;text-decoration:none;">
+                Підтвердити зміну електронної пошти
+                </a>
+            </p>
             <br/>
-            <br/>
-            <a href="{settings.frontend_app.base_url}/{settings.frontend_app.email_change_confirm_path}/{token_data.token}">Confirm Email Change</a>
+            <p>Якщо ви не ініціювали цей запит, просто проігноруйте це повідомлення.</p>
+            <p>З повагою, команда Relict Arte</p>
         """
         context = AuthTokenEmailMessageContext(
-            subject="Relict Arte - Email Change Confirmation",
+            subject="Relict Arte - Підтвердження зміни електронної пошти",
             body_message=body_message,
         )
         await self.send_email(context, token_data.owner_email)
