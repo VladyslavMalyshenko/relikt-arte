@@ -38,7 +38,7 @@ class UserCreate(BaseUserCreate):
     @field_validator("password_confirm")
     def validate_password_confirm(cls, value, values):
         if value != values.data.get("password"):
-            raise HTTPException(status_code=400, detail="Password mismatch!")
+            raise HTTPException(status_code=400, detail="Паролі не співпадають!")
         return value
 
 
@@ -77,10 +77,10 @@ class UserPasswordResetConfirm(BaseModel):
             raise HTTPException(detail=e.message, status_code=400)
         return value
 
-    @field_validator("new_password_confirm")
+    @field_validator("password_confirm")
     def validate_password_confirm(cls, value, values):
-        if value != values.data.get("new_password"):
-            raise HTTPException(status_code=400, detail="Password mismatch!")
+        if value != values.data.get("password"):
+            raise HTTPException(status_code=400, detail="Паролі не співпадають!")
         return value
 
 
@@ -97,10 +97,10 @@ class UserPasswordChange(BaseModel):
             raise HTTPException(detail=e.message, status_code=400)
         return value
 
-    @field_validator("new_password_confirm")
+    @field_validator("password_confirm")
     def validate_password_confirm(cls, value, values):
-        if value != values.data.get("new_password"):
-            raise HTTPException(status_code=400, detail="Password mismatch!")
+        if value != values.data.get("password"):
+            raise HTTPException(status_code=400, detail="Паролі не співпадають!")
         return value
 
 

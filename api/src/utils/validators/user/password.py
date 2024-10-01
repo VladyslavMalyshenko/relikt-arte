@@ -20,19 +20,27 @@ class PasswordValidator:
 
     def check_lowercase(self):
         if not re.search("[a-z]", self.password):
-            raise PasswordLowercaseException()
+            raise PasswordLowercaseException(
+                "Пароль повинен містити принаймні одну малу літеру."
+            )
 
     def check_uppercase(self):
         if not re.search("[A-Z]", self.password):
-            raise PasswordUppercaseException()
+            raise PasswordUppercaseException(
+                "Пароль повинен містити принаймні одну велику літеру."
+            )
 
     def check_numbers(self):
         if not re.search("[0-9]", self.password):
-            raise PasswordNumbersException()
+            raise PasswordNumbersException(
+                "Пароль повинен містити принаймні одну цифру."
+            )
 
     def check_length(self):
         if len(self.password) < 9:
-            raise PasswordLengthException()
+            raise PasswordLengthException(
+                "Пароль повинен містити не менше 9 символів."
+            )
 
     def check_all(self):
         self.check_lowercase()
