@@ -33,7 +33,7 @@ const Router = () => {
                 element={<RegisterConformationPage />}
             />
             <Route
-                path={paths.passwordResetConfirmation}
+                path={paths.emailChangeConfirmation}
                 element={<EmailChangeConfirmationPage />}
             />
             <Route path={paths.order} element={<OrderPage />} />

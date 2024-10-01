@@ -805,6 +805,10 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "адмін",
                 field: "is_admin",
             },
+            {
+                name: "активний",
+                field: "is_active",
+            },
         ],
         addItemFields: [
             {
@@ -938,8 +942,8 @@ export const categoriesData: (MainCategory | Category)[] = [
                 field: "status",
                 type: "radio",
                 choices: [
-                    { name: "Щойно створений", value: "new" },
-                    { name: "Прийнятий", value: "accepted" },
+                    { name: "Очікує обробки", value: "new" },
+                    { name: "В обробці", value: "accepted" },
                     {
                         name: "Готовий до відправки",
                         value: "ready_for_shipment",
@@ -965,6 +969,15 @@ export const categoriesData: (MainCategory | Category)[] = [
                 name: "Відділення",
                 field: "warehouse",
             },
+            {
+                name: "Статус",
+                field: "status",
+                valueNames: {
+                    new: "Очікує обробки",
+                    accepted: "В обробці",
+                    ready_for_shipment: "Готовий до відправки",
+                },
+            },
         ],
         addItemFields: [],
         inputFields: [
@@ -977,8 +990,8 @@ export const categoriesData: (MainCategory | Category)[] = [
                 field_name: "status",
                 type: "list-radio",
                 value: [
-                    { name: "Щойно створений", value: "new" },
-                    { name: "Прийнятий", value: "accepted" },
+                    { name: "Очікує обробки", value: "new" },
+                    { name: "В обробці", value: "accepted" },
                     {
                         name: "Готовий до відправки",
                         value: "ready_for_shipment",

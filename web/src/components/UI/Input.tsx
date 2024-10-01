@@ -20,6 +20,7 @@ type InputProps = {
     hasLabel?: boolean;
     onChosen?: any;
     readOnly?: boolean;
+    dynamicLabel?: boolean;
 };
 
 const Input = ({
@@ -33,6 +34,7 @@ const Input = ({
     hasLabel,
     onChosen,
     readOnly,
+    dynamicLabel,
 }: InputProps) => {
     const configureInput = (field: any) => {
         const className = `input-field${errors[name] ? " invalid" : ""}`;
@@ -93,6 +95,7 @@ const Input = ({
                 defaultValue={options?.default}
                 borderless={false}
                 needSearch={true}
+                dynamicLabel={dynamicLabel}
             />
         );
     };

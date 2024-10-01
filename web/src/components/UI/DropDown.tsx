@@ -28,6 +28,7 @@ type DropDownProps = {
     onChosen: (field: string, value: any, label?: string) => void;
     defaultValue?: DefaultDropDownValue;
     needSearch?: boolean;
+    dynamicLabel?: boolean;
 };
 
 const DropDown = ({
@@ -38,9 +39,10 @@ const DropDown = ({
     borderless = true,
     needSearch,
     defaultValue,
+    dynamicLabel,
 }: DropDownProps) => {
     const [filtersOpened, setFiltersOpened] = useState(false);
-    const [selectedOption, setSelectedOption] = useState("");
+    const [selectedOption, setSelectedOption] = useState<any>({});
     const [currentOptions, setCurrentOptions] = useState<DropDownOption[]>([]);
     const [filteredOptions, setFilteredOptions] = useState<DropDownOption[]>(
         []
@@ -52,8 +54,8 @@ const DropDown = ({
         identifier: string,
         label: string
     ) => {
-        if (selectedOption !== identifier) {
-            setSelectedOption(identifier);
+        if (selectedOption?.key !== identifier) {
+            setSelectedOption({ label, value, key: identifier });
             onChosen(field, value, label);
         }
     };
@@ -111,7 +113,10 @@ const DropDown = ({
             setCurrentOptions(newOptions);
             setFilteredOptions(newOptions);
 
-            if (!selectedOption) {
+            if (
+                JSON.stringify(selectedOption) === "{}" ||
+                !selectedOption?.key
+            ) {
                 const defaultOption = defaultValue
                     ? newOptions.find(
                           (opt: any) =>
@@ -162,6 +167,10 @@ const DropDown = ({
         setFilteredOptions(searchPrompt ? filterByPrompt() : currentOptions);
     }, [searchPrompt, currentOptions]);
 
+    useEffect(() => {
+        console.log(selectedOption, dynamicLabel, label);
+    }, [selectedOption]);
+
     return (
         <div className="filters-filter">
             <p
@@ -170,7 +179,9 @@ const DropDown = ({
                 }${borderless ? "" : " border"}`}
                 onClick={() => setFiltersOpened(!filtersOpened)}
             >
-                {label}
+                <span>
+                    {dynamicLabel ? selectedOption?.label || label : label}
+                </span>
                 <svg width="14" height="6" viewBox="0 0 14 6" fill="none">
                     <path
                         d="M12.833 5.33334L6.99967 0.666676L1.16634 5.33334"
@@ -204,7 +215,9 @@ const DropDown = ({
                                 key={currentIdentifier}
                                 label={option.name}
                                 groupName={field}
-                                isChecked={selectedOption === currentIdentifier}
+                                isChecked={
+                                    selectedOption?.key === currentIdentifier
+                                }
                                 onChange={() =>
                                     handleOptionSelect(
                                         option.value,

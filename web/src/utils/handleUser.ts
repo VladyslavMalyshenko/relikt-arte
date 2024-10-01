@@ -152,3 +152,28 @@ export const confirmEmailChange = async (token: string) => {
 
     return response;
 };
+
+// getters
+
+export const getUserOrders = async () => {
+    const isTokenValid = await validateToken();
+
+    if (isTokenValid) {
+        const headers: any = {};
+
+        headers["Authorization"] = `Bearer ${getAccessToken()}`;
+
+        const response = await axios
+            .get(generateUrl("/order/for_user"), { headers })
+            .then((res) => res.data)
+            .catch((err) => {
+                const errorData = err?.response?.data;
+
+                return handleErrors(errorData);
+            });
+
+        return response;
+    }
+
+    return [];
+};

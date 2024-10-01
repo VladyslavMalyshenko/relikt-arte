@@ -36,6 +36,7 @@ const Form = ({ control, errors, fields }: FormProps) => {
 
     const region = watch("region").value;
     const city_or_settlement = watch("city_or_settlement").value;
+    const addressFields = ["region", "city_or_settlement", "warehouse"];
 
     useEffect(() => {
         const currentValues = getValues();
@@ -111,11 +112,7 @@ const Form = ({ control, errors, fields }: FormProps) => {
     const onChosen = (field: string, value: any, label?: string) => {
         const currentValue = getValues(field);
         if (value && currentValue !== value) {
-            if (
-                ["region", "city_or_settlement", "warehouse"].every(
-                    (el) => el !== field
-                )
-            ) {
+            if (addressFields.every((el) => el !== field)) {
                 setValue(field, value);
             } else {
                 setValue(field, { value, label });
@@ -173,6 +170,10 @@ const Form = ({ control, errors, fields }: FormProps) => {
                                     }),
                                 }}
                                 onChosen={onChosen}
+                                dynamicLabel={addressFields.some(
+                                    (addressField: string) =>
+                                        addressField === field.name
+                                )}
                             />
                         ) : null
                     ) : (
