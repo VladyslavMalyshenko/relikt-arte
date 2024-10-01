@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy import Enum
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+
 from .enums import FilterOperator
 from ...exceptions.processors.filters import (
     FilterLenListException,
@@ -94,6 +97,15 @@ class FilterProcessor(AbstractFilterProcessor):
             filters_list.extend(await self.process_filter(filter_lst))
         return filters_list
 
+    async def __get_column_enum(self, column: str):
+        column = getattr(self.model, column)
+        if isinstance(column, InstrumentedAttribute) and isinstance(
+            column.property.columns[0].type,
+            Enum,
+        ):
+            return column.property.columns[0].type.enum_class
+        return None
+
     async def process_filter(self, filter_lst: list):
         if len(filter_lst) != 3:
             raise FilterLenListException()
@@ -104,6 +116,10 @@ class FilterProcessor(AbstractFilterProcessor):
             raise FilterInvalidColumnException(column, self.model)
         if operator not in FilterOperator.values():
             raise FilterInvalidOperatorException(operator)
+
+        enum_class = await self.__get_column_enum(column)
+        if enum_class:
+            value = enum_class(value)
 
         if operator == FilterOperator.EQUALS:
             return await self.process_equals(column, value)

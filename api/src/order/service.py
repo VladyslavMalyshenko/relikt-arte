@@ -374,7 +374,7 @@ class OrderService(BaseService):
                 )
         except SQLAlchemyError as e:
             log.exception(e)
-            raise OrderGetException()
+            raise OrderGetException(order_id=1)
 
     async def get_orders_for_user(
         self,
