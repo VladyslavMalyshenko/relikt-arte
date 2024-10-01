@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../router/paths";
 import "../../styles/components/UI/OrderHistory.scss";
@@ -38,6 +39,10 @@ const ProfileSettingsWindow = ({
         clearErrors,
         formState: { errors },
     } = useFormContext();
+
+    const currentWidth = useSelector(
+        (state: any) => state.ScreenPropertiesReducer.width
+    );
 
     const setPreviousValue = (key: string, value: any) => {
         setPreviousValues((prev: any) => ({ ...prev, [key]: value }));
@@ -367,24 +372,79 @@ const ProfileSettingsWindow = ({
             {currentCategory === "історія замовлень" &&
             orders &&
             orders?.length > 0 ? (
-                <>
-                    <div className="order black small">
-                        <span className=" cell">№</span>
-                        <span className=" cell">Замовник</span>
-                        <span className=" cell">Адреса</span>
-                        <span className="cell">Ціна</span>
-                        <span className="cell">Статус</span>
-                        <span className="cell"> </span>
-                    </div>
-                    {orders.map((order: any) => (
+                currentWidth > 875 ? (
+                    <>
                         <div className="order black small">
-                            <span className="cell">{order.id}</span>
-                            <span className="cell">{order.full_name}</span>
+                            <span className=" cell">№</span>
+                            <span className=" cell">Замовник</span>
+                            <span className=" cell">Адреса</span>
+                            <span className="cell">Ціна</span>
+                            <span className="cell">Статус</span>
+                            <span className="cell"> </span>
+                        </div>
+
+                        {orders.map((order: any) => (
+                            <div className="order black small">
+                                <span className="cell">{order.id}</span>
+                                <span className="cell">{order.full_name}</span>
+                                <span className="cell">
+                                    {order.region}, {order.city_or_settlement}
+                                </span>
+                                <span className="cell">
+                                    {order.total_value} ₴
+                                </span>
+                                <span className="cell">
+                                    {order.status === "new"
+                                        ? "Очікує обробки"
+                                        : order.status === "accepted"
+                                        ? "В обробці"
+                                        : "Готовий до відправки"}
+                                    <span
+                                        className="status"
+                                        style={{
+                                            backgroundColor:
+                                                order.status === "new"
+                                                    ? "var(--red)"
+                                                    : order.status ===
+                                                      "ready_for_shipment"
+                                                    ? "var(--green)"
+                                                    : "var(--yellow)",
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="cell">
+                                    <Button
+                                        text="Детальна інформація"
+                                        colorScheme="grey"
+                                        onClickCallback={() => {
+                                            navigate(
+                                                paths.order.replace(
+                                                    ":order_id",
+                                                    order.id
+                                                )
+                                            );
+                                        }}
+                                    />
+                                </span>
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    orders.map((order: any) => (
+                        <div className="order black small">
+                            <span className="cell">№ {order.id}</span>
                             <span className="cell">
-                                {order.region}, {order.city_or_settlement}
+                                Замовник: {order.full_name}
                             </span>
-                            <span className="cell">{order.total_value} ₴</span>
                             <span className="cell">
+                                Адреса: {order.region},{" "}
+                                {order.city_or_settlement}
+                            </span>
+                            <span className="cell">
+                                Ціна: {order.total_value} ₴
+                            </span>
+                            <span className="cell">
+                                Статус:{" "}
                                 {order.status === "new"
                                     ? "Очікує обробки"
                                     : order.status === "accepted"
@@ -418,8 +478,8 @@ const ProfileSettingsWindow = ({
                                 />
                             </span>
                         </div>
-                    ))}
-                </>
+                    ))
+                )
             ) : (
                 <p>Ви поки що нічого не замовляли ;(</p>
             )}

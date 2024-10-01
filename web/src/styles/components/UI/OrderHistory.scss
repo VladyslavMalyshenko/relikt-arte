@@ -43,3 +43,20 @@
         border-radius: 50%;
     }
 }
+
+@media (max-width: 875px) {
+    .order {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .cell {
+            text-align: start;
+        }
+
+        .status {
+            width: 10px;
+            height: 10px;
+        }
+    }
+}
