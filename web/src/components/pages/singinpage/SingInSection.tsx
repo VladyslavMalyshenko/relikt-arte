@@ -10,6 +10,7 @@ import Input from "../../UI/Input";
 const SingInSection = () => {
     const navigate = useNavigate();
     const [message, setMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     interface SingInFormData {
         email: string;
@@ -71,6 +72,10 @@ const SingInSection = () => {
                             name="password"
                             rules={{
                                 required: "Пароль є обов'язковим",
+                            }}
+                            passwordOptions={{
+                                value: showPassword,
+                                toggle: () => setShowPassword(!showPassword),
                             }}
                         />
 

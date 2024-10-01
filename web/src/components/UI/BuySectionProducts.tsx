@@ -31,6 +31,7 @@ const BuySectionProducts = () => {
 
     useEffect(() => {
         setProducts([]);
+        const controller = new AbortController();
 
         if (currentPage < 1) {
             changePage(1);
@@ -108,8 +109,6 @@ const BuySectionProducts = () => {
 
                 let readyFilters = filtersProcessor(filters);
 
-                console.log(readyFilters);
-
                 if (readyFilters && readyFilters.length < 1) {
                     readyFilters = undefined;
                 }
@@ -117,7 +116,10 @@ const BuySectionProducts = () => {
                 const newProducts = await getItems(
                     `/api/v1/product/list`,
                     readyFilters,
-                    true
+                    true,
+                    {
+                        signal: controller.signal,
+                    }
                 ).finally(() => setIsLoading(false));
 
                 dispatch(SetIsLoaded(true));
@@ -126,6 +128,10 @@ const BuySectionProducts = () => {
         };
 
         getProducts();
+
+        return () => {
+            controller.abort();
+        };
     }, [currentPage, filters]);
 
     return (
@@ -161,7 +167,7 @@ const BuySectionProducts = () => {
                     )}
                 </div>
             ) : (
-                <Loader />
+                <Loader style={{ width: "100%", textAlign: "center" }} />
             )}
         </>
     );
