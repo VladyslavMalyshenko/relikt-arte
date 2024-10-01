@@ -1,13 +1,11 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/checkoutpage/CheckoutSection.scss";
 import { ProductType } from "../../../types/productsRelatedTypes";
-import { generateUrl } from "../../../utils/generateUrl";
 import { getCart } from "../../../utils/handleCart";
-import { getAccessToken, validateToken } from "../../../utils/tokenUtils";
+import { createOrder } from "../../../utils/handleUser";
 import Button from "../../UI/Button";
 import CheckoutModal from "../../UI/CheckoutModal";
 import CheckoutProduct from "../../UI/CheckoutProduct";
@@ -195,21 +193,14 @@ const CheckoutSection = () => {
 
         data.items = filteredCartProducts;
 
-        const isTokenValid = await validateToken();
+        const response = await createOrder(data);
 
-        const headers: any = {};
-
-        if (isTokenValid) {
-            headers["Authorization"] = `Bearer ${getAccessToken()}`;
+        if (response) {
+            setIsOrderSuccess(true);
+            setOrderInfo(response);
         }
 
-        await axios
-            .post(generateUrl("/order/create"), data, { headers })
-            .then((res) => {
-                setIsOrderSuccess(true);
-                setOrderInfo(res.data);
-            })
-            .finally(() => setIsModalVisible(true));
+        setIsModalVisible(true);
     };
 
     return (

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { generateUrl } from "./generateUrl";
+import { getCartToken } from "./handleCart";
 import { handleErrors } from "./handleErrors";
 import {
     getAccessToken,
@@ -176,4 +177,29 @@ export const getUserOrders = async () => {
     }
 
     return [];
+};
+
+// order
+
+export const createOrder = async (data: any) => {
+    const isTokenValid = await validateToken();
+    const cartToken = await getCartToken();
+    let url = "/order/create";
+
+    if (cartToken) {
+        url += `?basket_token=${cartToken}`;
+    }
+
+    const headers: any = {};
+
+    if (isTokenValid) {
+        headers["Authorization"] = `Bearer ${getAccessToken()}`;
+    }
+
+    const response = await axios
+        .post(generateUrl(url), data, { headers })
+        .then((res) => res.data)
+        .finally(() => false);
+
+    return response;
 };

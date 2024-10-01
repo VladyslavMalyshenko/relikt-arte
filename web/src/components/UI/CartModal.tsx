@@ -55,7 +55,7 @@ const CartModal = ({ closeModal }: CartModalProps) => {
 
     return (
         <div className="cart-modal" onClick={closeModal}>
-            <div className="cart-modal-inner-wrapper">
+            <div className="cart-modal-inner-wrapper" onClick={stopPropagation}>
                 <div className="cart-modal-inner" onClick={stopPropagation}>
                     <div className="cart-modal-inner-header">
                         <p className="upper black mid">корзина</p>
