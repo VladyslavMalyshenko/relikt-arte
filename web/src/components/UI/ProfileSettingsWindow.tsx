@@ -375,33 +375,57 @@ const ProfileSettingsWindow = ({
                         currentWidth > 875 ? (
                             <>
                                 <div className="orders-order black small">
-                                    <span className=" cell">№</span>
-                                    <span className=" cell">Замовник</span>
-                                    <span className=" cell">Адреса</span>
-                                    <span className="cell">Ціна</span>
-                                    <span className="cell">Статус</span>
-                                    <span className="cell"> </span>
+                                    <span className="cell">
+                                        <p className="black small">№</p>
+                                    </span>
+                                    <span className="cell">
+                                        <p className="black small">Замовник</p>
+                                    </span>
+                                    <span className="cell">
+                                        <p className="black small">Адреса</p>
+                                    </span>
+                                    <span className="cell">
+                                        <p className="black small">Ціна</p>
+                                    </span>
+                                    <span className="cell">
+                                        <p className="black small">Статус</p>
+                                    </span>
+                                    <span className="cell"></span>
                                 </div>
 
                                 {orders.map((order: any) => (
-                                    <div className="orders-order black small">
-                                        <span className="cell">{order.id}</span>
+                                    <div className="orders-order">
                                         <span className="cell">
-                                            {order.full_name}
+                                            <p className="black small">
+                                                {order.id}
+                                            </p>
                                         </span>
                                         <span className="cell">
-                                            {order.region},{" "}
-                                            {order.city_or_settlement}
+                                            <p className="black small">
+                                                {order.full_name}
+                                            </p>
                                         </span>
                                         <span className="cell">
-                                            {order.total_value} ₴
+                                            <p className="black small start">
+                                                {order.region},{" "}
+                                                {order.city_or_settlement}
+                                            </p>
                                         </span>
                                         <span className="cell">
-                                            {order.status === "new"
-                                                ? "Очікує обробки"
-                                                : order.status === "accepted"
-                                                ? "В обробці"
-                                                : "Готовий до відправки"}
+                                            <p className="black small">
+                                                {order.total_value} ₴
+                                            </p>
+                                        </span>
+                                        <span className="cell">
+                                            <p className="black small">
+                                                {order.status === "new"
+                                                    ? "Очікує обробки"
+                                                    : order.status ===
+                                                      "accepted"
+                                                    ? "В обробці"
+                                                    : "Готовий до відправки"}
+                                            </p>
+
                                             <span
                                                 className="status"
                                                 style={{
