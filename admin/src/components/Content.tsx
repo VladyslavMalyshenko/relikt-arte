@@ -555,12 +555,8 @@ const Content = () => {
                                                                                         >
                                                                                             <span
                                                                                                 style={{
-                                                                                                    width: "100%",
-                                                                                                    height: "100%",
-                                                                                                    maxWidth:
-                                                                                                        "20px",
-                                                                                                    maxHeight:
-                                                                                                        "20px",
+                                                                                                    width: "20px",
+                                                                                                    height: "20px",
                                                                                                     display:
                                                                                                         "flex",
                                                                                                     borderRadius:
@@ -575,6 +571,8 @@ const Content = () => {
                                                                                                             : "var(--green)",
                                                                                                     aspectRatio:
                                                                                                         "1/1",
+                                                                                                    flexShrink:
+                                                                                                        "0",
                                                                                                 }}
                                                                                             ></span>
 
