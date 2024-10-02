@@ -3,6 +3,8 @@ import datetime
 
 from typing import Optional
 
+from pydantic import EmailStr
+
 from ..core.schemas import MainSchema, BaseListSchema
 from ..product.schemas import ProductShow
 from ..product.enums import ProductTypeOfPlatbandEnum, ProductOrientationEnum
@@ -92,7 +94,7 @@ class OrderShow(MainSchema):
     user_id: Optional[uuid.UUID] = None
     full_name: str
     phone: str
-    email: str
+    email: EmailStr
     region: str
     city_or_settlement: str
     warehouse: Optional[str] = None
@@ -135,7 +137,7 @@ class OrderCreate(MainSchema):
     user_id: Optional[uuid.UUID] = None
     full_name: str
     phone: str
-    email: str
+    email: EmailStr
     region: str
     city_or_settlement: str
     warehouse: Optional[str] = None
@@ -147,7 +149,7 @@ class OrderCreate(MainSchema):
 class OrderUpdate(MainSchema):
     full_name: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     region: Optional[str] = None
     city_or_settlement: Optional[str] = None
     warehouse: Optional[str] = None
