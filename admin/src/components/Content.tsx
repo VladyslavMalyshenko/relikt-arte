@@ -539,7 +539,32 @@ const Content = () => {
                                                                                     }
                                                                                 />
                                                                             ) : (
-                                                                                displayedValue
+                                                                                <>
+                                                                                    {fieldName ===
+                                                                                        "status" && (
+                                                                                        <span
+                                                                                            style={{
+                                                                                                width: "20px",
+                                                                                                height: "20px",
+                                                                                                display:
+                                                                                                    "flex",
+                                                                                                borderRadius:
+                                                                                                    "50%",
+                                                                                                backgroundColor:
+                                                                                                    product?.status ===
+                                                                                                    "new"
+                                                                                                        ? "var(--red)"
+                                                                                                        : product?.status ===
+                                                                                                          "accepted"
+                                                                                                        ? "var(--yellow)"
+                                                                                                        : "var(--green)",
+                                                                                                marginLeft:
+                                                                                                    "15px",
+                                                                                            }}
+                                                                                        ></span>
+                                                                                    )}
+                                                                                    displayedValue
+                                                                                </>
                                                                             )}
                                                                         </td>
                                                                     );

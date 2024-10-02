@@ -14,6 +14,7 @@ export type ProductPhotoType = {
 export type ProductType = {
     id: number;
     sku: string;
+    name: string;
     price: number;
     photo: string;
     description?: {

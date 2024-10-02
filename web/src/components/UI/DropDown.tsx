@@ -117,16 +117,23 @@ const DropDown = ({
                 JSON.stringify(selectedOption) === "{}" ||
                 !selectedOption?.key
             ) {
+                console.log(defaultValue, label);
+
+                console.log("OPT: ", newOptions);
+
                 const defaultOption = defaultValue
                     ? newOptions.find(
                           (opt: any) =>
                               opt[defaultValue.defaultFieldName] ===
-                              (defaultValue.defaultValue?.value ||
-                                  defaultValue.defaultValue)
+                              (defaultValue.defaultValue?.value !== undefined
+                                  ? defaultValue.defaultValue?.value
+                                  : defaultValue.defaultValue)
                       )
                     : newOptions[0];
 
                 if (defaultOption) {
+                    console.log("DEF: ", label, defaultOption);
+
                     handleOptionSelect(
                         defaultOption.value,
                         `option-${defaultOption.key || defaultOption.name}`,
@@ -166,10 +173,6 @@ const DropDown = ({
 
         setFilteredOptions(searchPrompt ? filterByPrompt() : currentOptions);
     }, [searchPrompt, currentOptions]);
-
-    useEffect(() => {
-        console.log(selectedOption, dynamicLabel, label);
-    }, [selectedOption]);
 
     return (
         <div className="filters-filter">

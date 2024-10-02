@@ -1,4 +1,5 @@
 .door-card {
+    position: relative;
     width: 100%;
     max-width: 296px;
     max-height: 563px;
@@ -16,6 +17,20 @@
 
     p {
         cursor: auto;
+
+        &.name {
+            width: 100%;
+            font-size: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        &.sku {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
     }
 
     .model {

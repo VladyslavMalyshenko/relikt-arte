@@ -156,12 +156,16 @@ const ProductSection = () => {
                                         "https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png"
                                     }
                                 />
+
+                                <p className="small black sku">
+                                    Артикул: {product.sku}
+                                </p>
                             </div>
 
                             <div className="product-info-main-description">
                                 <div className="product-info-main-description-principal">
                                     <p className="upper black mid">
-                                        тестовий продукт
+                                        {product.name}
                                     </p>
                                     <p className="black small">
                                         {product?.description?.text &&
@@ -303,6 +307,34 @@ const ProductSection = () => {
                                                 />
                                             )}
                                         </>
+                                    )}
+
+                                    {product?.material_choice && (
+                                        <DropDown
+                                            borderless={false}
+                                            label="матеріал"
+                                            field="material"
+                                            options={[
+                                                {
+                                                    name: "Деревина",
+                                                    value: "wood",
+                                                },
+                                                {
+                                                    name: "МДФ",
+                                                    value: "mdf",
+                                                },
+                                            ]}
+                                            onChosen={(
+                                                fieldName: string,
+                                                value: any
+                                            ) =>
+                                                onChosen(
+                                                    fieldName,
+                                                    value,
+                                                    "material_choice"
+                                                )
+                                            }
+                                        />
                                     )}
 
                                     {product?.orientation_choice && (

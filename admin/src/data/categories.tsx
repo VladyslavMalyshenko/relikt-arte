@@ -520,6 +520,10 @@ export const categoriesData: (MainCategory | Category)[] = [
         fields: [
             "id",
             { name: "артикул", field: "sku" },
+            {
+                name: "назва",
+                field: "name",
+            },
             { name: "ціна", field: "price" },
             {
                 name: "наявність скла",
@@ -542,6 +546,12 @@ export const categoriesData: (MainCategory | Category)[] = [
             {
                 name: "артикул",
                 field_name: "sku",
+                type: "text",
+                required: true,
+            },
+            {
+                name: "назва",
+                field_name: "name",
                 type: "text",
                 required: true,
             },
@@ -652,6 +662,12 @@ export const categoriesData: (MainCategory | Category)[] = [
             {
                 name: "артикул",
                 field_name: "sku",
+                type: "text",
+                required: true,
+            },
+            {
+                name: "назва",
+                field_name: "name",
                 type: "text",
                 required: true,
             },
