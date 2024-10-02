@@ -555,8 +555,12 @@ const Content = () => {
                                                                                         >
                                                                                             <span
                                                                                                 style={{
-                                                                                                    width: "20px",
-                                                                                                    height: "20px",
+                                                                                                    width: "100%",
+                                                                                                    height: "100%",
+                                                                                                    maxWidth:
+                                                                                                        "20px",
+                                                                                                    maxHeight:
+                                                                                                        "20px",
                                                                                                     display:
                                                                                                         "flex",
                                                                                                     borderRadius:
@@ -569,6 +573,8 @@ const Content = () => {
                                                                                                               "accepted"
                                                                                                             ? "var(--yellow)"
                                                                                                             : "var(--green)",
+                                                                                                    aspectRatio:
+                                                                                                        "1/1",
                                                                                                 }}
                                                                                             ></span>
 
