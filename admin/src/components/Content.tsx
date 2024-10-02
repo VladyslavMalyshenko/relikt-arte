@@ -541,29 +541,44 @@ const Content = () => {
                                                                             ) : (
                                                                                 <>
                                                                                     {fieldName ===
-                                                                                        "status" && (
-                                                                                        <span
+                                                                                    "status" ? (
+                                                                                        <div
                                                                                             style={{
-                                                                                                width: "20px",
-                                                                                                height: "20px",
                                                                                                 display:
                                                                                                     "flex",
-                                                                                                borderRadius:
-                                                                                                    "50%",
-                                                                                                backgroundColor:
-                                                                                                    product?.status ===
-                                                                                                    "new"
-                                                                                                        ? "var(--red)"
-                                                                                                        : product?.status ===
-                                                                                                          "accepted"
-                                                                                                        ? "var(--yellow)"
-                                                                                                        : "var(--green)",
-                                                                                                marginLeft:
-                                                                                                    "15px",
+                                                                                                gap: "10px",
+                                                                                                alignItems:
+                                                                                                    "center",
+                                                                                                justifyContent:
+                                                                                                    "center",
                                                                                             }}
-                                                                                        ></span>
+                                                                                        >
+                                                                                            <span
+                                                                                                style={{
+                                                                                                    width: "20px",
+                                                                                                    height: "20px",
+                                                                                                    display:
+                                                                                                        "flex",
+                                                                                                    borderRadius:
+                                                                                                        "50%",
+                                                                                                    backgroundColor:
+                                                                                                        product?.status ===
+                                                                                                        "new"
+                                                                                                            ? "var(--red)"
+                                                                                                            : product?.status ===
+                                                                                                              "accepted"
+                                                                                                            ? "var(--yellow)"
+                                                                                                            : "var(--green)",
+                                                                                                }}
+                                                                                            ></span>
+
+                                                                                            {
+                                                                                                displayedValue
+                                                                                            }
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        displayedValue
                                                                                     )}
-                                                                                    displayedValue
                                                                                 </>
                                                                             )}
                                                                         </td>

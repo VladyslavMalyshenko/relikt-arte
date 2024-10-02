@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import noImage from "../../../assets/no_image.png";
 import { SetIsLoaded } from "../../../redux/actions/LoadActions";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/productpage/ProductSection.scss";
@@ -150,12 +151,7 @@ const ProductSection = () => {
                     <div className="product-info">
                         <div className="product-info-main">
                             <div className="product-info-main-image">
-                                <img
-                                    src={
-                                        currentPhoto ||
-                                        "https://i.pinimg.com/originals/04/fb/4b/04fb4b12ab87e1832d17f723c81d1d69.png"
-                                    }
-                                />
+                                <img src={currentPhoto || noImage} />
 
                                 <p className="small black sku">
                                     Артикул: {product.sku}
