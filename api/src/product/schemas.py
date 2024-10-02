@@ -69,6 +69,7 @@ class ProductPhotoShow(MainSchema):
 
 
 class ProductCreate(BaseModel):
+    name: Optional[str] = None
     sku: Optional[str] = None
     price: int
     description: Optional[ProductDescription] = None
@@ -81,6 +82,7 @@ class ProductCreate(BaseModel):
 
 
 class ProductUpdate(BaseModel):
+    name: Optional[str] = None
     sku: Optional[str] = None
     price: Optional[int] = None
     description: Optional[ProductDescription] = None
@@ -94,6 +96,7 @@ class ProductUpdate(BaseModel):
 
 class ProductShow(MainSchema):
     id: int
+    name: Optional[str] = None
     sku: Optional[str] = None
     price: int
     description: Optional[ProductDescription] = None
