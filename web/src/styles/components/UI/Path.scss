@@ -2,12 +2,21 @@
     display: flex;
     align-items: center;
     gap: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     a,
     span {
         text-decoration: none;
         color: var(--transparent-black-10);
         transition: 0.3s;
+
+        &:last-of-type {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 
     a.black {
