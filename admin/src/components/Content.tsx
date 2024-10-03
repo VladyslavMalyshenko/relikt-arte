@@ -539,7 +539,51 @@ const Content = () => {
                                                                                     }
                                                                                 />
                                                                             ) : (
-                                                                                displayedValue
+                                                                                <>
+                                                                                    {fieldName ===
+                                                                                    "status" ? (
+                                                                                        <div
+                                                                                            style={{
+                                                                                                display:
+                                                                                                    "flex",
+                                                                                                gap: "10px",
+                                                                                                alignItems:
+                                                                                                    "center",
+                                                                                                justifyContent:
+                                                                                                    "center",
+                                                                                            }}
+                                                                                        >
+                                                                                            <span
+                                                                                                style={{
+                                                                                                    width: "20px",
+                                                                                                    height: "20px",
+                                                                                                    display:
+                                                                                                        "flex",
+                                                                                                    borderRadius:
+                                                                                                        "50%",
+                                                                                                    backgroundColor:
+                                                                                                        product?.status ===
+                                                                                                        "new"
+                                                                                                            ? "var(--red)"
+                                                                                                            : product?.status ===
+                                                                                                              "accepted"
+                                                                                                            ? "var(--yellow)"
+                                                                                                            : "var(--green)",
+                                                                                                    aspectRatio:
+                                                                                                        "1/1",
+                                                                                                    flexShrink:
+                                                                                                        "0",
+                                                                                                }}
+                                                                                            ></span>
+
+                                                                                            {
+                                                                                                displayedValue
+                                                                                            }
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        displayedValue
+                                                                                    )}
+                                                                                </>
                                                                             )}
                                                                         </td>
                                                                     );

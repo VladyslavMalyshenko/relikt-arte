@@ -204,28 +204,36 @@ const DoorCard = ({ product }: DoorCardProps) => {
             className="door-card"
             onClick={() => navigate(paths.buy + `/${product.id}`)}
         >
-            <img
-                src={
-                    product.photos.find(
-                        (photo: ProductPhotoType) => photo.is_main
-                    )?.photo || noImage
-                }
-                alt={`door-${product.price}-${product.id}`}
-            />
+            <p className="black small sku">Арт. {product.sku}</p>
 
-            <p className="mid black bold" onClick={stopPropagation}>
+            <div className="door-card-image-container">
+                <img
+                    src={
+                        product.photos.find(
+                            (photo: ProductPhotoType) => photo.is_main
+                        )?.photo || noImage
+                    }
+                    alt={`door-${product.price}-${product.id}`}
+                />
+            </div>
+
+            <p className="black bold name" onClick={stopPropagation}>
+                {product.name}
+            </p>
+
+            <p className="black bold price" onClick={stopPropagation}>
                 {product.price} ₴
             </p>
 
-            {tags.length > 0 && (
-                <div className="tags" onClick={stopPropagation}>
-                    {tags.map((tag: any, index: number) => (
+            <div className="tags" onClick={stopPropagation}>
+                {tags.length > 0 &&
+                    tags.map((tag: any, index: number) => (
                         <p key={`tag[${index}]`} className="pre-small gray">
                             {tag.name}
                         </p>
                     ))}
-                </div>
-            )}
+            </div>
+
             <Button
                 inversed={true}
                 borderless={false}

@@ -5,7 +5,7 @@ import "../styles/components/OrderItem.scss";
 import { generateUrl } from "../utils/generateUrl";
 
 type OrderItemProps = {
-    product: any;
+    product: any; // checkout product type needed
 };
 
 const OrderItem = ({ product }: OrderItemProps) => {
@@ -21,8 +21,11 @@ const OrderItem = ({ product }: OrderItemProps) => {
     const [orientation, setOrientation] = useState<boolean | string>(false);
     const [material, setMaterial] = useState<boolean | string>(false);
     const [withGlass, setWithGlass] = useState<boolean | string>(false);
+    const [glassColor, setGlassColor] = useState<boolean | string>(false);
 
     const getProductInfo = async (product: any) => {
+        console.log(product);
+
         setCurrentProduct(product.product);
         setProductQuantity(product.quantity);
         setTotalValue(product.total_price);
@@ -74,6 +77,16 @@ const OrderItem = ({ product }: OrderItemProps) => {
 
             if (product.product.have_glass) {
                 setWithGlass(product.with_glass ? "Присутнє" : "Відсутнє");
+
+                await axios
+                    .get(
+                        generateUrl(
+                            `product/related/product_glass_color/${product.glass_color_id}`
+                        )
+                    )
+                    .then((res) => {
+                        setGlassColor(res.data.name);
+                    });
             }
         };
 
@@ -92,19 +105,37 @@ const OrderItem = ({ product }: OrderItemProps) => {
     return (
         currentProduct && (
             <div className="checkout-product">
-                <img
-                    className="checkout-product-cell"
-                    src={currentPhoto || noImage}
-                    alt={`door-${currentProduct.price}-${currentProduct.id}`}
-                />
-                <div className="checkout-product-count checkout-product-cell">
-                    <p className="upper black pre-small">
-                        {productQuantity || 1} шт
-                    </p>
+                <div className="checkout-product-inner-container">
+                    <div className="checkout-product-image-container">
+                        <img
+                            className="checkout-product-cell"
+                            src={currentPhoto || noImage}
+                            alt={`door-${currentProduct.price}-${currentProduct.id}`}
+                        />
+                    </div>
+
+                    <div className="checkout-product-cell main">
+                        <div className="checkout-product-info">
+                            <p className="small black bold">
+                                {currentProduct.name}
+                            </p>
+                            <p className="small black">
+                                Арт. {currentProduct.sku}
+                            </p>
+                        </div>
+
+                        <div className="checkout-product-active">
+                            <div className="checkout-product-count">
+                                <p className="upper black pre-small">
+                                    {productQuantity || 1} шт
+                                </p>
+                            </div>
+                            <p className="upper black bold mid">
+                                {totalValue} ₴
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <p className="upper black bold mid checkout-product-cell">
-                    {totalValue} ₴
-                </p>
 
                 <div className="checkout-product-options order checkout-product-cell">
                     {colorName && (
@@ -134,9 +165,17 @@ const OrderItem = ({ product }: OrderItemProps) => {
                     )}
 
                     {withGlass && (
-                        <p className="black small">
-                            Наявність скла: {withGlass}
-                        </p>
+                        <>
+                            <p className="black small">
+                                Наявність скла: {withGlass}
+                            </p>
+
+                            {glassColor && (
+                                <p className="black small">
+                                    Колір скла: {glassColor}
+                                </p>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

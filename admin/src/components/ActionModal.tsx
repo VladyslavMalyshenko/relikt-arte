@@ -850,6 +850,20 @@ const ActionModal = () => {
             </>
         ) : fieldObject.type === "product-image" ? (
             <>
+                {(action === "edit" || action === "show") &&
+                    productImages?.find((image: any) => image.is_main)
+                        ?.photo && (
+                        <div className="product-image-preview">
+                            <img
+                                src={
+                                    productImages.find(
+                                        (image: any) => image.is_main
+                                    )?.photo
+                                }
+                            />
+                        </div>
+                    )}
+
                 <button onClick={() => setIsProductImageOpened(true)}>
                     Переглянути
                 </button>

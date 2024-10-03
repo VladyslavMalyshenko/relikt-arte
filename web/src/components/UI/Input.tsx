@@ -169,6 +169,10 @@ const Input = ({
         } else if (type === "email") {
             return {
                 required: "Email є обов'язковим",
+                pattern: {
+                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+                    message: "Неправильний email",
+                },
             };
         } else if (type === "phone") {
             return {
