@@ -2,22 +2,71 @@
     width: 100%;
     height: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 100%;
     grid-template-rows: 180px auto;
     border: 1px solid var(--transparent-black-10);
     border-radius: 10px;
     padding: 20px 50px;
     box-sizing: border-box;
 
-    img {
+    &-inner-container {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        grid-column: 1;
+    }
+
+    &-image-container {
+        height: 100%;
         max-width: 100%;
         max-height: 100%;
+        aspect-ratio: 1/1;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+
+    &-active {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &-info {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        p {
+            max-width: 40%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 
     &-cell {
         display: flex;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
+
+        &.main {
+            width: 100%;
+            max-width: 100%;
+            flex-direction: column;
+            gap: 15px;
+            overflow: hidden;
+        }
+
+        p {
+            text-align: center;
+        }
 
         &-delete {
             width: auto;
@@ -49,7 +98,7 @@
         justify-content: center;
         flex-wrap: wrap;
         gap: 20px;
-        grid-column: 1 / 4;
+        grid-column: 1 / 3;
         padding-top: 20px;
         box-sizing: border-box;
 
@@ -60,6 +109,9 @@
     }
 
     &-count {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         gap: 15px;
     }
 }
@@ -78,6 +130,25 @@
             max-height: 250px;
             width: 100%;
             height: 100%;
+        }
+
+        &-inner-container {
+            flex-direction: column;
+        }
+
+        &-cell.main {
+            gap: 25px;
+            overflow: inherit;
+        }
+
+        &-active,
+        &-info {
+            gap: 20px;
+            flex-direction: column;
+
+            p {
+                max-width: 100%;
+            }
         }
     }
 }

@@ -146,73 +146,80 @@ const CheckoutProduct = ({
     return (
         currentProduct && (
             <div className="checkout-product">
-                <img
-                    className="checkout-product-cell"
-                    src={currentPhoto || noImage}
-                    alt={`door-${currentProduct.price}-${currentProduct.id}`}
-                />
-                <div className="checkout-product-cell main">
-                    <div className="checkout-product-info">
-                        <p className="small black bold">
-                            {currentProduct.name}
-                        </p>
-                        <p className="small black">Арт. {currentProduct.sku}</p>
+                <div className="checkout-product-inner-container">
+                    <div className="checkout-product-image-container">
+                        <img
+                            className="checkout-product-cell"
+                            src={currentPhoto || noImage}
+                            alt={`door-${currentProduct.price}-${currentProduct.id}`}
+                        />
                     </div>
 
-                    <div className="checkout-product-active">
-                        <div className="checkout-product-count">
-                            <div
-                                className="buy-products-pagination-button"
-                                onClick={() =>
-                                    setProductQuantity((prev) =>
-                                        prev > 1 ? prev - 1 : prev
-                                    )
-                                }
-                            >
-                                -
-                            </div>
-
-                            <p className="upper black pre-small">
-                                {productQuantity || 1} шт
+                    <div className="checkout-product-cell main">
+                        <div className="checkout-product-info">
+                            <p className="small black bold">
+                                {currentProduct.name}
                             </p>
-
-                            <div
-                                className="buy-products-pagination-button"
-                                onClick={() =>
-                                    setProductQuantity((prev) => prev + 1)
-                                }
-                            >
-                                +
-                            </div>
+                            <p className="small black">
+                                Арт. {currentProduct.sku}
+                            </p>
                         </div>
 
-                        <div className="checkout-product-cell">
-                            <p className="upper black bold mid">
-                                {totalValue} ₴{" "}
-                            </p>
-
-                            {deleteItem && (
-                                <button
-                                    className="checkout-product-cell-delete"
-                                    onClick={async () => {
-                                        await deleteItem(product.id);
-                                    }}
+                        <div className="checkout-product-active">
+                            <div className="checkout-product-count">
+                                <div
+                                    className="buy-products-pagination-button"
+                                    onClick={() =>
+                                        setProductQuantity((prev) =>
+                                            prev > 1 ? prev - 1 : prev
+                                        )
+                                    }
                                 >
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
+                                    -
+                                </div>
+
+                                <p className="upper black pre-small">
+                                    {productQuantity || 1} шт
+                                </p>
+
+                                <div
+                                    className="buy-products-pagination-button"
+                                    onClick={() =>
+                                        setProductQuantity((prev) => prev + 1)
+                                    }
+                                >
+                                    +
+                                </div>
+                            </div>
+
+                            <div className="checkout-product-cell">
+                                <p className="upper black bold mid">
+                                    {totalValue} ₴{" "}
+                                </p>
+
+                                {deleteItem && (
+                                    <button
+                                        className="checkout-product-cell-delete"
+                                        onClick={async () => {
+                                            await deleteItem(product.id);
+                                        }}
                                     >
-                                        <path
-                                            d="M3 3L6 6M6 6L10 10M6 6V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18M6 6H4M10 10L14 14M10 10V17M14 14L18 18M14 14V17M18 18L21 21M18 6V12.3906M18 6H16M18 6H20M16 6L15.4558 4.36754C15.1836 3.55086 14.4193 3 13.5585 3H10.4415C9.94239 3 9.47572 3.18519 9.11861 3.5M16 6H11.6133"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </button>
-                            )}
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M3 3L6 6M6 6L10 10M6 6V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18M6 6H4M10 10L14 14M10 10V17M14 14L18 18M14 14V17M18 18L21 21M18 6V12.3906M18 6H16M18 6H20M16 6L15.4558 4.36754C15.1836 3.55086 14.4193 3 13.5585 3H10.4415C9.94239 3 9.47572 3.18519 9.11861 3.5M16 6H11.6133"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
