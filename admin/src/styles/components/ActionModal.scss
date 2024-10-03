@@ -228,3 +228,14 @@
         }
     }
 }
+
+.product-image-preview {
+    width: 200px;
+    height: 200px;
+    aspect-ratio: 1/1;
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
