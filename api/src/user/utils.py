@@ -1,9 +1,8 @@
 from .schemas import AuthTokenShow
-from .dataclasses import AuthTokenEmailMessageContext
 
 from ..core.config import settings
-
 from ..utils.managers.email.manager import BaseEmailManager
+from ..utils.managers.email.dataclasses import EmailMessageContext
 
 
 class AuthTokenEmailManager(BaseEmailManager):
@@ -26,11 +25,11 @@ class AuthTokenEmailManager(BaseEmailManager):
                 <p style="margin: 0;">З повагою, команда Relict Arte 😊</p>
             </div>
         """
-        context = AuthTokenEmailMessageContext(
+        context = EmailMessageContext(
             subject="Relict Arte - Підтвердження реєстрації",
             body_message=body_message,
         )
-        await self.send_email(context, token_data.owner_email)
+        await self.send_email(context, [token_data.owner_email])
 
     async def send_password_reset(self, token_data: AuthTokenShow):
         body_message = f"""
@@ -48,11 +47,11 @@ class AuthTokenEmailManager(BaseEmailManager):
                 <p style="margin: 0;">З повагою, команда Relict Arte 😊</p>
             </div>
         """
-        context = AuthTokenEmailMessageContext(
+        context = EmailMessageContext(
             subject="Relict Arte - Скидання пароля",
             body_message=body_message,
         )
-        await self.send_email(context, token_data.owner_email)
+        await self.send_email(context, [token_data.owner_email])
 
     async def send_email_change_confirmation(self, token_data: AuthTokenShow):
         body_message = f"""
@@ -70,8 +69,8 @@ class AuthTokenEmailManager(BaseEmailManager):
                 <p style="margin: 0;">З повагою, команда Relict Arte 😊</p>
             </div>
         """
-        context = AuthTokenEmailMessageContext(
+        context = EmailMessageContext(
             subject="Relict Arte - Підтвердження зміни електронної пошти",
             body_message=body_message,
         )
-        await self.send_email(context, token_data.owner_new_email)
+        await self.send_email(context, [token_data.owner_new_email])
