@@ -10,3 +10,4 @@ app.conf.update(
     broker_heartbeat=240,
 )
 app.autodiscover_tasks(["src.user.tasks"])
+app.autodiscover_tasks(["src.letter.tasks"])
