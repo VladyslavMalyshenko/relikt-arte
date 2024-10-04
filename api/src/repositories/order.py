@@ -103,6 +103,10 @@ class OrderRepository(GenericRepository[Order, OrderCreate, OrderUpdate]):
                         Product.photos,
                     )
                 ),
+                selectinload(OrderItem.color),
+                selectinload(OrderItem.size),
+                selectinload(OrderItem.covering),
+                selectinload(OrderItem.glass_color),
             ),
         )
         if not options:
