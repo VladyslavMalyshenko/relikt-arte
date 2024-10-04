@@ -15,6 +15,7 @@ from ..user.schemas import (
     AuthTokenCreate,
     AuthTokenUpdate,
 )
+from ..utils.base import clean_dict
 
 
 class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
@@ -55,7 +56,7 @@ class UserRepository(GenericRepository[User, UserCreate, UserUpdate]):
             update(self.model)
             .where(self.model.id == obj_id)
             .values(
-                **self.clean_dict(
+                **clean_dict(
                     dict(obj_in),
                     ignore_keys=clean_dict_ignore_keys,
                 )
