@@ -1078,6 +1078,26 @@ const ActionModal = () => {
                     </div>
                 ) : null}
             </>
+        ) : fieldObject.type === "textarea" ? (
+            <textarea
+                {...register(fieldName, {
+                    required: fieldObject.required || false,
+                })}
+                {...(action !== "add"
+                    ? {
+                          readOnly:
+                              ((action === "show" || action === "delete") &&
+                                  typeof item[fieldName] !== "boolean") ||
+                              fieldName === "id" ||
+                              fieldObject.locked,
+                          disabled:
+                              ((action === "show" || action === "delete") &&
+                                  typeof item[fieldName] === "boolean") ||
+                              fieldObject.locked,
+                      }
+                    : {})}
+                placeholder={fieldObject.name}
+            />
         ) : (
             <input
                 {...register(fieldName, {

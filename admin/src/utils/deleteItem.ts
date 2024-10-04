@@ -25,7 +25,7 @@ export const deleteItem = async (
         .delete(validUrl)
         .then(async () => {
             const success = {
-                message: `Item with id ${data.id} was deleted.`,
+                message: `Об'єкт з номером ${data.id} був видалений.`,
                 type: "success",
             };
 
@@ -42,7 +42,7 @@ export const deleteItem = async (
         })
         .catch(() => {
             const error = {
-                message: `Error occured while deleting item with id ${data.id}.`,
+                message: `Помилка під час видалення об'єкту з номером ${data.id}.`,
                 type: "error",
             };
 

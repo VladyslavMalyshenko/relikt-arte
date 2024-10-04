@@ -36,14 +36,14 @@ export const bulkEdit = async (
 
     if (!noError) {
         const error = {
-            message: `Error occurred while updating the bulk of items.`,
+            message: `Сталася помилка під час оновлення об'єктів.`,
             type: "error",
         };
 
         store.dispatch(AddNotification(error as NotificationBody));
     } else {
         const success = {
-            message: `The bulk of items was updated.`,
+            message: `Обрані об'єкти були оновлені успішно!`,
             type: "success",
         };
 

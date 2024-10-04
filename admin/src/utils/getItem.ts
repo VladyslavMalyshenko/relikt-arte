@@ -24,7 +24,7 @@ export const getItem = async (url_part: string, data?: any) => {
         })
         .catch(() => {
             const error = {
-                message: `Error loading the item with id ${data.id}.`,
+                message: `Сталася помилка під час завантаження об'єкту під номером ${data.id}.`,
                 type: "error",
             };
 

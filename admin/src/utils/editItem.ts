@@ -25,7 +25,7 @@ export const editItem = async (
         .put(validUrl, newItem)
         .then(async (res) => {
             const success = {
-                message: `Item with id ${data.id} was changed.`,
+                message: `Об'єкт під номером ${data.id} був змінений.`,
                 type: "success",
             };
 
@@ -38,7 +38,7 @@ export const editItem = async (
         })
         .catch(() => {
             const error = {
-                message: `Error occurred while changing item with id ${data.id}.`,
+                message: `Сталася помилка під час зміни об'єкту під номером ${data.id}.`,
                 type: "error",
             };
 

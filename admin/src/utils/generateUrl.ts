@@ -3,10 +3,10 @@ export const generateUrl = (targetUrl: string) => {
 
     const isDomainNotEndsWithSlash = !(
         process.env.REACT_APP_BACKEND_LINK || "http://localhost:8000"
-    ).endsWith("/");
+    )?.endsWith("/");
     const validPart = `${isDomainNotEndsWithSlash ? "/" : ""}${
-        !targetUrl.includes(part) ? part : ""
-    }${!targetUrl.startsWith("/") ? "/" : ""}`;
+        !targetUrl?.includes(part) ? part : ""
+    }${!targetUrl?.startsWith("/") ? "/" : ""}`;
 
     const secondPart = `${validPart}${targetUrl}`.replaceAll("//", "/");
     const url = `${

@@ -45,3 +45,13 @@ export type MainCategory = {
     link: string;
     main: boolean;
 };
+
+export type LetterCategory = {
+    icon: JSX.Element;
+    label: string;
+    link: string;
+    letter: boolean;
+    addUrl: string;
+    addItemFields: InputField[];
+    inputFields: InputField[];
+};

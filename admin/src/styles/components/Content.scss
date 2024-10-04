@@ -294,6 +294,12 @@
                             background: var(--red-background);
                             border-color: var(--red);
                         }
+
+                        &.order-download:hover {
+                            color: #8f8f8f;
+                            background: #8f8f8f1e;
+                            border-color: #8f8f8f;
+                        }
                     }
                 }
             }

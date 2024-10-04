@@ -87,6 +87,28 @@
             }
         }
 
+        textarea {
+            border: 2px solid transparent;
+            width: 25em;
+            height: 5em;
+            outline: none;
+            overflow: hidden;
+            background-color: var(--background-color-muted);
+            border-radius: 10px;
+            transition: border, box-shadow 0.3s;
+
+            &.invalid {
+                border: 2px solid var(--red);
+            }
+
+            &:hover,
+            &:focus {
+                border: 2px solid var(--active-color);
+                box-shadow: 0px 0px 0px 7px var(--active-background);
+                background-color: var(var(--background-color));
+            }
+        }
+
         .list-input {
             width: 200px;
             max-width: 100%;
