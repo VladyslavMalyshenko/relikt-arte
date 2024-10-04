@@ -1,4 +1,7 @@
 import logging
+import csv
+
+from io import StringIO
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -169,7 +172,9 @@ class BasketService(BaseService):
                             self.uow.basket_item.model.basket_id: basket.id,
                         }
                     )
-                    basket_item.quantity += item_data.quantity if item_data.quantity else 1
+                    basket_item.quantity += (
+                        item_data.quantity if item_data.quantity else 1
+                    )
                 else:
                     await self.uow.basket_item.create(obj_in=item_data)
                 await self.uow.commit()
@@ -405,3 +410,83 @@ class OrderService(BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise InvalidCredentialsException()
+
+    async def get_order_in_csv(self, order_id: int):
+        try:
+            async with self.uow:
+                order = await self.uow.order.get_by_id(obj_id=order_id)
+
+                output = StringIO()
+                writer = csv.writer(output)
+
+                writer.writerow(
+                    ["Order Information"]
+                )
+                writer.writerow(
+                    [
+                        "Full Name",
+                        "Phone",
+                        "Email",
+                        "Region",
+                        "City",
+                        "Warehouse",
+                        "Address",
+                        "Additional Info",
+                        "Status",
+                    ]
+                )
+                writer.writerow(
+                    [
+                        order.full_name,
+                        order.phone,
+                        order.email,
+                        order.region,
+                        order.city_or_settlement,
+                        order.warehouse,
+                        order.delivery_address,
+                        order.additional_info,
+                        order.status.name,
+                    ]
+                )
+
+                writer.writerow([])
+
+                writer.writerow(["Order Items"])
+                writer.writerow(
+                    [
+                        "Product Name",
+                        "SKU",
+                        "Price",
+                        "Quantity",
+                        "Total Price",
+                        "Material Choice",
+                        "Type of Platband Choice",
+                        "Orientation Choice",
+                        "Photos",
+                    ]
+                )
+
+                for item in order.items:
+                    product = item.product
+
+                    photos = [photo.photo for photo in product.photos]
+                    photo_urls = ", ".join(photos)
+
+                    writer.writerow(
+                        [
+                            product.name,
+                            product.sku,
+                            product.price,
+                            item.quantity,
+                            item.total_price,
+                            product.material_choice,
+                            product.type_of_platband_choice,
+                            product.orientation_choice,
+                            photo_urls,
+                        ]
+                    )
+
+                return output.getvalue()
+        except SQLAlchemyError as e:
+            log.exception(e)
+            raise OrderGetException(order_id=order_id)
