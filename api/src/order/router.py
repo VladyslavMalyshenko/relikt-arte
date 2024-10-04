@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from fastapi.responses import StreamingResponse
+
 from ..core.db.dependencies import uowDEP
 from ..core.dependencies import pagination_params
 from ..user.dependencies import authorization
@@ -151,4 +153,21 @@ async def delete_order(
 ) -> list[OrderShow]:
     return await OrderService(uow).delete_order(
         order_id=order_id,
+    )
+
+
+@router.get("/download_csv/{order_id}/", tags=["Order"])
+async def download_order_csv(
+    order_id: int,
+    uow: uowDEP,
+):
+    csv_data = await OrderService(uow).get_order_in_csv(
+        order_id=order_id,
+    )
+    return StreamingResponse(
+        iter([csv_data]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=order_{order_id}.csv"
+        },
     )
