@@ -94,7 +94,7 @@ class OrderShow(MainSchema):
     user_id: Optional[uuid.UUID] = None
     full_name: str
     phone: str
-    email: EmailStr
+    email: str
     region: str
     city_or_settlement: str
     warehouse: Optional[str] = None
