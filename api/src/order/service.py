@@ -419,22 +419,25 @@ class OrderService(BaseService):
                 output = StringIO()
                 writer = csv.writer(output)
 
-                writer.writerow(
-                    ["Order Information"]
-                )
+                writer.writerow(["Інформація про замовлення"])
                 writer.writerow(
                     [
-                        "Full Name",
-                        "Phone",
-                        "Email",
-                        "Region",
-                        "City",
-                        "Warehouse",
-                        "Address",
-                        "Additional Info",
-                        "Status",
+                        "ПІБ",
+                        "Телефон",
+                        "Електронна пошта",
+                        "Регіон",
+                        "Місто",
+                        "Відділення",
+                        "Додаткова інформація",
+                        "Статус",
                     ]
                 )
+                if order.status == "new":
+                    order_status = "Нове"
+                elif order.status == "accepted":
+                    order_status = "Приняте"
+                else:
+                    order_status = "Готове до відправлення"
                 writer.writerow(
                     [
                         order.full_name,
@@ -443,28 +446,40 @@ class OrderService(BaseService):
                         order.region,
                         order.city_or_settlement,
                         order.warehouse,
-                        order.delivery_address,
                         order.additional_info,
-                        order.status.name,
+                        order_status,
                     ]
                 )
 
                 writer.writerow([])
 
-                writer.writerow(["Order Items"])
-                writer.writerow(
+                writer.writerow(["Товари в замовленні"])
+                headers = [
+                    "Назва товару",
+                    "SKU",
+                    "Ціна",
+                    "Кількість",
+                    "Загальна ціна",
+                ]
+
+                if any(item.material for item in order.items):
+                    headers.append("Матеріал")
+                if any(item.type_of_platband for item in order.items):
+                    headers.append("Тип плінтуса")
+                if any(item.orientation for item in order.items):
+                    headers.append("Орієнтація")
+                if any(item.with_glass is not None for item in order.items):
+                    headers.append("З склом")
+                headers.extend(
                     [
-                        "Product Name",
-                        "SKU",
-                        "Price",
-                        "Quantity",
-                        "Total Price",
-                        "Material Choice",
-                        "Type of Platband Choice",
-                        "Orientation Choice",
-                        "Photos",
+                        "Колір",
+                        "Колір скла",
+                        "Покриття",
+                        "Розмір",
+                        "URL фотографій",
                     ]
                 )
+                writer.writerow(headers)
 
                 for item in order.items:
                     product = item.product
@@ -472,21 +487,47 @@ class OrderService(BaseService):
                     photos = [photo.photo for photo in product.photos]
                     photo_urls = ", ".join(photos)
 
-                    writer.writerow(
+                    row = [
+                        product.name,
+                        product.sku,
+                        product.price,
+                        item.quantity,
+                        item.total_price,
+                    ]
+
+                    if item.material:
+                        row.append(
+                            "Дерево" if item.material == "wood" else "МДФ"
+                        )
+                    if item.type_of_platband:
+                        row.append(
+                            "Г-подібний"
+                            if item.type_of_platband == "L-shaped"
+                            else "Звичайний"
+                        )
+                    if item.orientation:
+                        row.append(
+                            "Ліва" if item.orientation == "left" else "Права"
+                        )
+                    if item.with_glass is not None:
+                        row.append("Так" if item.with_glass else "Ні")
+                    row.extend(
                         [
-                            product.name,
-                            product.sku,
-                            product.price,
-                            item.quantity,
-                            item.total_price,
-                            product.material_choice,
-                            product.type_of_platband_choice,
-                            product.orientation_choice,
+                            item.color.name,
+                            (
+                                item.glass_color.name
+                                if item.glass_color
+                                else "Н/Д"
+                            ),
+                            item.covering.name if item.covering else "Н/Д",
+                            item.size.dimensions if item.size else "Н/Д",
                             photo_urls,
                         ]
                     )
+                    writer.writerow(row)
 
                 return output.getvalue()
+
         except SQLAlchemyError as e:
             log.exception(e)
             raise OrderGetException(order_id=order_id)

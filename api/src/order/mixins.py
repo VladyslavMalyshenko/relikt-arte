@@ -8,7 +8,13 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..core.db.mixins import BaseModelMixin
-from ..product.models import Product
+from ..product.models import (
+    Product,
+    ProductGlassColor,
+    ProductCovering,
+    ProductColor,
+    ProductSize,
+)
 from ..product.enums import ProductTypeOfPlatbandEnum, ProductOrientationEnum
 
 from .enums import ItemMaterialEnum
@@ -103,6 +109,30 @@ class ItemMixin(BaseModelMixin):
     def product(cls) -> Mapped[Product]:
         return relationship(
             Product,
+        )
+
+    @declared_attr
+    def color(cls) -> Mapped[ProductColor]:
+        return relationship(
+            ProductColor,
+        )
+
+    @declared_attr
+    def size(cls) -> Mapped[ProductSize]:
+        return relationship(
+            ProductSize,
+        )
+
+    @declared_attr
+    def covering(cls) -> Mapped[ProductCovering]:
+        return relationship(
+            ProductCovering,
+        )
+
+    @declared_attr
+    def glass_color(cls) -> Mapped[ProductGlassColor]:
+        return relationship(
+            ProductGlassColor,
         )
 
     @hybrid_property
