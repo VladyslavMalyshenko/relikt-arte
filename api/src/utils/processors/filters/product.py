@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 from .base import FilterProcessor
 
@@ -17,7 +17,17 @@ class ProductFilterProcessor(FilterProcessor):
 
     async def process_equals(self, field: str, value: str):
         field_attr = getattr(self.model, field)
-        return [and_(field_attr.isnot(None), field_attr == value)]
+        if field == "have_glass":
+            return [
+                or_(
+                    and_(
+                        field_attr == value,
+                        self.model.category.has(is_glass_available=True),
+                    ),
+                    self.model.category.has(is_glass_available=False),
+                )
+            ]
+        return [field_attr == value]
 
 
 class CategoryFilterProcessor(FilterProcessor):

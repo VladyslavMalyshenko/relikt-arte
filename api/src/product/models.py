@@ -123,7 +123,6 @@ class Product(BaseModelMixin, Base):
     )
     have_glass: Mapped[bool] = mapped_column(
         nullable=True,
-        default=False,
         doc="Does product have glass",
     )
     material_choice: Mapped[bool] = mapped_column(

@@ -69,6 +69,8 @@ class FilterProcessor(AbstractFilterProcessor):
         super().__init__()
 
     async def process_equals(self, field: str, value: str):
+        print("process_equals")
+        print(field, value)
         return [getattr(self.model, field) == value]
 
     async def process_range(self, field: str, range_values: list):
@@ -77,6 +79,7 @@ class FilterProcessor(AbstractFilterProcessor):
         return [getattr(self.model, field).between(*range_values)]
 
     async def process_value_in(self, field: str, values: list):
+        print("process_value_in")
         return [getattr(self.model, field).in_(values)]
 
     async def process_value_more_than(self, field: str, value: str):
@@ -95,6 +98,7 @@ class FilterProcessor(AbstractFilterProcessor):
         filters_list = []
         for filter_lst in filters:
             filters_list.extend(await self.process_filter(filter_lst))
+        print(filters_list)
         return filters_list
 
     async def __get_column_enum(self, column: str):
@@ -120,6 +124,8 @@ class FilterProcessor(AbstractFilterProcessor):
         enum_class = await self.__get_column_enum(column)
         if enum_class:
             value = enum_class(value)
+
+        print(column, operator, value)
 
         if operator == FilterOperator.EQUALS:
             return await self.process_equals(column, value)
