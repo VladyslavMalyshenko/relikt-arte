@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ChangeCartProduct, SetCart } from "../../redux/actions/CartActions";
 import { paths } from "../../router/paths";
 import "../../styles/components/UI/CartModal.scss";
 import { deleteCartItem, getCart } from "../../utils/handleCart";
@@ -14,11 +16,18 @@ type CartModalProps = {
 const CartModal = ({ closeModal }: CartModalProps) => {
     const stopPropagation = (e: any) => e.stopPropagation();
     const navigate = useNavigate();
-    const [products, setProducts] = useState<any>([]); // checkout product type needed
     const [itemsInfo, setItemsInfo] = useState<any>({});
     const [totalValue, setTotalValue] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [cart, setCart] = useState<any>({});
+    const dispatch = useDispatch();
+
+    const products = useSelector(
+        (state: any) => state.CartReducer.cartProducts
+    );
+
+    const setProducts = (cartProducts: any) => {
+        dispatch(SetCart(cartProducts));
+    };
 
     useEffect(() => {
         const setUpCart = async () => {
@@ -29,7 +38,6 @@ const CartModal = ({ closeModal }: CartModalProps) => {
             });
 
             if (cart) {
-                setCart(cart);
                 setTotalValue(cart.total_value);
                 setItemsInfo(cart.items);
                 setProducts(cart.items.results);
@@ -47,9 +55,18 @@ const CartModal = ({ closeModal }: CartModalProps) => {
         ]);
 
         if (cart) {
-            setCart(cart);
             setItemsInfo(cart.items);
             setProducts(cart.items.results);
+        }
+    };
+
+    const onQuantityChange = (options: any) => {
+        if (options?.currentObject) {
+            dispatch(ChangeCartProduct(options.currentObject));
+        }
+
+        if (options?.data?.total_value !== undefined) {
+            setTotalValue(options.data.total_value);
         }
     };
 
@@ -92,10 +109,8 @@ const CartModal = ({ closeModal }: CartModalProps) => {
                                                 product={product}
                                                 setValue={() => false}
                                                 deleteItem={deleteItem}
-                                                onQuantityChange={(data: any) =>
-                                                    setTotalValue(
-                                                        data.total_value
-                                                    )
+                                                onQuantityChange={
+                                                    onQuantityChange
                                                 }
                                             />
                                         ))}

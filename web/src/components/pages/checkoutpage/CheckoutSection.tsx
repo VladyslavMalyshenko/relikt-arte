@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ChangeCartProduct, SetCart } from "../../../redux/actions/CartActions";
 import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/checkoutpage/CheckoutSection.scss";
 import { ProductType } from "../../../types/productsRelatedTypes";
@@ -14,12 +16,20 @@ import Loader from "../../UI/Loader";
 
 const CheckoutSection = () => {
     const navigate = useNavigate();
-    const [cartProducts, setCartProducts] = useState<ProductType[]>([]);
     const [totalValue, setTotalValue] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOrderSuccess, setIsOrderSuccess] = useState(false);
     const [orderInfo, setOrderInfo] = useState<any>(null);
     const [isLoading, setIsLoading] = useState<any>(true);
+
+    const dispatch = useDispatch();
+    const cartProducts = useSelector(
+        (state: any) => state.CartReducer.cartProducts
+    );
+
+    const setCartProducts = (cartProducts: any) => {
+        dispatch(SetCart(cartProducts));
+    };
 
     const formController = useForm({
         defaultValues: {
@@ -172,11 +182,13 @@ const CheckoutSection = () => {
         navigate(paths.buy);
     };
 
-    const onQuantityChange = async () => {
-        const cart = await getCart().catch(() => false);
+    const onQuantityChange = async (options: any) => {
+        if (options?.currentObject) {
+            dispatch(ChangeCartProduct(options.currentObject));
+        }
 
-        if (cart) {
-            setTotalValue(cart.total_value);
+        if (options?.data?.total_value !== undefined) {
+            setTotalValue(options.data.total_value);
         }
     };
 
@@ -296,6 +308,7 @@ const CheckoutSection = () => {
                                                 />
                                             )
                                         )}
+
                                         <div className="checkout-section-inner-products-checkout">
                                             <p className="upper black pre-small bold">
                                                 доставка

@@ -48,6 +48,7 @@ const DropDown = ({
         []
     );
     const [searchPrompt, setSearchPrompt] = useState("");
+    const [previousDefaultOption, setPreviousDefaultOption] = useState<any>("");
 
     const handleOptionSelect = (
         value: any,
@@ -94,7 +95,6 @@ const DropDown = ({
                             ...item,
                             key: `${item.name}-${item.value}`,
                         }));
-                        console.log("H: ", newOptions);
                     }
                 }
             } else if ((options as any)?.url && (options as any)?.labelKey) {
@@ -113,35 +113,36 @@ const DropDown = ({
             setCurrentOptions(newOptions);
             setFilteredOptions(newOptions);
 
+            const defaultOption = defaultValue
+                ? newOptions.find(
+                      (opt: any) =>
+                          opt[defaultValue.defaultFieldName] ===
+                          (defaultValue.defaultValue?.value !== undefined
+                              ? defaultValue.defaultValue?.value
+                              : defaultValue.defaultValue)
+                  )
+                : newOptions[0];
+
             if (
-                JSON.stringify(selectedOption) === "{}" ||
-                !selectedOption?.key
+                defaultOption &&
+                (JSON.stringify(selectedOption) === "{}" ||
+                    !selectedOption?.key ||
+                    previousDefaultOption !==
+                        `option-${defaultOption.key || defaultOption.name}`)
             ) {
-                console.log(defaultValue, label);
+                handleOptionSelect(
+                    defaultOption.value,
+                    `option-${defaultOption.key || defaultOption.name}`,
+                    defaultOption.name
+                );
 
-                console.log("OPT: ", newOptions);
-
-                const defaultOption = defaultValue
-                    ? newOptions.find(
-                          (opt: any) =>
-                              opt[defaultValue.defaultFieldName] ===
-                              (defaultValue.defaultValue?.value !== undefined
-                                  ? defaultValue.defaultValue?.value
-                                  : defaultValue.defaultValue)
-                      )
-                    : newOptions[0];
-
-                if (defaultOption) {
-                    console.log("DEF: ", label, defaultOption);
-
-                    handleOptionSelect(
-                        defaultOption.value,
-                        `option-${defaultOption.key || defaultOption.name}`,
-                        defaultOption.name
-                    );
-                }
+                setPreviousDefaultOption(
+                    `option-${defaultOption.key || defaultOption.name}`
+                );
             }
         };
+
+        console.log(defaultValue);
 
         fetchOptions();
     }, [options, defaultValue]);

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import noImage from "../../assets/no_image.png";
+import { ChangeCartProduct } from "../../redux/actions/CartActions";
 import "../../styles/components/UI/CheckoutProduct.scss";
 import { ProductPhotoType } from "../../types/productsRelatedTypes";
 import { getItem } from "../../utils/getItem";
@@ -29,10 +31,9 @@ const CheckoutProduct = ({
     const [totalValue, setTotalValue] = useState<number>(0);
     const isProductLoaded = useRef(false);
     const [withGlass, setWithGlass] = useState(false);
+    const dispatch = useDispatch();
 
     const getProductInfo = async (product: any) => {
-        console.log(product);
-
         setCurrentProduct(product.product);
         setProductQuantity(product.quantity);
         setPreviousQuantity(product.quantity);
@@ -67,10 +68,18 @@ const CheckoutProduct = ({
                 setTotalValue(currentPrice * productQuantity);
 
                 if (onQuantityChange) {
-                    await onQuantityChange(res);
+                    console.log(res.data);
+
+                    await onQuantityChange({
+                        currentObject: {
+                            ...product,
+                            quantity: productQuantity,
+                        },
+                        data: res.data,
+                    });
                 }
             });
-        }, 1000);
+        }, 300);
 
         return () => {
             clearTimeout(delayDebounceFn);
@@ -139,9 +148,15 @@ const CheckoutProduct = ({
             if (fieldName === "with_glass" && !value) {
                 onChosen("glass_color_id", null, "glass_color_id");
             }
-            await changeCartItem(product.id, { [fieldName]: value });
+            await changeCartItem(product.id, { [fieldName]: value }).then(() =>
+                dispatch(ChangeCartProduct({ ...product, [fieldName]: value }))
+            );
         }
     };
+
+    useEffect(() => {
+        console.log(product);
+    }, [product]);
 
     return (
         currentProduct && (

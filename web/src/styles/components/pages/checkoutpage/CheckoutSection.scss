@@ -1,5 +1,6 @@
 .checkout {
     $innerGap: 15px;
+
     &-section {
         width: 100%;
         display: flex;
@@ -38,7 +39,7 @@
             }
 
             &-products {
-                width: 50%;
+                width: 65%;
                 display: flex;
                 align-items: center;
                 flex-direction: column;
