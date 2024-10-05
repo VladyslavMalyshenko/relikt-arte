@@ -1,3 +1,5 @@
+import datetime
+
 from enum import Enum as PyEnum
 
 from sqlalchemy import ForeignKey
@@ -88,6 +90,10 @@ class Order(BasketAndOrderMixin, Base):
         default=OrderStatusEnum.NEW,
         nullable=False,
         doc="Order status",
+    )
+    status_date_to: Mapped[datetime.date] = mapped_column(
+        nullable=True,
+        doc="Date to change status",
     )
 
     items: Mapped[list["OrderItem"]] = relationship(
