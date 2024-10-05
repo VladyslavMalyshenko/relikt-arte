@@ -348,6 +348,7 @@ class OrderService(BaseService):
                     repo=self.uow.order,
                     data=data,
                     obj_id=order_id,
+                    clean_dict_ignore_keys=["status_date_to"],
                 )
         except SQLAlchemyError as e:
             log.exception(e)
