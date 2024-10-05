@@ -278,6 +278,7 @@ class OrderService(BaseService):
             updated_at=obj.updated_at,
             total_items=obj.total_items,
             total_value=obj.total_value,
+            additional_info=obj.additional_info,
             status=obj.status,
         )
 
