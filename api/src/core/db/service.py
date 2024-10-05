@@ -57,10 +57,15 @@ class BaseService(AbstractService):
         repo: Repo,
         data: BaseModel,
         obj_id: int | uuid.UUID,
+        clean_dict_ignore_keys: Optional[list] = None,
     ) -> BaseModel:
         if not await repo.exists_by_id(obj_id=obj_id):
             raise IdNotFoundException(model=repo.model, id=obj_id)
-        await repo.update(obj_in=data, obj_id=obj_id)
+        await repo.update(
+            obj_in=data,
+            obj_id=obj_id,
+            clean_dict_ignore_keys=clean_dict_ignore_keys,
+        )
         await self.uow.commit()
         obj = await repo.get_by_id(obj_id=obj_id)
         return await self.get_show_scheme(obj)
