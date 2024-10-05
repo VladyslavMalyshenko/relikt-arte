@@ -13,6 +13,7 @@ import RegisterConformationPage from "../pages/RegisterConformationPage";
 import RegisterPage from "../pages/RegisterPage";
 import SingInPage from "../pages/SingInPage";
 import { paths } from "./paths";
+import MaterialsPage from "../pages/MaterialsPage";
 
 const Router = () => {
     return (
@@ -29,6 +30,7 @@ const Router = () => {
             <Route path={paths.profile} element={<ProfilePage />} />
             <Route path={paths.checkout} element={<CheckoutPage />} />
             <Route path={paths.contacts} element={<ContactsPage />} />
+            <Route path={paths.materials} element={<MaterialsPage />} />
             <Route
                 path={paths.registerConfirmation}
                 element={<RegisterConformationPage />}

@@ -908,7 +908,7 @@ const ActionModal = () => {
                                 ?.toISOString()
                                 .split("T")[0]
                         }
-                        value={item?.status_date_to || ""}
+                        defaultValue={item?.status_date_to || ""}
                         onChange={(e) => {
                             const getDateString = (date: any) => {
                                 return date.toISOString().split("T")[0];
@@ -919,12 +919,12 @@ const ActionModal = () => {
                             let currentDate = getDateString(orderDate);
 
                             if (orderDate > inputDate) {
-                                e.target.value = getDateString(orderDate);
                                 currentDate = getDateString(orderDate);
                             } else {
                                 currentDate = getDateString(inputDate);
                             }
 
+                            e.target.value = currentDate;
                             setValue("status_date_to", currentDate);
                         }}
                     />

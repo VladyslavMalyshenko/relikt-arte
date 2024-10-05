@@ -48,7 +48,13 @@ const OrderSection = () => {
                     ? "Очікує обробки"
                     : order.status === "accepted"
                     ? "В обробці"
-                    : "Готовий до відправки"}
+                    : "Готовий до відправки"}{" "}
+                {order.status !== "new" &&
+                    `(до: ${
+                        order.status_date_to
+                            ? formatDate(order.status_date_to)
+                            : "не вказано"
+                    })`}
                 <span
                     style={{
                         width: "20px",

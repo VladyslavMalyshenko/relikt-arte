@@ -89,6 +89,13 @@ const Navbar = () => {
 
                     <NavbarLink
                         onClick={() => handleNavbar(true)}
+                        to={paths.materials}
+                    >
+                        Матеріали
+                    </NavbarLink>
+
+                    <NavbarLink
+                        onClick={() => handleNavbar(true)}
                         to={paths.contacts}
                     >
                         Контакти
