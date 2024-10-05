@@ -102,6 +102,7 @@ class OrderShow(MainSchema):
     additional_info: Optional[str] = None
     items: Optional[OrderItemList] = None
     status: OrderStatusEnum
+    status_date_to: Optional[datetime.date] = None
     total_value: int
     total_items: int
     created_at: datetime.datetime
@@ -156,6 +157,7 @@ class OrderUpdate(MainSchema):
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
     status: Optional[OrderStatusEnum] = None
+    status_date_to: Optional[datetime.date] = None
 
 
 OrderListSchema = BaseListSchema[OrderShow]

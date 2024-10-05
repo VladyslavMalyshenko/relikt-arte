@@ -280,6 +280,7 @@ class OrderService(BaseService):
             total_value=obj.total_value,
             additional_info=obj.additional_info,
             status=obj.status,
+            status_date_to=obj.status_date_to,
         )
 
     async def create_order(
