@@ -168,7 +168,8 @@ const ActionModal = () => {
                 ).filter(
                     (field: InputField) =>
                         (field.type === "list" ||
-                            field.type === "list-radio") &&
+                            field.type === "list-radio" ||
+                            field.type === "order-status") &&
                         (field.getUrl || field.value)
                 );
 
@@ -300,13 +301,15 @@ const ActionModal = () => {
                                 const value =
                                     fieldObject.type === "boolean" ||
                                     fieldObject.type === "list" ||
-                                    fieldObject.type === "list-radio"
+                                    fieldObject.type === "list-radio" ||
+                                    fieldObject.type === "order-status"
                                         ? getNestedValue(item, fieldName)
                                         : getNestedValue(item, fieldName) || "";
 
                                 if (
                                     fieldObject.type === "list" ||
-                                    fieldObject.type === "list-radio"
+                                    fieldObject.type === "list-radio" ||
+                                    fieldObject.type === "order-status"
                                 ) {
                                     console.log(fieldObject);
 
@@ -385,13 +388,15 @@ const ActionModal = () => {
                                 const value =
                                     itemField.type === "boolean" ||
                                     itemField.type === "list" ||
-                                    itemField.type === "list-radio"
+                                    itemField.type === "list-radio" ||
+                                    itemField.type === "order-status"
                                         ? getNestedValue(item, fieldName)
                                         : getNestedValue(item, fieldName) || "";
 
                                 if (
                                     itemField.type === "list" ||
-                                    itemField.type === "list-radio"
+                                    itemField.type === "list-radio" ||
+                                    itemField.type === "order-status"
                                 ) {
                                     await setCheckboxes(itemField);
                                 }
@@ -526,7 +531,7 @@ const ActionModal = () => {
 
     useEffect(() => {
         const setUpOptions = async () => {
-            let newOptions = {};
+            let newOptions: any = {};
 
             for (const optionField of productImageOptionsFields) {
                 const items = optionField.getUrl
@@ -571,6 +576,19 @@ const ActionModal = () => {
                         }
                     }
                 }
+            }
+
+            const currentCategoryObject = await getItems(
+                `product/category/${item?.category_id}`
+            );
+
+            if (currentCategoryObject) {
+                newOptions.size.items = newOptions?.size?.items.filter(
+                    (item: any) =>
+                        currentCategoryObject?.allowed_sizes?.some(
+                            (size: any) => size === item.id
+                        )
+                );
             }
 
             setProductImageOptions(newOptions);
@@ -744,6 +762,174 @@ const ActionModal = () => {
             ) : (
                 <p>Сталася помилка. Ми не змогли завантажити товари ;(</p>
             )
+        ) : fieldObject.type === "order-status" ? (
+            <>
+                <ul className="list-input" id={fieldName}>
+                    {selectOptions[fieldName]?.length > 0 &&
+                        selectOptions[fieldName].map((option: any) => (
+                            <li
+                                key={option.id || option.value}
+                                id={`${fieldName}[${
+                                    option.id || option.value
+                                }]`}
+                            >
+                                <input
+                                    name={fieldObject.field_name}
+                                    type={
+                                        fieldObject.type === "list"
+                                            ? "checkbox"
+                                            : "radio"
+                                    }
+                                    {...(action !== "add"
+                                        ? {
+                                              disabled:
+                                                  action === "show" ||
+                                                  action === "delete" ||
+                                                  fieldObject.locked,
+                                          }
+                                        : {})}
+                                    onChange={async (e) => {
+                                        if (
+                                            e.target.checked &&
+                                            fieldObject.getItem &&
+                                            fieldObject.dependencies
+                                        ) {
+                                            const currentItem: any =
+                                                await getItemWithNoDispatch(
+                                                    fieldObject.getItem,
+                                                    {
+                                                        id: option.id,
+                                                    }
+                                                );
+
+                                            fieldObject.dependencies.forEach(
+                                                (
+                                                    dependency: InputFieldDependency
+                                                ) => {
+                                                    const targetLabel: any =
+                                                        document.querySelector(
+                                                            `label[for="${dependency.target}"]`
+                                                        );
+
+                                                    if (targetLabel) {
+                                                        if (
+                                                            !currentItem[
+                                                                dependency
+                                                                    .dependOn
+                                                            ]
+                                                        ) {
+                                                            targetLabel.style.setProperty(
+                                                                "display",
+                                                                "none"
+                                                            );
+                                                        } else {
+                                                            targetLabel.style.setProperty(
+                                                                "display",
+                                                                "inherit"
+                                                            );
+                                                        }
+                                                    }
+                                                }
+                                            );
+                                        }
+
+                                        setSelectedItems((prev: any) => {
+                                            const updated = {
+                                                ...prev,
+                                            };
+
+                                            if (fieldObject.type === "list") {
+                                                if (!updated[fieldName]) {
+                                                    updated[fieldName] = [];
+                                                }
+                                                if (e.target.checked) {
+                                                    updated[fieldName].push(
+                                                        option.id
+                                                    );
+                                                } else {
+                                                    updated[fieldName] =
+                                                        updated[
+                                                            fieldName
+                                                        ].filter(
+                                                            (value: any) =>
+                                                                value !==
+                                                                    option.id ||
+                                                                option.value
+                                                        );
+                                                }
+                                            } else {
+                                                if (!updated[fieldName]) {
+                                                    updated[fieldName] = 0;
+                                                }
+                                                if (e.target.checked) {
+                                                    updated[fieldName] =
+                                                        option.id ||
+                                                        option.value;
+                                                }
+                                            }
+
+                                            if (
+                                                fieldName === "status" &&
+                                                updated[fieldName] === "new"
+                                            ) {
+                                                console.log(
+                                                    fieldName,
+                                                    updated[fieldName]
+                                                );
+
+                                                setValue(
+                                                    "status_date_to",
+                                                    null
+                                                );
+                                            }
+
+                                            setValue(
+                                                fieldName,
+                                                updated[fieldName]
+                                            );
+
+                                            return updated;
+                                        });
+                                    }}
+                                />
+                                {fieldObject &&
+                                    fieldObject.labelField &&
+                                    option[fieldObject.labelField]}
+                            </li>
+                        ))}
+                </ul>
+
+                {(selectedItems?.status === "accepted" ||
+                    selectedItems?.status === "ready_for_shipment") && (
+                    <input
+                        type="date"
+                        min={
+                            new Date(item?.created_at)
+                                ?.toISOString()
+                                .split("T")[0]
+                        }
+                        value={item?.status_date_to || ""}
+                        onChange={(e) => {
+                            const getDateString = (date: any) => {
+                                return date.toISOString().split("T")[0];
+                            };
+
+                            const inputDate = new Date(e.target.value);
+                            const orderDate = new Date(item.created_at);
+                            let currentDate = getDateString(orderDate);
+
+                            if (orderDate > inputDate) {
+                                e.target.value = getDateString(orderDate);
+                                currentDate = getDateString(orderDate);
+                            } else {
+                                currentDate = getDateString(inputDate);
+                            }
+
+                            setValue("status_date_to", currentDate);
+                        }}
+                    />
+                )}
+            </>
         ) : fieldObject.type === "multiple-field" ? (
             <>
                 {fields[fieldName]?.length > 0 &&
@@ -827,6 +1013,7 @@ const ActionModal = () => {
 
                 {action !== "show" && (
                     <button
+                        className="active"
                         onClick={() => {
                             setFields((prevFields: any) => {
                                 const data = {
@@ -864,7 +1051,10 @@ const ActionModal = () => {
                         </div>
                     )}
 
-                <button onClick={() => setIsProductImageOpened(true)}>
+                <button
+                    className="active"
+                    onClick={() => setIsProductImageOpened(true)}
+                >
                     Переглянути
                 </button>
 
@@ -912,7 +1102,7 @@ const ActionModal = () => {
                                     )}
                                 {action !== "show" && (
                                     <button
-                                        className="add-item"
+                                        className="active add-item"
                                         onClick={() => {
                                             setIsAddProductImageOpened(true);
                                             setIsProductImageOpened(false);
@@ -934,7 +1124,7 @@ const ActionModal = () => {
 
                                 <div className="action-modal-buttons">
                                     <button
-                                        className={"show"}
+                                        className="active show"
                                         onClick={() =>
                                             setIsProductImageOpened(false)
                                         }
@@ -1032,6 +1222,7 @@ const ActionModal = () => {
                                         )
                                     )}
                                 <button
+                                    className="active"
                                     onClick={() =>
                                         setAddProductImages((prev: any) => [
                                             ...prev,
@@ -1043,7 +1234,7 @@ const ActionModal = () => {
                                 </button>
                                 <div className="action-modal-buttons">
                                     <button
-                                        className={"show"}
+                                        className="active show"
                                         onClick={closeProductPhotoAddWindow}
                                     >
                                         Повернутися
@@ -1051,7 +1242,7 @@ const ActionModal = () => {
 
                                     {action !== "add" && (
                                         <button
-                                            className={"add"}
+                                            className="active add"
                                             onClick={async () => {
                                                 const newItem = await addItem(
                                                     fieldObject.postUrl as string,
@@ -1386,7 +1577,9 @@ const ActionModal = () => {
                             categoryFields.some(
                                 (field: InputField) =>
                                     (field.field_name || field.name) ===
-                                    fieldName
+                                        fieldName ||
+                                    (field.type === "order-status" &&
+                                        fieldName === "status_date_to")
                             );
 
                         const recursiveClean = (currentObj: any, path = "") => {
@@ -1416,18 +1609,21 @@ const ActionModal = () => {
                                     );
 
                                     if (
-                                        !isFieldInCategory(fullPath) ||
-                                        (value === originalItem?.[fullPath] &&
-                                            typeof value !== "boolean" &&
-                                            labelElement.style.display !==
-                                                "none") ||
-                                        value === undefined ||
-                                        value === null ||
-                                        value === "" ||
-                                        (typeof value === "object" &&
-                                            Object.keys(value).length === 0) ||
-                                        (Array.isArray(value) &&
-                                            value.length === 0)
+                                        (!isFieldInCategory(fullPath) ||
+                                            (value ===
+                                                originalItem?.[fullPath] &&
+                                                typeof value !== "boolean" &&
+                                                labelElement.style.display !==
+                                                    "none") ||
+                                            value === undefined ||
+                                            value === null ||
+                                            value === "" ||
+                                            (typeof value === "object" &&
+                                                Object.keys(value).length ===
+                                                    0) ||
+                                            (Array.isArray(value) &&
+                                                value.length === 0)) &&
+                                        key !== "status_date_to"
                                     ) {
                                         delete currentObj[key];
                                     } else if (
@@ -1726,6 +1922,7 @@ const ActionModal = () => {
             <div className="action-modal-buttons">
                 {action !== "show" && (
                     <button
+                        className="active"
                         onClick={() => {
                             closeModal();
                         }}
@@ -1734,7 +1931,7 @@ const ActionModal = () => {
                     </button>
                 )}
 
-                <button className={action} onClick={handleSuccess}>
+                <button className={`active ${action}`} onClick={handleSuccess}>
                     {action === "edit"
                         ? "Зберегти"
                         : action === "show"

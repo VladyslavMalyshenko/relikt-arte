@@ -90,7 +90,11 @@ const AuthSection = () => {
                 </p>
             )}
 
-            <button disabled={buttonDisabled} onClick={handleSubmit(onSubmit)}>
+            <button
+                className="active"
+                disabled={buttonDisabled}
+                onClick={handleSubmit(onSubmit)}
+            >
                 Увійти
             </button>
         </div>

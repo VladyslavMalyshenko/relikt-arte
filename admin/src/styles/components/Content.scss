@@ -347,6 +347,47 @@
     }
 }
 
+button.active {
+    width: min-content;
+    height: min-content;
+    color: var(--text-color);
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 8px;
+    aspect-ratio: 2 / 1;
+    transition: 0.3s;
+
+    &:not(:disabled):hover {
+        color: var(--active-color);
+        background: var(--active-background);
+        border-color: var(--active-color);
+    }
+
+    &.add:not(:disabled):hover,
+    &.edit:not(:disabled):hover {
+        color: var(--green);
+        background: var(--green-background);
+        border-color: var(--green);
+    }
+
+    &.delete:not(:disabled):hover {
+        color: var(--red);
+        background: var(--red-background);
+        border-color: var(--red);
+    }
+
+    &:disabled {
+        filter: brightness(0) saturate(100%);
+
+        &:hover {
+            color: var(--red);
+            background: var(--red-background);
+            border-color: var(--red);
+        }
+    }
+}
+
 @media (hover: hover) {
     .pagination-button:hover:not(.disabled) {
         background: var(--active-color);

@@ -19,6 +19,7 @@ const BuySectionFilters = () => {
     const [currentFilters, setCurrentFilters] = useState<any>([]);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch();
+    const [glassChoiceAvailable, setGlassChoiceAvailable] = useState(false);
 
     const currentWidth = useSelector(
         (state: any) => state.ScreenPropertiesReducer.width
@@ -32,6 +33,25 @@ const BuySectionFilters = () => {
         if (e.currentTarget) {
             e.currentTarget.classList.toggle("active");
         }
+    };
+
+    const getCategoryHaveGlass = () => {
+        const categories = currentFilters.filter(
+            (item: any) => item.field === "category_id"
+        );
+
+        if (categories?.length > 0 && categories) {
+            const categoriesGlassAvailability = categories.some(
+                (item: any) => item?.originalObject?.is_glass_available
+            );
+
+            if (categoriesGlassAvailability) {
+                setGlassChoiceAvailable(true);
+                return;
+            }
+        }
+
+        setGlassChoiceAvailable(false);
     };
 
     useEffect(() => {
@@ -81,6 +101,7 @@ const BuySectionFilters = () => {
 
         clearFilters();
 
+        getCategoryHaveGlass();
         if (readyFilters && JSON.stringify(readyFilters) !== "{}") {
             dispatch(SetFilters(readyFilters));
         }
@@ -117,6 +138,7 @@ const BuySectionFilters = () => {
                                 name: option[field.targetKey],
                                 value: option.id,
                                 field: field.field,
+                                originalObject: option,
                             }));
 
                             newOptions[field.field] = newOption;
@@ -125,6 +147,7 @@ const BuySectionFilters = () => {
                         const newOption = options.map((option: any) => ({
                             ...option,
                             field: field.field,
+                            originalObject: option,
                         }));
 
                         newOptions[field.field] = newOption;
@@ -228,18 +251,44 @@ const BuySectionFilters = () => {
                     </div>
                 </div>
 
-                {filtersData.map((filter: any, index: number) => (
-                    <Filter
-                        key={`filter[${index}]`}
-                        label={filter.name}
-                        options={filtersOptions[filter.field] || filter.options}
-                        filters={currentFilters}
-                        handleFilter={(data: any) => setCurrentFilters(data)}
-                        {...(filter.field === "have_glass"
-                            ? { type: "radio" }
-                            : {})}
-                    />
-                ))}
+                {filtersData.map((filter: any, index: number) =>
+                    filter.field !== "have_glass" ? (
+                        <Filter
+                            key={`filter[${index}]`}
+                            label={filter.name}
+                            options={
+                                filtersOptions[filter.field] || filter.options
+                            }
+                            filters={currentFilters}
+                            handleFilter={(data: any) =>
+                                setCurrentFilters(data)
+                            }
+                            {...(filter.field === "have_glass"
+                                ? { type: "radio" }
+                                : {})}
+                        />
+                    ) : (
+                        <>
+                            {glassChoiceAvailable && (
+                                <Filter
+                                    key={`filter[${index}]`}
+                                    label={filter.name}
+                                    options={
+                                        filtersOptions[filter.field] ||
+                                        filter.options
+                                    }
+                                    filters={currentFilters}
+                                    handleFilter={(data: any) =>
+                                        setCurrentFilters(data)
+                                    }
+                                    {...(filter.field === "have_glass"
+                                        ? { type: "radio" }
+                                        : {})}
+                                />
+                            )}
+                        </>
+                    )
+                )}
             </div>
         </>
     );

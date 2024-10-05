@@ -365,7 +365,7 @@ const Content = () => {
                             !category.letter &&
                             category.addUrl && (
                                 <button
-                                    className="add-item"
+                                    className="active add-item"
                                     onClick={() => {
                                         dispatch(SetCurrentAction("add"));
                                     }}
@@ -465,7 +465,7 @@ const Content = () => {
                         </div>
                     ) : category.letter ? (
                         <button
-                            className="show"
+                            className="default-button show"
                             onClick={() => dispatch(SetCurrentAction("add"))}
                         >
                             Написати листа
@@ -573,8 +573,6 @@ const Content = () => {
                                                                                                     "flex",
                                                                                                 gap: "10px",
                                                                                                 alignItems:
-                                                                                                    "center",
-                                                                                                justifyContent:
                                                                                                     "center",
                                                                                             }}
                                                                                         >

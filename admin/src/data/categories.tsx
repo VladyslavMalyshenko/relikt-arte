@@ -1054,7 +1054,7 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
             {
                 name: "Статус",
                 field_name: "status",
-                type: "list-radio",
+                type: "order-status",
                 value: [
                     { name: "Очікує обробки", value: "new" },
                     { name: "В обробці", value: "accepted" },
@@ -1098,6 +1098,12 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
             {
                 name: "Відділення",
                 field_name: "warehouse",
+                type: "text",
+                locked: true,
+            },
+            {
+                name: "Додаткова інформація",
+                field_name: "additional_info",
                 type: "text",
                 locked: true,
             },

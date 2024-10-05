@@ -78,15 +78,17 @@ const OrderItem = ({ product }: OrderItemProps) => {
             if (product.product.have_glass) {
                 setWithGlass(product.with_glass ? "Присутнє" : "Відсутнє");
 
-                await axios
-                    .get(
-                        generateUrl(
-                            `product/related/product_glass_color/${product.glass_color_id}`
+                if (product.glass_color_id) {
+                    await axios
+                        .get(
+                            generateUrl(
+                                `product/related/product_glass_color/${product.glass_color_id}`
+                            )
                         )
-                    )
-                    .then((res) => {
-                        setGlassColor(res.data.name);
-                    });
+                        .then((res) => {
+                            setGlassColor(res.data.name);
+                        });
+                }
             }
         };
 

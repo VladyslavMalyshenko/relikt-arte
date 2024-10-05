@@ -93,6 +93,12 @@ const OrderSection = () => {
                     <p className="black small">
                         Адреса відділення нової пошти: {order.warehouse}
                     </p>
+                    {order.additional_info && (
+                        <p className="black small">
+                            Додаткова інформація: {order.additional_info}
+                        </p>
+                    )}
+
                     <p className="black mid bold upper">
                         До сплати: {order.total_value}₴
                     </p>

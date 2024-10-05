@@ -5,7 +5,7 @@ import { paths } from "../../../router/paths";
 import "../../../styles/components/pages/checkoutpage/CheckoutSection.scss";
 import { ProductType } from "../../../types/productsRelatedTypes";
 import { getCart } from "../../../utils/handleCart";
-import { createOrder } from "../../../utils/handleUser";
+import { createOrder, getProfile } from "../../../utils/handleUser";
 import Button from "../../UI/Button";
 import CheckoutModal from "../../UI/CheckoutModal";
 import CheckoutProduct from "../../UI/CheckoutProduct";
@@ -19,23 +19,7 @@ const CheckoutSection = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOrderSuccess, setIsOrderSuccess] = useState(false);
     const [orderInfo, setOrderInfo] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState<any>(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-        const getCartProducts = async () => {
-            const cart = await getCart()
-                .catch(() => false)
-                .finally(() => setIsLoading(false));
-
-            if (cart) {
-                setTotalValue(cart.total_value);
-                setCartProducts(cart.items.results || []);
-            }
-        };
-
-        getCartProducts();
-    }, []);
+    const [isLoading, setIsLoading] = useState<any>(true);
 
     const formController = useForm({
         defaultValues: {
@@ -45,15 +29,56 @@ const CheckoutSection = () => {
             region: "",
             city_or_settlement: "",
             warehouse: "",
-            additional: "",
+            additional_info: "",
         },
     });
 
     const {
         control,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = formController;
+
+    useEffect(() => {
+        const isReady = [false, false];
+
+        const getCartProducts = async () => {
+            const cart = await getCart()
+                .catch(() => false)
+                .finally(() => (isReady[0] = true));
+
+            if (cart) {
+                setTotalValue(cart.total_value);
+                setCartProducts(cart.items.results || []);
+            }
+        };
+
+        const setUpDefaultValues = async () => {
+            const profile = await getProfile().finally(
+                () => (isReady[1] = true)
+            );
+
+            if (profile) {
+                setValue("full_name", profile.full_name);
+                setValue("phone", profile.phone);
+                setValue("email", profile.email);
+            }
+        };
+
+        const setUp = async () => {
+            setIsLoading(true);
+
+            await getCartProducts();
+            await setUpDefaultValues();
+
+            if (isReady.every((readyState: boolean) => readyState)) {
+                setIsLoading(false);
+            }
+        };
+
+        setUp();
+    }, []);
 
     const checkoutFields = [
         {
@@ -130,7 +155,6 @@ const CheckoutSection = () => {
                 },
             ],
         },
-
         {
             control: control,
             errors: errors,
@@ -138,7 +162,7 @@ const CheckoutSection = () => {
                 {
                     type: "text",
                     placeholder: "Додаткова інформація",
-                    name: "additional",
+                    name: "additional_info",
                 },
             ],
         },
@@ -214,89 +238,90 @@ const CheckoutSection = () => {
             )}
 
             <div className="checkout-section">
-                <div className="checkout-section-header">
-                    <p className="black upper biggest ">
-                        оформлення замовлення
-                    </p>
-                    <Button
-                        colorScheme={"grey"}
-                        additionalClasses={["upper"]}
-                        onClickCallback={navigateToProductionPage}
-                    >
-                        продовжити покупки
-                    </Button>
-                </div>
-
-                <div className="checkout-section-inner">
-                    <div className="checkout-section-inner-inputs">
-                        {checkoutFields.map((fieldGroup, index) => (
-                            <div
-                                key={`fieldGroup[${index}]`}
-                                className="checkout-section-inner-inputs-group"
+                {isLoading ? (
+                    <Loader />
+                ) : (
+                    <>
+                        <div className="checkout-section-header">
+                            <p className="black upper biggest ">
+                                оформлення замовлення
+                            </p>
+                            <Button
+                                colorScheme={"grey"}
+                                additionalClasses={["upper"]}
+                                onClickCallback={navigateToProductionPage}
                             >
-                                <FormProvider {...formController}>
-                                    <Form
-                                        control={fieldGroup.control}
-                                        errors={fieldGroup.errors}
-                                        fields={fieldGroup.fields}
-                                    />
-                                </FormProvider>
-                            </div>
-                        ))}
-
-                        <Button
-                            inversed={true}
-                            borderless={false}
-                            additionalClasses={["upper"]}
-                            style={{ width: "100%" }}
-                            onClickCallback={handleSubmit(handleData)}
-                            disabled={cartProducts.length < 1}
-                        >
-                            оформити замовлення
-                        </Button>
-                    </div>
-                    <div className="checkout-section-inner-products">
-                        {!isLoading ? (
-                            cartProducts.length > 0 ? (
-                                <>
-                                    {cartProducts.map(
-                                        (product: ProductType) => (
-                                            <CheckoutProduct
-                                                key={product.id}
-                                                product={product}
-                                                onQuantityChange={
-                                                    onQuantityChange
-                                                }
+                                продовжити покупки
+                            </Button>
+                        </div>
+                        <div className="checkout-section-inner">
+                            <div className="checkout-section-inner-inputs">
+                                {checkoutFields.map((fieldGroup, index) => (
+                                    <div
+                                        key={`fieldGroup[${index}]`}
+                                        className="checkout-section-inner-inputs-group"
+                                    >
+                                        <FormProvider {...formController}>
+                                            <Form
+                                                control={fieldGroup.control}
+                                                errors={fieldGroup.errors}
+                                                fields={fieldGroup.fields}
                                             />
-                                        )
-                                    )}
-                                    <div className="checkout-section-inner-products-checkout">
-                                        <p className="upper black pre-small bold">
-                                            доставка
-                                            <span className="regular">
-                                                за тарифами перевезника
-                                            </span>
-                                        </p>
-
-                                        <p className="upper black pre-small bold">
-                                            загальна сума
-                                            <span className="regular">
-                                                {totalValue} ₴
-                                            </span>
-                                        </p>
+                                        </FormProvider>
                                     </div>
-                                </>
-                            ) : (
-                                <p className="black small">
-                                    Ви ще не вибрали жодного товару для
-                                    оформлення замовлення
-                                </p>
-                            )
-                        ) : (
-                            <Loader />
-                        )}
-                    </div>
-                </div>
+                                ))}
+
+                                <Button
+                                    inversed={true}
+                                    borderless={false}
+                                    additionalClasses={["upper"]}
+                                    style={{ width: "100%" }}
+                                    onClickCallback={handleSubmit(handleData)}
+                                    disabled={cartProducts.length < 1}
+                                >
+                                    оформити замовлення
+                                </Button>
+                            </div>
+                            <div className="checkout-section-inner-products">
+                                {cartProducts.length > 0 ? (
+                                    <>
+                                        {cartProducts.map(
+                                            (product: ProductType) => (
+                                                <CheckoutProduct
+                                                    key={product.id}
+                                                    product={product}
+                                                    onQuantityChange={
+                                                        onQuantityChange
+                                                    }
+                                                />
+                                            )
+                                        )}
+                                        <div className="checkout-section-inner-products-checkout">
+                                            <p className="upper black pre-small bold">
+                                                доставка
+                                                <span className="regular">
+                                                    за тарифами перевезника
+                                                </span>
+                                            </p>
+
+                                            <p className="upper black pre-small bold">
+                                                загальна сума
+                                                <span className="regular">
+                                                    {totalValue} ₴
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <p className="black small">
+                                        Ви ще не вибрали жодного товару для
+                                        оформлення замовлення
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </>
     );
