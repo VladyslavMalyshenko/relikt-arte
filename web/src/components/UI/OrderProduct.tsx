@@ -21,7 +21,9 @@ const OrderProduct = ({ product }: OrderProductProps) => {
     const [orientation, setOrientation] = useState<boolean | string>(false);
     const [material, setMaterial] = useState<boolean | string>(false);
     const [withGlass, setWithGlass] = useState<boolean | string>(false);
-    const [glassColor, setGlassColor] = useState<boolean | string>(false);
+    const [glassColorName, setGlassColorName] = useState<boolean | string>(
+        false
+    );
 
     const getProductInfo = async (product: any) => {
         console.log(product);
@@ -75,18 +77,22 @@ const OrderProduct = ({ product }: OrderProductProps) => {
                 setMaterial(product.material === "wood" ? "Дерево" : "МДФ");
             }
 
-            if (product.product.have_glass) {
+            if (product.product.have_glass !== undefined) {
                 setWithGlass(product.with_glass ? "Присутнє" : "Відсутнє");
 
-                await axios
-                    .get(
-                        generateUrl(
-                            `product/related/product_glass_color/${product.glass_color_id}`
+                console.log(product);
+
+                if (product.with_glass && product.glass_color_id !== null) {
+                    await axios
+                        .get(
+                            generateUrl(
+                                `product/related/product_glass_color/${product.glass_color_id}`
+                            )
                         )
-                    )
-                    .then((res) => {
-                        setGlassColor(res.data.name);
-                    });
+                        .then((res) => {
+                            setGlassColorName(res.data.name);
+                        });
+                }
             }
         };
 
@@ -170,9 +176,9 @@ const OrderProduct = ({ product }: OrderProductProps) => {
                                 Наявність скла: {withGlass}
                             </p>
 
-                            {glassColor && (
+                            {glassColorName && (
                                 <p className="black small">
-                                    Колір скла: {glassColor}
+                                    Колір скла: {glassColorName}
                                 </p>
                             )}
                         </>

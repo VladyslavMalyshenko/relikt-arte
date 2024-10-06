@@ -234,6 +234,7 @@ const CheckoutSection = () => {
         if (response) {
             setIsOrderSuccess(true);
             setOrderInfo(response);
+            setCartProducts([]);
         }
 
         setIsModalVisible(true);

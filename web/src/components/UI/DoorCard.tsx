@@ -173,6 +173,32 @@ const DoorCard = ({ product }: DoorCardProps) => {
 
             await processColor();
 
+            const processGlassColor = async () => {
+                if (savedObjects?.processGlassColor) {
+                    newValues.push({
+                        field: "glass_color_id",
+                        value: savedObjects.glassColor.id,
+                    });
+                } else {
+                    const color = await getItems(
+                        "/api/v1/product/related/product_glass_color/list/?page=1&size=1"
+                    );
+
+                    if (color.length > 0 && color[0]) {
+                        savedObjects.glassColor = color[0];
+
+                        newValues.push({
+                            field: "glass_color_id",
+                            value: savedObjects.glassColor.id,
+                        });
+                    }
+                }
+            };
+
+            if (product.have_glass) {
+                await processGlassColor();
+            }
+
             setTags(newTags);
             setValues(newValues);
         };

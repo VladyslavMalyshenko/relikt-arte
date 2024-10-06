@@ -899,35 +899,42 @@ const ActionModal = () => {
                         ))}
                 </ul>
 
-                {(selectedItems?.status === "accepted" ||
-                    selectedItems?.status === "ready_for_shipment") && (
+                <label style={{ padding: 0 }} htmlFor={"status_date_to"}>
+                    Дата оформлення
                     <input
                         type="date"
-                        min={
-                            new Date(item?.created_at)
-                                ?.toISOString()
-                                .split("T")[0]
-                        }
-                        defaultValue={item?.status_date_to || ""}
-                        onChange={(e) => {
-                            const getDateString = (date: any) => {
-                                return date.toISOString().split("T")[0];
-                            };
-
-                            const inputDate = new Date(e.target.value);
-                            const orderDate = new Date(item.created_at);
-                            let currentDate = getDateString(orderDate);
-
-                            if (orderDate > inputDate) {
-                                currentDate = getDateString(orderDate);
-                            } else {
-                                currentDate = getDateString(inputDate);
-                            }
-
-                            e.target.value = currentDate;
-                            setValue("status_date_to", currentDate);
-                        }}
+                        value={item?.created_at?.split("T")[0]}
+                        readOnly={true}
                     />
+                </label>
+
+                {selectedItems?.status !== "new" && (
+                    <label style={{ padding: 0 }} htmlFor={"status_date_to"}>
+                        Статус дійсний до:
+                        <input
+                            type="date"
+                            min={item?.created_at?.split("T")[0]}
+                            defaultValue={item?.status_date_to || ""}
+                            onChange={(e) => {
+                                const getDateString = (date: any) => {
+                                    return date.toISOString().split("T")[0];
+                                };
+
+                                const inputDate = new Date(e.target.value);
+                                const orderDate = new Date(item.created_at);
+                                let currentDate = getDateString(orderDate);
+
+                                if (orderDate > inputDate) {
+                                    currentDate = getDateString(orderDate);
+                                } else {
+                                    currentDate = getDateString(inputDate);
+                                }
+
+                                e.target.value = currentDate;
+                                setValue("status_date_to", currentDate);
+                            }}
+                        />
+                    </label>
                 )}
             </>
         ) : fieldObject.type === "multiple-field" ? (

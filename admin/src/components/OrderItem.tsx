@@ -21,7 +21,9 @@ const OrderItem = ({ product }: OrderItemProps) => {
     const [orientation, setOrientation] = useState<boolean | string>(false);
     const [material, setMaterial] = useState<boolean | string>(false);
     const [withGlass, setWithGlass] = useState<boolean | string>(false);
-    const [glassColor, setGlassColor] = useState<boolean | string>(false);
+    const [glassColorName, setGlassColorName] = useState<boolean | string>(
+        false
+    );
 
     const getProductInfo = async (product: any) => {
         console.log(product);
@@ -75,10 +77,12 @@ const OrderItem = ({ product }: OrderItemProps) => {
                 setMaterial(product.material === "wood" ? "Дерево" : "МДФ");
             }
 
-            if (product.product.have_glass) {
+            if (product.product.have_glass !== undefined) {
                 setWithGlass(product.with_glass ? "Присутнє" : "Відсутнє");
 
-                if (product.glass_color_id) {
+                console.log(product);
+
+                if (product.with_glass && product.glass_color_id) {
                     await axios
                         .get(
                             generateUrl(
@@ -86,7 +90,7 @@ const OrderItem = ({ product }: OrderItemProps) => {
                             )
                         )
                         .then((res) => {
-                            setGlassColor(res.data.name);
+                            setGlassColorName(res.data.name);
                         });
                 }
             }
@@ -172,9 +176,9 @@ const OrderItem = ({ product }: OrderItemProps) => {
                                 Наявність скла: {withGlass}
                             </p>
 
-                            {glassColor && (
+                            {glassColorName && (
                                 <p className="black small">
-                                    Колір скла: {glassColor}
+                                    Колір скла: {glassColorName}
                                 </p>
                             )}
                         </>
