@@ -135,7 +135,11 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
-        query = select(self.model).where(self.model.id.in_(obj_ids))
+        query = (
+            select(self.model)
+            .where(self.model.id.in_(obj_ids))
+            .order_by(self.model.created_at.desc())
+        )
         if options:
             query = await self._add_options_to_query(query, options)
         if filters:
@@ -156,7 +160,7 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
-        query = select(self.model)
+        query = select(self.model).order_by(self.model.created_at.desc())
         if options:
             query = await self._add_options_to_query(query, options)
         if filters:
