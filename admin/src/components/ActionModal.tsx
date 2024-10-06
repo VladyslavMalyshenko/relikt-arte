@@ -4,6 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { SetCurrentAction } from "../redux/actions/currentActionActions";
 import { SetDeleteItem } from "../redux/actions/currentDeleteObjectActions";
 import { SetCurrentItem } from "../redux/actions/currentItemActions";
+import {
+    AddNotification,
+    NotificationBody,
+} from "../redux/actions/notificationsActions";
 import "../styles/components/ActionModal.scss";
 import { InputField, InputFieldDependency } from "../types/categoriesTypes";
 import { addItem } from "../utils/addItem";
@@ -579,7 +583,11 @@ const ActionModal = () => {
             }
 
             const currentCategoryObject = await getItems(
-                `product/category/${item?.category_id}`
+                `product/category/${
+                    action !== "add"
+                        ? item?.category_id
+                        : getValues()?.category_id
+                }`
             );
 
             if (currentCategoryObject) {
@@ -1060,7 +1068,22 @@ const ActionModal = () => {
 
                 <button
                     className="active"
-                    onClick={() => setIsProductImageOpened(true)}
+                    onClick={() => {
+                        console.log("ASD");
+
+                        if (!item?.category_id && !getValues()?.category_id) {
+                            dispatch(
+                                AddNotification({
+                                    message:
+                                        "Щоб додати фото, потрібно обрати категорію!",
+                                    type: "error",
+                                } as NotificationBody)
+                            );
+                            return;
+                        }
+
+                        setIsProductImageOpened(true);
+                    }}
                 >
                     Переглянути
                 </button>
