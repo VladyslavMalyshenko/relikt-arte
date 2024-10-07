@@ -49,7 +49,7 @@ const OrderSection = () => {
                     : order.status === "accepted"
                     ? "В обробці"
                     : "Готовий до відправки"}{" "}
-                {order.status !== "new" &&
+                {order.status === "accepted" &&
                     `(до: ${
                         order.status_date_to
                             ? formatDate(order.status_date_to)
