@@ -107,13 +107,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
         ],
         addItemFields: [
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
                 required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного кольору у списку кольорів на сайті.",
+                required: true,
             },
         ],
         inputFields: [
@@ -122,12 +124,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 type: "text",
             },
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
+                required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного кольору у списку кольорів на сайті.",
+                required: true,
             },
         ],
     },
@@ -174,13 +179,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
         ],
         addItemFields: [
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
                 required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного покриття у списку на сайті.",
+                required: true,
             },
         ],
         inputFields: [
@@ -189,12 +196,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 type: "text",
             },
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
+                required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного покриття у списку на сайті.",
+                required: true,
             },
         ],
     },
@@ -236,13 +246,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
         ],
         addItemFields: [
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
                 required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного кольору скла у списку на сайті.",
+                required: true,
             },
         ],
         inputFields: [
@@ -251,12 +263,15 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 type: "text",
             },
             {
-                name: "name",
+                name: "Назва",
                 type: "text",
+                required: true,
             },
             {
-                name: "active",
+                name: "Активний",
                 type: "checkbox",
+                hint: "Цей чекмарк відповідає за відображення конкретного кольору скла у списку на сайті.",
+                required: true,
             },
         ],
     },
@@ -452,21 +467,25 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 name: "наявність скла",
                 field_name: "is_glass_available",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати скло.",
             },
             {
                 name: "наявність матеріалу",
                 field_name: "have_material_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір матеріалу.",
             },
             {
                 name: "вибір сторони",
                 field_name: "have_orientation_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір сторону петель.",
             },
             {
                 name: "вибір лиштви",
                 field_name: "have_type_of_platband_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір лиштви.",
             },
             {
                 name: "розміри",
@@ -486,21 +505,25 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 name: "наявність скла",
                 field_name: "is_glass_available",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати скло.",
             },
             {
                 name: "наявність матеріалу",
                 field_name: "have_material_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір матеріалу.",
             },
             {
                 name: "вибір сторони",
                 field_name: "have_orientation_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір сторону петель.",
             },
             {
                 name: "вибір лиштви",
                 field_name: "have_type_of_platband_choice",
                 type: "checkbox",
+                hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір лиштви.",
             },
             {
                 name: "розміри",
@@ -650,24 +673,28 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field_name: "have_glass",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір наявності скла.",
             },
             {
                 name: "вибір сторони",
                 field_name: "orientation_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір сторони петель.",
             },
             {
                 name: "вибір матеріалу",
                 field_name: "material_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір матеріалу.",
             },
             {
                 name: "вибір типу лиштви",
                 field_name: "type_of_platband_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір лиштви.",
             },
             {
                 name: "категорія товару",
@@ -766,24 +793,28 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field_name: "have_glass",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір наявності скла.",
             },
             {
                 name: "вибір сторони",
                 field_name: "orientation_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір сторони петель.",
             },
             {
                 name: "вибір матеріалу",
                 field_name: "material_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір матеріалу.",
             },
             {
                 name: "вибір типу лиштви",
                 field_name: "type_of_platband_choice",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекмарк вирішує чи має конкретний товар вибір лиштви.",
             },
             {
                 name: "категорія товару",
@@ -911,12 +942,14 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field_name: "as_admin",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекамарк вирішує чи може цей користувач входити з даними цього аккаунту до адмін панелі.",
             },
             {
                 name: "Активний",
                 field_name: "is_active",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекамарк вирішує чи можна буде увійти до аккаунту на сайті (адмінці або головному сайті в залежності від чекмарку 'Адмін').",
             },
         ],
         inputFields: [
@@ -951,12 +984,14 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field_name: "is_admin",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекамарк вирішує чи може цей користувач входити з даними цього аккаунту до адмін панелі.",
             },
             {
                 name: "Активний",
                 field_name: "is_active",
                 type: "checkbox",
                 required: true,
+                hint: "Цей чекамарк вирішує чи можна буде увійти до аккаунту на сайті (адмінці або головному сайті в залежності від чекмарку 'Адмін').",
             },
         ],
     },

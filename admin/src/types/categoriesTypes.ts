@@ -22,6 +22,7 @@ export type InputField = {
     required?: boolean;
     value?: any;
     locked?: boolean;
+    hint?: string;
 };
 
 export type Category = {

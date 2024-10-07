@@ -952,7 +952,26 @@ const ActionModal = () => {
                                             style={{ padding: 0 }}
                                             htmlFor={"status_date_to"}
                                         >
-                                            Статус дійсний до:
+                                            <span
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "10px",
+                                                }}
+                                            >
+                                                Статус дійсний до:
+                                                <div className="hint-container">
+                                                    <p className="hint-content">
+                                                        Це поле відповідає за
+                                                        дату, коли статус
+                                                        зміниться з "В обробці"
+                                                        на "Готовий до
+                                                        відправки" (не включно з
+                                                        датою)
+                                                    </p>
+                                                </div>
+                                            </span>
+
                                             <input
                                                 type="date"
                                                 min={
@@ -2079,7 +2098,30 @@ const ActionModal = () => {
                                                             fieldObject.name
                                                         }
                                                     >
-                                                        {fieldObject.name}
+                                                        {fieldObject.hint ? (
+                                                            <span
+                                                                style={{
+                                                                    display:
+                                                                        "flex",
+                                                                    alignItems:
+                                                                        "center",
+                                                                    gap: "15px",
+                                                                }}
+                                                            >
+                                                                {
+                                                                    fieldObject.name
+                                                                }
+                                                                <div className="hint-container">
+                                                                    <p className="hint-content">
+                                                                        {
+                                                                            fieldObject.hint
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </span>
+                                                        ) : (
+                                                            fieldObject.name
+                                                        )}
 
                                                         {getInput(fieldObject)}
                                                     </label>
@@ -2105,7 +2147,27 @@ const ActionModal = () => {
                                                         itemField.name
                                                     }
                                                 >
-                                                    {itemField.name}
+                                                    {itemField.hint ? (
+                                                        <span
+                                                            style={{
+                                                                display: "flex",
+                                                                alignItems:
+                                                                    "center",
+                                                                gap: "15px",
+                                                            }}
+                                                        >
+                                                            {itemField.name}
+                                                            <div className="hint-container">
+                                                                <p className="hint-content">
+                                                                    {
+                                                                        itemField.hint
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </span>
+                                                    ) : (
+                                                        itemField.name
+                                                    )}
                                                     {getInput(itemField)}
                                                 </label>
                                             )
