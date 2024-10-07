@@ -1036,6 +1036,10 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field: "warehouse",
             },
             {
+                name: "Дата оформлення",
+                field: "created_at",
+            },
+            {
                 name: "Статус",
                 field: "status",
                 valueNames: {

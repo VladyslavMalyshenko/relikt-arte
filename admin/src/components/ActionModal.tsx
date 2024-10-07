@@ -197,17 +197,28 @@ const ActionModal = () => {
                         );
 
                         listChildren.forEach((child) => {
-                            const input = child.querySelector("input") as any;
+                            const input =
+                                (child.querySelector("input") as any) ||
+                                (child.querySelector("div input") as any);
 
                             if (input) {
-                                const inputIdNumberValue = +input
-                                    .parentNode!.id.split("[")[1]
-                                    .split("]")[0];
-                                const value = !isNaN(inputIdNumberValue)
-                                    ? inputIdNumberValue
-                                    : input
-                                          .parentNode!.id.split("[")[1]
-                                          .split("]")[0];
+                                const inputIdNumberValue = +input.parentNode?.id
+                                    ?.split("[")?.[1]
+                                    ?.split("]")?.[0];
+
+                                const value =
+                                    inputIdNumberValue !== undefined &&
+                                    !isNaN(inputIdNumberValue)
+                                        ? inputIdNumberValue
+                                        : fieldName !== "status"
+                                        ? input
+                                              .parentNode!.id.split("[")[1]
+                                              .split("]")[0]
+                                        : input
+                                              .parentNode!.parentNode!.id.split(
+                                                  "["
+                                              )[1]
+                                              .split("]")[0];
 
                                 const isSingleValue =
                                     typeof item[fieldName] === "number";
@@ -772,178 +783,232 @@ const ActionModal = () => {
             )
         ) : fieldObject.type === "order-status" ? (
             <>
-                <ul className="list-input" id={fieldName}>
+                <div
+                    style={{
+                        display: "flex",
+                        width: "100%",
+                        justifyContent: "space-between",
+                    }}
+                    id={fieldName}
+                >
                     {selectOptions[fieldName]?.length > 0 &&
                         selectOptions[fieldName].map((option: any) => (
-                            <li
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "15px",
+                                }}
                                 key={option.id || option.value}
                                 id={`${fieldName}[${
                                     option.id || option.value
                                 }]`}
                             >
-                                <input
-                                    name={fieldObject.field_name}
-                                    type={
-                                        fieldObject.type === "list"
-                                            ? "checkbox"
-                                            : "radio"
-                                    }
-                                    {...(action !== "add"
-                                        ? {
-                                              disabled:
-                                                  action === "show" ||
-                                                  action === "delete" ||
-                                                  fieldObject.locked,
-                                          }
-                                        : {})}
-                                    onChange={async (e) => {
-                                        if (
-                                            e.target.checked &&
-                                            fieldObject.getItem &&
-                                            fieldObject.dependencies
-                                        ) {
-                                            const currentItem: any =
-                                                await getItemWithNoDispatch(
-                                                    fieldObject.getItem,
-                                                    {
-                                                        id: option.id,
-                                                    }
-                                                );
+                                <div style={{ display: "flex" }}>
+                                    <input
+                                        name={fieldObject.field_name}
+                                        type={
+                                            fieldObject.type === "list"
+                                                ? "checkbox"
+                                                : "radio"
+                                        }
+                                        {...(action !== "add"
+                                            ? {
+                                                  disabled:
+                                                      action === "show" ||
+                                                      action === "delete" ||
+                                                      fieldObject.locked,
+                                              }
+                                            : {})}
+                                        onChange={async (e) => {
+                                            if (
+                                                e.target.checked &&
+                                                fieldObject.getItem &&
+                                                fieldObject.dependencies
+                                            ) {
+                                                const currentItem: any =
+                                                    await getItemWithNoDispatch(
+                                                        fieldObject.getItem,
+                                                        {
+                                                            id: option.id,
+                                                        }
+                                                    );
 
-                                            fieldObject.dependencies.forEach(
-                                                (
-                                                    dependency: InputFieldDependency
-                                                ) => {
-                                                    const targetLabel: any =
-                                                        document.querySelector(
-                                                            `label[for="${dependency.target}"]`
-                                                        );
+                                                fieldObject.dependencies.forEach(
+                                                    (
+                                                        dependency: InputFieldDependency
+                                                    ) => {
+                                                        const targetLabel: any =
+                                                            document.querySelector(
+                                                                `label[for="${dependency.target}"]`
+                                                            );
 
-                                                    if (targetLabel) {
-                                                        if (
-                                                            !currentItem[
-                                                                dependency
-                                                                    .dependOn
-                                                            ]
-                                                        ) {
-                                                            targetLabel.style.setProperty(
-                                                                "display",
-                                                                "none"
-                                                            );
-                                                        } else {
-                                                            targetLabel.style.setProperty(
-                                                                "display",
-                                                                "inherit"
-                                                            );
+                                                        if (targetLabel) {
+                                                            if (
+                                                                !currentItem[
+                                                                    dependency
+                                                                        .dependOn
+                                                                ]
+                                                            ) {
+                                                                targetLabel.style.setProperty(
+                                                                    "display",
+                                                                    "none"
+                                                                );
+                                                            } else {
+                                                                targetLabel.style.setProperty(
+                                                                    "display",
+                                                                    "inherit"
+                                                                );
+                                                            }
                                                         }
                                                     }
-                                                }
-                                            );
-                                        }
-
-                                        setSelectedItems((prev: any) => {
-                                            const updated = {
-                                                ...prev,
-                                            };
-
-                                            if (fieldObject.type === "list") {
-                                                if (!updated[fieldName]) {
-                                                    updated[fieldName] = [];
-                                                }
-                                                if (e.target.checked) {
-                                                    updated[fieldName].push(
-                                                        option.id
-                                                    );
-                                                } else {
-                                                    updated[fieldName] =
-                                                        updated[
-                                                            fieldName
-                                                        ].filter(
-                                                            (value: any) =>
-                                                                value !==
-                                                                    option.id ||
-                                                                option.value
-                                                        );
-                                                }
-                                            } else {
-                                                if (!updated[fieldName]) {
-                                                    updated[fieldName] = 0;
-                                                }
-                                                if (e.target.checked) {
-                                                    updated[fieldName] =
-                                                        option.id ||
-                                                        option.value;
-                                                }
+                                                );
                                             }
 
-                                            if (
-                                                fieldName === "status" &&
-                                                updated[fieldName] === "new"
-                                            ) {
-                                                console.log(
+                                            setSelectedItems((prev: any) => {
+                                                const updated = {
+                                                    ...prev,
+                                                };
+
+                                                if (
+                                                    fieldObject.type === "list"
+                                                ) {
+                                                    if (!updated[fieldName]) {
+                                                        updated[fieldName] = [];
+                                                    }
+                                                    if (e.target.checked) {
+                                                        updated[fieldName].push(
+                                                            option.id
+                                                        );
+                                                    } else {
+                                                        updated[fieldName] =
+                                                            updated[
+                                                                fieldName
+                                                            ].filter(
+                                                                (value: any) =>
+                                                                    value !==
+                                                                        option.id ||
+                                                                    option.value
+                                                            );
+                                                    }
+                                                } else {
+                                                    if (!updated[fieldName]) {
+                                                        updated[fieldName] = 0;
+                                                    }
+                                                    if (e.target.checked) {
+                                                        updated[fieldName] =
+                                                            option.id ||
+                                                            option.value;
+                                                    }
+                                                }
+
+                                                if (
+                                                    fieldName === "status" &&
+                                                    updated[fieldName] === "new"
+                                                ) {
+                                                    console.log(
+                                                        fieldName,
+                                                        updated[fieldName]
+                                                    );
+
+                                                    setValue(
+                                                        "status_date_to",
+                                                        null
+                                                    );
+                                                }
+
+                                                setValue(
                                                     fieldName,
                                                     updated[fieldName]
                                                 );
 
-                                                setValue(
-                                                    "status_date_to",
-                                                    null
-                                                );
+                                                return updated;
+                                            });
+                                        }}
+                                    />
+                                    {fieldObject &&
+                                        fieldObject.labelField &&
+                                        option[fieldObject.labelField]}
+                                </div>
+
+                                {option.value === "new" ? (
+                                    <label
+                                        style={{ padding: 0 }}
+                                        htmlFor={"status_date_to"}
+                                    >
+                                        Дата оформлення
+                                        <input
+                                            type="date"
+                                            value={
+                                                item?.created_at?.split("T")[0]
                                             }
+                                            readOnly={true}
+                                        />
+                                    </label>
+                                ) : (
+                                    option.value === "accepted" &&
+                                    selectedItems[fieldName] === "accepted" && (
+                                        <label
+                                            style={{ padding: 0 }}
+                                            htmlFor={"status_date_to"}
+                                        >
+                                            Статус дійсний до:
+                                            <input
+                                                type="date"
+                                                min={
+                                                    item?.created_at?.split(
+                                                        "T"
+                                                    )[0]
+                                                }
+                                                defaultValue={
+                                                    item?.status_date_to || ""
+                                                }
+                                                onChange={(e) => {
+                                                    const getDateString = (
+                                                        date: any
+                                                    ) => {
+                                                        return date
+                                                            .toISOString()
+                                                            .split("T")[0];
+                                                    };
 
-                                            setValue(
-                                                fieldName,
-                                                updated[fieldName]
-                                            );
+                                                    const inputDate = new Date(
+                                                        e.target.value
+                                                    );
+                                                    const orderDate = new Date(
+                                                        item.created_at
+                                                    );
+                                                    let currentDate =
+                                                        getDateString(
+                                                            orderDate
+                                                        );
 
-                                            return updated;
-                                        });
-                                    }}
-                                />
-                                {fieldObject &&
-                                    fieldObject.labelField &&
-                                    option[fieldObject.labelField]}
-                            </li>
+                                                    if (orderDate > inputDate) {
+                                                        currentDate =
+                                                            getDateString(
+                                                                orderDate
+                                                            );
+                                                    } else {
+                                                        currentDate =
+                                                            getDateString(
+                                                                inputDate
+                                                            );
+                                                    }
+
+                                                    e.target.value =
+                                                        currentDate;
+                                                    setValue(
+                                                        "status_date_to",
+                                                        currentDate
+                                                    );
+                                                }}
+                                            />
+                                        </label>
+                                    )
+                                )}
+                            </div>
                         ))}
-                </ul>
-
-                <label style={{ padding: 0 }} htmlFor={"status_date_to"}>
-                    Дата оформлення
-                    <input
-                        type="date"
-                        value={item?.created_at?.split("T")[0]}
-                        readOnly={true}
-                    />
-                </label>
-
-                {selectedItems?.status !== "new" && (
-                    <label style={{ padding: 0 }} htmlFor={"status_date_to"}>
-                        Статус дійсний до:
-                        <input
-                            type="date"
-                            min={item?.created_at?.split("T")[0]}
-                            defaultValue={item?.status_date_to || ""}
-                            onChange={(e) => {
-                                const getDateString = (date: any) => {
-                                    return date.toISOString().split("T")[0];
-                                };
-
-                                const inputDate = new Date(e.target.value);
-                                const orderDate = new Date(item.created_at);
-                                let currentDate = getDateString(orderDate);
-
-                                if (orderDate > inputDate) {
-                                    currentDate = getDateString(orderDate);
-                                } else {
-                                    currentDate = getDateString(inputDate);
-                                }
-
-                                e.target.value = currentDate;
-                                setValue("status_date_to", currentDate);
-                            }}
-                        />
-                    </label>
-                )}
+                </div>
             </>
         ) : fieldObject.type === "multiple-field" ? (
             <>
