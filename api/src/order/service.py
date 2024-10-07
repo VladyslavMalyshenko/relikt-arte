@@ -1,5 +1,6 @@
 import logging
 import csv
+import datetime
 
 from io import StringIO
 
@@ -45,6 +46,7 @@ from .schemas import (
     OrderUpdate,
     OrderListSchema,
 )
+from .enums import OrderStatusEnum
 from .utils import generate_basket_token
 
 
@@ -534,3 +536,15 @@ class OrderService(BaseService):
         except SQLAlchemyError as e:
             log.exception(e)
             raise OrderGetException(order_id=order_id)
+
+    async def update_orders_by_status_date_to(self):
+        try:
+            async with self.uow:
+                await self.uow.order.update_orders_by_status_date_to(
+                    status_date_to=datetime.date.today()
+                )
+                await self.uow.commit()
+                return True
+        except SQLAlchemyError as e:
+            log.exception(e)
+            return False

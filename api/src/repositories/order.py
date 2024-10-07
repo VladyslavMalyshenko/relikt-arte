@@ -1,5 +1,7 @@
 import uuid
+import datetime
 
+from sqlalchemy import update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -140,6 +142,31 @@ class OrderRepository(GenericRepository[Order, OrderCreate, OrderUpdate]):
     ) -> Order:
         options = await self._add_default_options(options)
         return await super().get_by_id(obj_id=obj_id, options=options)
+
+    async def get_list_by_status_date_to(
+        self,
+        status_date_to: datetime.date,
+        options: list | None = None,
+    ) -> list[Order]:
+        return await self.get_all(
+            filters=[self.model.status_date_to == status_date_to],
+            options=options,
+        )
+
+    async def update_orders_by_status_date_to(
+        self, status_date_to: datetime.date
+    ):
+        stmt = (
+            update(self.model)
+            .where(
+                and_(
+                    self.model.status_date_to == status_date_to,
+                    self.model.status == OrderStatusEnum.ACCEPTED,
+                )
+            )
+            .values(status=OrderStatusEnum.READY_FOR_SHIPMENT)
+        )
+        await self.session.execute(stmt)
 
 
 class OrderItemRepository(

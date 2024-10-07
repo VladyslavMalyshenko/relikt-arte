@@ -19,10 +19,10 @@ set +a
 # Check the MODE environment variable and start the Celery worker accordingly
 if [ "$MODE" = "PROD" ]; then
     echo "Starting Celery in production mode..."
-    celery -A src.core.celery.app worker --loglevel=INFO
+    celery -A src.core.celery.app worker -B --loglevel=INFO
 elif [ "$MODE" = "DEV" ]; then
     echo "Starting Celery in development mode..."
-    celery -A src.core.celery.app worker --loglevel=DEBUG
+    celery -A src.core.celery.app worker -B --loglevel=DEBUG
 else
     echo "Invalid MODE specified. Exiting."
     exit 1
