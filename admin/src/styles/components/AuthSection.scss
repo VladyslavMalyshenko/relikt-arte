@@ -21,6 +21,23 @@
                 text-transform: capitalize;
                 box-sizing: border-box;
 
+                .password {
+                    &-container {
+                        position: relative;
+                        display: flex;
+                    }
+
+                    &-show-toggle {
+                        position: absolute;
+                        width: 20px;
+                        height: 20px;
+                        top: 50%;
+                        right: 10px;
+                        transform: translateY(-50%);
+                        cursor: pointer;
+                    }
+                }
+
                 input {
                     border: 2px solid transparent;
                     width: 15em;
