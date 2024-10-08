@@ -488,6 +488,12 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір лиштви.",
             },
             {
+                name: "Приорітетність",
+                field_name: "priority",
+                type: "number",
+                hint: "Це поле вирішує порядок виводу категорій на сайті.",
+            },
+            {
                 name: "розміри",
                 field_name: "allowed_sizes",
                 type: "list",
@@ -524,6 +530,12 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field_name: "have_type_of_platband_choice",
                 type: "checkbox",
                 hint: "Цей чекмарк вирішує чи можуть товари цієї категорії мати вибір лиштви.",
+            },
+            {
+                name: "Приорітетність",
+                field_name: "priority",
+                type: "number",
+                hint: "Це поле вирішує порядок виводу категорій на сайті.",
             },
             {
                 name: "розміри",
