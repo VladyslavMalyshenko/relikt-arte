@@ -87,7 +87,8 @@ class ProductRepository(
         return await super().get_all(
             options=options,
             filters=filters,
-            order_by=[self.model.category.priority],
+            order_by=[Category.priority],
+            joins=[Category],
             with_pagination=with_pagination,
             pagination=pagination,
         )
@@ -113,7 +114,8 @@ class ProductRepository(
         return await super().get_by_ids(
             obj_ids=obj_ids,
             options=options,
-            order_by=[self.model.category.priority],
+            order_by=[Category.priority],
+            joins=[Category],
             with_pagination=with_pagination,
             pagination=pagination,
         )

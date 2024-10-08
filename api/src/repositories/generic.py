@@ -35,6 +35,11 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
             query = query.options(option)
         return query
 
+    async def _add_joins_to_query(self, query, joins: list) -> None:
+        for join in joins:
+            query = query.join(join)
+        return query
+
     async def _add_filters_to_query(self, query, filters: list) -> None:
         query = query.where(and_(*filters))
         return query
@@ -133,12 +138,13 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         options: Optional[list] = None,
         filters: Optional[list] = None,
         order_by: Optional[list] = None,
+        joins: Optional[list] = None,
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
         order_by = (
-            order_by.extend([self.model.created_at.desc()])
-            if order_by
+            order_by + [self.model.created_at.desc()]
+            if order_by is not None
             else [self.model.created_at.desc()]
         )
         query = (
@@ -146,6 +152,8 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
             .where(self.model.id.in_(obj_ids))
             .order_by(*order_by)
         )
+        if joins:
+            query = await self._add_joins_to_query(query, joins)
         if options:
             query = await self._add_options_to_query(query, options)
         if filters:
@@ -164,15 +172,18 @@ class GenericRepository(Generic[T, CreateScheme, UpdateScheme]):
         options: Optional[list] = None,
         filters: Optional[list] = None,
         order_by: Optional[list] = None,
+        joins: Optional[list] = None,
         with_pagination: bool = False,
         pagination: Optional[PaginationParams] = None,
     ) -> list[T]:
         order_by = (
-            order_by.extend([self.model.created_at.desc()])
-            if order_by
+            order_by + [self.model.created_at.desc()]
+            if order_by is not None
             else [self.model.created_at.desc()]
         )
         query = select(self.model).order_by(*order_by)
+        if joins:
+            query = await self._add_joins_to_query(query, joins)
         if options:
             query = await self._add_options_to_query(query, options)
         if filters:
