@@ -4,7 +4,7 @@ const MaterialsSection = () => {
     return (
         <div className="contacts-section">
             <p className="black small">
-                Скоро тут з'явиться інформація про матеріали ;)
+                Ми використовуємо екологічно чисті матеріали, що робить Наш Товар безпечним для вас та навколишнього середовища.
             </p>
         </div>
     );
