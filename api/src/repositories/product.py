@@ -87,6 +87,7 @@ class ProductRepository(
         return await super().get_all(
             options=options,
             filters=filters,
+            order_by=[self.model.category.priority],
             with_pagination=with_pagination,
             pagination=pagination,
         )
@@ -112,6 +113,7 @@ class ProductRepository(
         return await super().get_by_ids(
             obj_ids=obj_ids,
             options=options,
+            order_by=[self.model.category.priority],
             with_pagination=with_pagination,
             pagination=pagination,
         )
@@ -158,6 +160,7 @@ class CategoryRepository(
             have_material_choice=obj_in.have_material_choice,
             have_orientation_choice=obj_in.have_orientation_choice,
             have_type_of_platband_choice=obj_in.have_type_of_platband_choice,
+            priority=obj_in.priority,
         )
         category.allowed_sizes = allowed_sizes
         return category

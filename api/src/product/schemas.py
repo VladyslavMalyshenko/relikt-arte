@@ -115,6 +115,7 @@ class CategoryCreate(BaseModel):
     have_material_choice: bool
     have_orientation_choice: bool
     have_type_of_platband_choice: bool
+    priority: Optional[int] = None
     allowed_sizes: Optional[list[int]] = None
 
 
@@ -124,6 +125,7 @@ class CategoryUpdate(BaseModel):
     have_material_choice: Optional[bool] = None
     have_orientation_choice: Optional[bool] = None
     have_type_of_platband_choice: Optional[bool] = None
+    priority: Optional[int] = None
     allowed_sizes: Optional[list[int]] = None
 
 
@@ -134,6 +136,7 @@ class CategoryShow(MainSchema):
     have_material_choice: bool
     have_orientation_choice: bool
     have_type_of_platband_choice: bool
+    priority: Optional[int] = None
     allowed_sizes: list[int] = []
 
 

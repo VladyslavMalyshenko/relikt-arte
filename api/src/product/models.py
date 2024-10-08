@@ -82,6 +82,10 @@ class Category(BaseModelMixin, Base):
         default=False,
         doc="Is type of platband choice available for products in this category",
     )
+    priority: Mapped[int] = mapped_column(
+        nullable=True,
+        doc="Priority",
+    )
 
     allowed_sizes: Mapped[list[ProductSize]] = relationship(
         secondary="category_size_association",

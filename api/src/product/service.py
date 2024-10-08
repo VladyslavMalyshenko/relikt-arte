@@ -370,6 +370,7 @@ class CategoryService(BaseService):
             have_material_choice=obj.have_material_choice,
             have_orientation_choice=obj.have_orientation_choice,
             have_type_of_platband_choice=obj.have_type_of_platband_choice,
+            priority=obj.priority,
             allowed_sizes=[size.id for size in obj.allowed_sizes],
         )
 
