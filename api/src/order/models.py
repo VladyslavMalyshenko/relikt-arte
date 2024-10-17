@@ -73,6 +73,10 @@ class Order(BasketAndOrderMixin, Base):
         nullable=True,
         doc="Warehouse",
     )
+    pickup: Mapped[bool] = mapped_column(
+        nullable=True,
+        doc="Pickup",
+    )
     delivery_address: Mapped[str] = mapped_column(
         nullable=True,
         doc="Delivery address",

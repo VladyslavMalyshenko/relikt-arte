@@ -253,6 +253,8 @@ class OrderService(BaseService):
             region=obj.region,
             city_or_settlement=obj.city_or_settlement,
             warehouse=obj.warehouse,
+            pickup=obj.pickup,
+            delivery_address=obj.delivery_address,
             items=OrderItemList(
                 objects_count=obj.total_items,
                 results=[

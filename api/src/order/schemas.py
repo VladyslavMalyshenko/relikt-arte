@@ -98,6 +98,7 @@ class OrderShow(MainSchema):
     region: str
     city_or_settlement: str
     warehouse: Optional[str] = None
+    pickup: Optional[bool] = None
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
     items: Optional[OrderItemList] = None
@@ -142,6 +143,7 @@ class OrderCreate(MainSchema):
     region: str
     city_or_settlement: str
     warehouse: Optional[str] = None
+    pickup: Optional[bool] = None
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
     items: Optional[list[OrderItemCreate]] = None
@@ -154,6 +156,7 @@ class OrderUpdate(MainSchema):
     region: Optional[str] = None
     city_or_settlement: Optional[str] = None
     warehouse: Optional[str] = None
+    pickup: Optional[bool] = None
     delivery_address: Optional[str] = None
     additional_info: Optional[str] = None
     status: Optional[OrderStatusEnum] = None
