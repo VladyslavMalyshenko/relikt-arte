@@ -131,6 +131,7 @@ class OrderRepository(GenericRepository[Order, OrderCreate, OrderUpdate]):
             region=obj_in.region,
             city_or_settlement=obj_in.city_or_settlement,
             warehouse=obj_in.warehouse,
+            pickup=obj_in.pickup,
             delivery_address=obj_in.delivery_address,
             additional_info=obj_in.additional_info,
             status=OrderStatusEnum.NEW,
