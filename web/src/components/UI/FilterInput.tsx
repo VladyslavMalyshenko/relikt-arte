@@ -6,6 +6,7 @@ type FilterInputProps = {
     groupName?: string;
     isChecked?: boolean;
     onChange?: () => void;
+    wrapperStyles?: any;
 };
 
 const FilterInput = ({
@@ -14,9 +15,14 @@ const FilterInput = ({
     groupName,
     isChecked,
     onChange,
+    wrapperStyles,
 }: FilterInputProps) => {
     return (
-        <div className="filters-filter-option" onClick={onChange}>
+        <div
+            style={wrapperStyles || {}}
+            className="filters-filter-option"
+            onClick={onChange}
+        >
             <input
                 type={type}
                 name={groupName || label}
