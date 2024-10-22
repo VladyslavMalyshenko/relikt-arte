@@ -7,6 +7,7 @@ export type TableField = {
 export type InputFieldDependency = {
     dependOn: string;
     target: string;
+    targetValue?: any;
 };
 
 export type InputField = {

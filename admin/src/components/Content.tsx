@@ -538,18 +538,14 @@ const Content = () => {
                                                                             ?.valueNames;
 
                                                                     const displayedValue =
-                                                                        valueNames
-                                                                            ? valueNames[
-                                                                                  product[
-                                                                                      fieldName
-                                                                                  ]
-                                                                              ] ||
-                                                                              product[
-                                                                                  fieldName
-                                                                              ]
-                                                                            : product[
-                                                                                  fieldName
-                                                                              ];
+                                                                        valueNames?.[
+                                                                            product[
+                                                                                fieldName
+                                                                            ]
+                                                                        ] ||
+                                                                        product[
+                                                                            fieldName
+                                                                        ];
 
                                                                     return (
                                                                         <td

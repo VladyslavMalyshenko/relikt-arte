@@ -1,5 +1,5 @@
 .button {
-    --primary: var(--white);
+    --primary: var(--background-color);
     --secondary: var(--dark-grey);
     width: 100%;
     max-width: 274px;
@@ -34,7 +34,7 @@
 
     &.facebook {
         --primary: var(--blue);
-        --secondary: var(--white);
+        --secondary: var(--background-color);
     }
 
     &.facebook.border {
@@ -43,7 +43,7 @@
 
     &.inverse {
         --primary: var(--dark-grey);
-        --secondary: var(--white);
+        --secondary: var(--background-color);
     }
 
     &:disabled {

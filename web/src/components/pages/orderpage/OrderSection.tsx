@@ -75,7 +75,7 @@ const OrderSection = () => {
                 <div className="order-items">
                     {order.items.results.length > 0 &&
                         order.items.results.map((item: any) => (
-                            <OrderProduct product={item} />
+                            <OrderProduct key={item.id} product={item} />
                         ))}
                 </div>
 
@@ -99,6 +99,18 @@ const OrderSection = () => {
                     <p className="black small">
                         Адреса відділення нової пошти: {order.warehouse}
                     </p>
+
+                    <p className="black small">
+                        Тип отримання:{" "}
+                        {order.pickup ? "самовивіз" : "доставка на адресу"}
+                    </p>
+
+                    {!order.pickup && order?.delivery_address && (
+                        <p className="black small">
+                            Адреса доставки: {order.delivery_address}
+                        </p>
+                    )}
+
                     {order.additional_info && (
                         <p className="black small">
                             Додаткова інформація: {order.additional_info}

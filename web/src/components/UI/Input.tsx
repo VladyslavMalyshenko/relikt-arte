@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import "../../styles/components/UI/Input.scss";
 import DropDown, { DefaultDropDownValue } from "./DropDown";
+import FilterInput from "./FilterInput";
 
 export type InputOptions = {
     labelField: string;
@@ -16,12 +18,14 @@ type InputProps = {
     options?: InputOptions;
     control: Control<any>;
     errors: FieldErrors<any>;
+    watch?: any;
     rules?: any;
     hasLabel?: boolean;
     onChosen?: any;
     readOnly?: boolean;
     dynamicLabel?: boolean;
     passwordOptions?: any;
+    dependency?: any;
 };
 
 const Input = ({
@@ -32,12 +36,28 @@ const Input = ({
     control,
     errors,
     rules,
+    watch = () => undefined,
     hasLabel,
     onChosen,
     readOnly,
     dynamicLabel,
     passwordOptions,
+    dependency,
 }: InputProps) => {
+    const [isChecked, setIsChecked] = useState(true);
+    const [showValue, setShowValue] = useState(true);
+    const currentDependencyValue = watch(dependency?.dependencyFieldName);
+
+    useEffect(() => {
+        if (dependency && typeof currentDependencyValue !== "object") {
+            if (currentDependencyValue === dependency.targetValue) {
+                setShowValue(true);
+            } else {
+                setShowValue(false);
+            }
+        }
+    }, [watch, dependency, currentDependencyValue]);
+
     const configureInput = (field: any) => {
         const className = `input-field${errors[name] ? " invalid" : ""}`;
 
@@ -100,6 +120,18 @@ const Input = ({
                             )}
                         </div>
                     </div>
+                ) : ["boolean", "checkbox"].some(
+                      (el: string) => el === type
+                  ) ? (
+                    <FilterInput
+                        label={placeholder}
+                        isChecked={isChecked}
+                        onChange={() => {
+                            setIsChecked(!isChecked);
+                            field.onChange(!isChecked);
+                        }}
+                        wrapperStyles={{ height: "50px" }}
+                    />
                 ) : (
                     <input
                         type={type}
@@ -215,16 +247,20 @@ const Input = ({
         );
     };
 
-    return (
+    const field =
+        !["boolean", "checkbox"].every((el: string) => el === type) &&
+        hasLabel ? (
+            <label className="upper black small input-field-label">
+                {placeholder}
+                {getField()}
+            </label>
+        ) : (
+            getField()
+        );
+
+    return showValue ? (
         <div className="input-field-wrapper">
-            {hasLabel ? (
-                <label className="upper black small input-field-label">
-                    {placeholder}
-                    {getField()}
-                </label>
-            ) : (
-                getField()
-            )}
+            {field}
 
             {(errors as any)[name]?.message && (
                 <p className="input-field-error">
@@ -232,7 +268,7 @@ const Input = ({
                 </p>
             )}
         </div>
-    );
+    ) : null;
 };
 
 export default Input;

@@ -114,6 +114,59 @@ const ActionModal = () => {
         setValue,
     } = useForm();
 
+    const getNestedValue = (obj: any, path: string): any => {
+        return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+    };
+
+    const hideDependentField = async (
+        fieldObject: any,
+        dependency: any,
+        values?: any
+    ) => {
+        const fieldName = fieldObject.field_name || fieldObject.name;
+
+        const value = getNestedValue(item, fieldName) || "";
+
+        const getItemAsync = async () => {
+            const currentItem: any =
+                value && fieldObject?.getItem
+                    ? await getItemWithNoDispatch(fieldObject.getItem, {
+                          id: values?.[fieldName] || value,
+                      })
+                    : item;
+
+            return Promise.resolve(currentItem);
+        };
+
+        await getItemAsync().then((currentItem) => {
+            if (currentItem) {
+                const showDependent =
+                    dependency?.targetValue !== undefined
+                        ? Array.isArray(dependency.targetValue)
+                            ? dependency.targetValue.some(
+                                  (value: any) =>
+                                      value === currentItem[dependency.dependOn]
+                              )
+                            : currentItem[dependency.dependOn] ===
+                              dependency.targetValue
+                        : currentItem[dependency.dependOn];
+
+                console.log(showDependent, currentItem, item);
+
+                setTimeout(() => {
+                    const targetLabel: any = document.querySelector(
+                        `label[for="${dependency.target}"]`
+                    );
+
+                    targetLabel.style.setProperty(
+                        "display",
+                        !showDependent ? "none" : "inherit"
+                    );
+                }, 0);
+            }
+        });
+    };
+
     useEffect(() => {
         if (
             isAddProductImageOpened &&
@@ -158,18 +211,31 @@ const ActionModal = () => {
     }, [isAddProductImageOpened]);
 
     useEffect(() => {
-        const getNestedValue = (obj: any, path: string): any => {
-            return path.split(".").reduce((acc, part) => acc && acc[part], obj);
-        };
-
         const initializeFields = async (): Promise<void> => {
             if (!category.main && action !== "" && action !== "delete") {
-                const lists = Array.from(
+                const categoryFields = Array.from(
                     new Set([
                         ...category.inputFields,
                         ...category.addItemFields,
                     ])
-                ).filter(
+                );
+
+                const fieldWithDependencies = categoryFields.filter(
+                    (field: InputField) =>
+                        field.dependencies && field.dependencies?.length > 0
+                );
+
+                console.log("CHE :", fieldWithDependencies);
+
+                await fieldWithDependencies.forEach(async (field: any) => {
+                    await field!.dependencies.forEach(
+                        async (dependency: any) => {
+                            await hideDependentField(field, dependency);
+                        }
+                    );
+                });
+
+                const lists = categoryFields.filter(
                     (field: InputField) =>
                         (field.type === "list" ||
                             field.type === "list-radio" ||
@@ -191,6 +257,7 @@ const ActionModal = () => {
                 const setCheckboxes = async (fieldObject: InputField) => {
                     const fieldName =
                         fieldObject.field_name || fieldObject.name;
+
                     setTimeout(() => {
                         const listChildren = Array.from(
                             document.getElementById(fieldName!)?.children || []
@@ -229,7 +296,8 @@ const ActionModal = () => {
                                       item[fieldName] === value
                                     : getNestedValue(item, fieldName)?.includes(
                                           value
-                                      );
+                                      ) ||
+                                      getNestedValue(item, fieldName) === value;
 
                                 setSelectedItems((prev: any) => {
                                     const updated = { ...prev };
@@ -268,43 +336,6 @@ const ActionModal = () => {
                             }
                         });
                     }, 100);
-
-                    if (fieldObject.getItem && fieldObject.dependencies) {
-                        const value = getNestedValue(item, fieldName) || "";
-
-                        if (value) {
-                            const currentItem: any =
-                                await getItemWithNoDispatch(
-                                    fieldObject.getItem,
-                                    {
-                                        id: value,
-                                    }
-                                );
-
-                            fieldObject.dependencies.forEach(
-                                (dependency: InputFieldDependency) => {
-                                    const targetLabel: any =
-                                        document.querySelector(
-                                            `label[for="${dependency.target}"]`
-                                        );
-
-                                    if (targetLabel) {
-                                        if (!currentItem[dependency.dependOn]) {
-                                            targetLabel.style.setProperty(
-                                                "display",
-                                                "none"
-                                            );
-                                        } else {
-                                            targetLabel.style.setProperty(
-                                                "display",
-                                                "inherit"
-                                            );
-                                        }
-                                    }
-                                }
-                            );
-                        }
-                    }
                 };
 
                 if (action !== "add") {
@@ -326,8 +357,6 @@ const ActionModal = () => {
                                     fieldObject.type === "list-radio" ||
                                     fieldObject.type === "order-status"
                                 ) {
-                                    console.log(fieldObject);
-
                                     await setCheckboxes(fieldObject);
                                 }
 
@@ -687,49 +716,6 @@ const ActionModal = () => {
                                       }
                                     : {})}
                                 onChange={async (e) => {
-                                    if (
-                                        e.target.checked &&
-                                        fieldObject.getItem &&
-                                        fieldObject.dependencies
-                                    ) {
-                                        const currentItem: any =
-                                            await getItemWithNoDispatch(
-                                                fieldObject.getItem,
-                                                {
-                                                    id: option.id,
-                                                }
-                                            );
-
-                                        fieldObject.dependencies.forEach(
-                                            (
-                                                dependency: InputFieldDependency
-                                            ) => {
-                                                const targetLabel: any =
-                                                    document.querySelector(
-                                                        `label[for="${dependency.target}"]`
-                                                    );
-
-                                                if (targetLabel) {
-                                                    if (
-                                                        !currentItem[
-                                                            dependency.dependOn
-                                                        ]
-                                                    ) {
-                                                        targetLabel.style.setProperty(
-                                                            "display",
-                                                            "none"
-                                                        );
-                                                    } else {
-                                                        targetLabel.style.setProperty(
-                                                            "display",
-                                                            "inherit"
-                                                        );
-                                                    }
-                                                }
-                                            }
-                                        );
-                                    }
-
                                     setSelectedItems((prev: any) => {
                                         const updated = {
                                             ...prev,
@@ -763,6 +749,25 @@ const ActionModal = () => {
                                         }
 
                                         setValue(fieldName, updated[fieldName]);
+
+                                        if (
+                                            e.target.checked &&
+                                            fieldObject.getItem &&
+                                            fieldObject.dependencies
+                                        ) {
+                                            fieldObject.dependencies.forEach(
+                                                async (
+                                                    dependency: InputFieldDependency
+                                                ) => {
+                                                    await hideDependentField(
+                                                        fieldObject,
+                                                        dependency,
+                                                        updated
+                                                    );
+                                                }
+                                            );
+                                        }
+
                                         return updated;
                                     });
                                 }}
@@ -821,50 +826,6 @@ const ActionModal = () => {
                                               }
                                             : {})}
                                         onChange={async (e) => {
-                                            if (
-                                                e.target.checked &&
-                                                fieldObject.getItem &&
-                                                fieldObject.dependencies
-                                            ) {
-                                                const currentItem: any =
-                                                    await getItemWithNoDispatch(
-                                                        fieldObject.getItem,
-                                                        {
-                                                            id: option.id,
-                                                        }
-                                                    );
-
-                                                fieldObject.dependencies.forEach(
-                                                    (
-                                                        dependency: InputFieldDependency
-                                                    ) => {
-                                                        const targetLabel: any =
-                                                            document.querySelector(
-                                                                `label[for="${dependency.target}"]`
-                                                            );
-
-                                                        if (targetLabel) {
-                                                            if (
-                                                                !currentItem[
-                                                                    dependency
-                                                                        .dependOn
-                                                                ]
-                                                            ) {
-                                                                targetLabel.style.setProperty(
-                                                                    "display",
-                                                                    "none"
-                                                                );
-                                                            } else {
-                                                                targetLabel.style.setProperty(
-                                                                    "display",
-                                                                    "inherit"
-                                                                );
-                                                            }
-                                                        }
-                                                    }
-                                                );
-                                            }
-
                                             setSelectedItems((prev: any) => {
                                                 const updated = {
                                                     ...prev,
@@ -906,11 +867,6 @@ const ActionModal = () => {
                                                     fieldName === "status" &&
                                                     updated[fieldName] === "new"
                                                 ) {
-                                                    console.log(
-                                                        fieldName,
-                                                        updated[fieldName]
-                                                    );
-
                                                     setValue(
                                                         "status_date_to",
                                                         null
@@ -921,6 +877,24 @@ const ActionModal = () => {
                                                     fieldName,
                                                     updated[fieldName]
                                                 );
+
+                                                if (
+                                                    e.target.checked &&
+                                                    fieldObject.getItem &&
+                                                    fieldObject.dependencies
+                                                ) {
+                                                    fieldObject.dependencies.forEach(
+                                                        async (
+                                                            dependency: InputFieldDependency
+                                                        ) => {
+                                                            await hideDependentField(
+                                                                fieldObject,
+                                                                dependency,
+                                                                updated
+                                                            );
+                                                        }
+                                                    );
+                                                }
 
                                                 return updated;
                                             });
@@ -1153,8 +1127,6 @@ const ActionModal = () => {
                 <button
                     className="active"
                     onClick={() => {
-                        console.log("ASD");
-
                         if (!item?.category_id && !getValues()?.category_id) {
                             dispatch(
                                 AddNotification({

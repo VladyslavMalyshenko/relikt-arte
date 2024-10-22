@@ -20,7 +20,8 @@ html {
     --transparent-black-20: rgba(0, 0, 0, 0.2);
     --transparent-black-40: rgba(0, 0, 0, 0.4);
     --transparent-black-60: rgba(0, 0, 0, 0.6);
-    --profile-grey: #e1e1e1;
+    --profile-grey: #f7eec8;
+    --background-color: #fff8dc;
     --offset: 100px;
     --block-gap: 200px;
     --top-padding: 200px;
@@ -34,7 +35,7 @@ body,
     overflow-x: hidden;
     padding: 0;
     margin: 0;
-    background: var(--white);
+    background: var(--background-color);
 }
 
 .App {

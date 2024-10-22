@@ -1087,6 +1087,10 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 field: "created_at",
             },
             {
+                name: "Самовивіз",
+                field: "pickup",
+            },
+            {
                 name: "Статус",
                 field: "status",
                 valueNames: {
@@ -1135,22 +1139,62 @@ export const categoriesData: (MainCategory | Category | LetterCategory)[] = [
                 locked: true,
             },
             {
+                name: "Самовивіз",
+                field_name: "pickup",
+                type: "checkbox",
+                locked: true,
+            },
+            {
                 name: "Область",
                 field_name: "region",
                 type: "text",
                 locked: true,
+                dependencies: [
+                    {
+                        dependOn: "pickup",
+                        target: "region",
+                        targetValue: [false, null],
+                    },
+                ],
             },
             {
                 name: "Населений пункт",
                 field_name: "city_or_settlement",
                 type: "text",
                 locked: true,
+                dependencies: [
+                    {
+                        dependOn: "pickup",
+                        target: "city_or_settlement",
+                        targetValue: [false, null],
+                    },
+                ],
             },
             {
                 name: "Відділення",
                 field_name: "warehouse",
                 type: "text",
                 locked: true,
+                dependencies: [
+                    {
+                        dependOn: "pickup",
+                        target: "warehouse",
+                        targetValue: [false, null],
+                    },
+                ],
+            },
+            {
+                name: "Адреса доствки",
+                field_name: "delivery_address",
+                type: "text",
+                locked: true,
+                dependencies: [
+                    {
+                        dependOn: "pickup",
+                        target: "delivery_address",
+                        targetValue: [false, null],
+                    },
+                ],
             },
             {
                 name: "Додаткова інформація",

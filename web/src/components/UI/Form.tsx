@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Control, FieldErrors, useFormContext } from "react-hook-form";
 import { getItems } from "../../utils/getItems";
 import Input from "./Input";
-import Loader from "./Loader"; // Import your Loader component
+import Loader from "./Loader";
 
 type FieldOptions = {
     labelField: string | string[];
@@ -18,12 +18,23 @@ type Field = {
     rules?: any;
     options?: FieldOptions;
     optionsUrl?: string;
+    dependency?: any;
 };
 
 type FormProps = {
     control: Control<any>;
     errors: FieldErrors<any>;
     fields: Field[];
+};
+
+const debounce = (func: any, delay: any) => {
+    let timeout: any;
+    return (...args: any) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
 };
 
 const Form = ({ control, errors, fields }: FormProps) => {
@@ -66,7 +77,7 @@ const Form = ({ control, errors, fields }: FormProps) => {
     }, [city_or_settlement]);
 
     useEffect(() => {
-        const fetchOptions = async () => {
+        const fetchOptions = debounce(async () => {
             const optionsArray = await Promise.all(
                 fields.map(async (field: Field) => {
                     if (field.options) {
@@ -78,13 +89,13 @@ const Form = ({ control, errors, fields }: FormProps) => {
                         } else {
                             const targetField = field.options.url.split("$")[1];
                             const value =
-                                currentValues[targetField].value ||
+                                currentValues[targetField]?.value ||
                                 currentValues[targetField];
 
                             if (!value) return null;
 
                             url = field.options.url.replace(
-                                "$" + field.options.url.split("$")[1],
+                                "$" + targetField,
                                 value
                             );
                         }
@@ -102,12 +113,11 @@ const Form = ({ control, errors, fields }: FormProps) => {
             );
 
             setFieldOptions(optionsArray);
-
             setLoading(false);
-        };
+        }, 500);
 
         fetchOptions();
-    }, [fields, region, city_or_settlement]);
+    }, [region, city_or_settlement]);
 
     const onChosen = (field: string, value: any, label?: string) => {
         const currentValue = getValues(field);
@@ -147,6 +157,7 @@ const Form = ({ control, errors, fields }: FormProps) => {
                                 type={field.type}
                                 control={control}
                                 errors={errors}
+                                watch={watch}
                                 placeholder={field.placeholder}
                                 name={field.name}
                                 rules={field.rules}
@@ -174,6 +185,7 @@ const Form = ({ control, errors, fields }: FormProps) => {
                                     (addressField: string) =>
                                         addressField === field.name
                                 )}
+                                dependency={field.dependency}
                             />
                         ) : null
                     ) : (
@@ -182,9 +194,11 @@ const Form = ({ control, errors, fields }: FormProps) => {
                             type={field.type}
                             control={control}
                             errors={errors}
+                            watch={watch}
                             placeholder={field.placeholder}
                             name={field.name}
                             rules={field.rules}
+                            dependency={field.dependency}
                         />
                     );
                 })

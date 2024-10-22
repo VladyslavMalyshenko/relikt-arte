@@ -39,6 +39,8 @@ const CheckoutSection = () => {
             region: "",
             city_or_settlement: "",
             warehouse: "",
+            delivery_address: "",
+            pickup: true,
             additional_info: "",
         },
     });
@@ -120,6 +122,17 @@ const CheckoutSection = () => {
             errors: errors,
             fields: [
                 {
+                    type: "boolean",
+                    placeholder: "Самовивіз з нашого магазину",
+                    name: "pickup",
+                },
+            ],
+        },
+        {
+            control: control,
+            errors: errors,
+            fields: [
+                {
                     type: "dropdown",
                     placeholder: "Область",
                     name: "region",
@@ -130,6 +143,10 @@ const CheckoutSection = () => {
                         labelField: "description",
                         valueField: "ref",
                         url: "/nova_post/areas",
+                    },
+                    dependency: {
+                        dependencyFieldName: "pickup",
+                        targetValue: false,
                     },
                 },
                 {
@@ -148,6 +165,10 @@ const CheckoutSection = () => {
                         url: "/nova_post/cities/$region",
                         load: true,
                     },
+                    dependency: {
+                        dependencyFieldName: "pickup",
+                        targetValue: false,
+                    },
                 },
                 {
                     type: "dropdown",
@@ -162,9 +183,23 @@ const CheckoutSection = () => {
                         url: "/nova_post/warehouses/$city_or_settlement",
                         load: true,
                     },
+                    dependency: {
+                        dependencyFieldName: "pickup",
+                        targetValue: false,
+                    },
+                },
+                {
+                    type: "text",
+                    placeholder: "Адреса доставки",
+                    name: "delivery_address",
+                    dependency: {
+                        dependencyFieldName: "pickup",
+                        targetValue: false,
+                    },
                 },
             ],
         },
+
         {
             control: control,
             errors: errors,
@@ -228,6 +263,15 @@ const CheckoutSection = () => {
         }
 
         data.items = filteredCartProducts;
+
+        if (data.pickup) {
+            delete data?.delivery_address;
+            delete data?.warehouse;
+            delete data?.city_or_settlement;
+            delete data?.region;
+        }
+
+        console.log(data);
 
         const response = await createOrder(data);
 

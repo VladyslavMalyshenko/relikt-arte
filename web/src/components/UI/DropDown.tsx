@@ -142,8 +142,6 @@ const DropDown = ({
             }
         };
 
-        console.log(defaultValue);
-
         fetchOptions();
     }, [options, defaultValue]);
 
