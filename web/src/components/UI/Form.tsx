@@ -12,10 +12,11 @@ type FieldOptions = {
 };
 
 type Field = {
-    type: string;
-    placeholder: string;
+    type?: string;
+    placeholder?: string;
     name: string;
     rules?: any;
+    values?: any[];
     options?: FieldOptions;
     optionsUrl?: string;
     dependency?: any;
@@ -143,6 +144,11 @@ const Form = ({ control, errors, fields }: FormProps) => {
                     const options = field.options as any;
                     const targetField: any = field?.options?.url.split("$")[1];
                     const values = getValues();
+                    const inputType = !field?.values ? field?.type : "text";
+                    const inputPlaceHolder = !field?.values
+                        ? field?.placeholder
+                        : "";
+                    const inputValues = field?.values || undefined;
 
                     return targetField || field.name === "region" ? (
                         field.options &&
@@ -154,11 +160,11 @@ const Form = ({ control, errors, fields }: FormProps) => {
                             field.name === "region") ? (
                             <Input
                                 key={`formField[${index}]`}
-                                type={field.type}
+                                type={field!.type}
                                 control={control}
                                 errors={errors}
                                 watch={watch}
-                                placeholder={field.placeholder}
+                                placeholder={field!.placeholder}
                                 name={field.name}
                                 rules={field.rules}
                                 options={{
@@ -191,14 +197,15 @@ const Form = ({ control, errors, fields }: FormProps) => {
                     ) : (
                         <Input
                             key={`formField[${index}]`}
-                            type={field.type}
+                            type={inputType}
                             control={control}
                             errors={errors}
                             watch={watch}
-                            placeholder={field.placeholder}
+                            placeholder={inputPlaceHolder}
                             name={field.name}
                             rules={field.rules}
                             dependency={field.dependency}
+                            values={inputValues}
                         />
                     );
                 })

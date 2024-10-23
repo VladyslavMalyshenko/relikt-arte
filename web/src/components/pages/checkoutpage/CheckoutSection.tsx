@@ -122,8 +122,18 @@ const CheckoutSection = () => {
             errors: errors,
             fields: [
                 {
-                    type: "boolean",
-                    placeholder: "Самовивіз з нашого магазину",
+                    values: [
+                        {
+                            type: "boolean",
+                            placeholder: "Самовивіз з нашого магазину",
+                            value: true,
+                        },
+                        {
+                            type: "boolean",
+                            placeholder: "Доставка на адресу",
+                            value: false,
+                        },
+                    ],
                     name: "pickup",
                 },
             ],

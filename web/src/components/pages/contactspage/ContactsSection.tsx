@@ -1,7 +1,7 @@
 import "../../../styles/components/pages/contactspage/ContactsSection.scss";
 
 const ContactsSection = () => {
-    const email = "dolmatov1406@gmail.com";
+    const email = "reliktarte24@gmail.com";
     const phone = "+380503266044";
 
     const mailTo = () => {

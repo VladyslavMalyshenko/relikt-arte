@@ -12,8 +12,8 @@ export type InputOptions = {
 };
 
 type InputProps = {
-    type: string;
-    placeholder: string;
+    type?: string;
+    placeholder?: string;
     name: string;
     options?: InputOptions;
     control: Control<any>;
@@ -26,6 +26,7 @@ type InputProps = {
     dynamicLabel?: boolean;
     passwordOptions?: any;
     dependency?: any;
+    values?: any;
 };
 
 const Input = ({
@@ -43,8 +44,10 @@ const Input = ({
     dynamicLabel,
     passwordOptions,
     dependency,
+    values,
 }: InputProps) => {
     const [isChecked, setIsChecked] = useState(true);
+    const [currentValue, setCurrentValue] = useState("");
     const [showValue, setShowValue] = useState(true);
     const currentDependencyValue = watch(dependency?.dependencyFieldName);
 
@@ -61,137 +64,166 @@ const Input = ({
     const configureInput = (field: any) => {
         const className = `input-field${errors[name] ? " invalid" : ""}`;
 
-        return type !== "dropdown" ? (
-            <>
-                {type === "password" && passwordOptions ? (
-                    <div className="password-input-container">
+        return !values && placeholder ? (
+            type !== "dropdown" ? (
+                <>
+                    {type === "password" && passwordOptions ? (
+                        <div className="password-input-container">
+                            <input
+                                type={
+                                    passwordOptions?.value ? "text" : "password"
+                                }
+                                value={field.value || ""}
+                                onChange={(e) => {
+                                    let cleanValue = e.target.value;
+
+                                    field.onChange(cleanValue);
+                                }}
+                                className={className}
+                                placeholder={placeholder}
+                                readOnly={readOnly || false}
+                            />
+
+                            <div
+                                className="password-toggle"
+                                onClick={() => passwordOptions?.toggle()}
+                            >
+                                {passwordOptions?.value ? (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M2 12C2 12 5.63636 5 12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12Z"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                )}
+                            </div>
+                        </div>
+                    ) : ["boolean", "checkbox"].some(
+                          (el: string) => el === type
+                      ) ? (
+                        <FilterInput
+                            label={placeholder as string}
+                            isChecked={isChecked}
+                            onChange={() => {
+                                setIsChecked(!isChecked);
+                                field.onChange(!isChecked);
+                            }}
+                            wrapperStyles={{ height: "50px" }}
+                        />
+                    ) : (
                         <input
-                            type={passwordOptions?.value ? "text" : "password"}
+                            type={type}
                             value={field.value || ""}
                             onChange={(e) => {
                                 let cleanValue = e.target.value;
+                                if (type === "phone") {
+                                    cleanValue = cleanValue.replace(
+                                        /[^0-9]/g,
+                                        ""
+                                    );
+                                }
 
                                 field.onChange(cleanValue);
                             }}
+                            maxLength={type === "phone" ? 10 : undefined}
                             className={className}
                             placeholder={placeholder}
                             readOnly={readOnly || false}
                         />
-
-                        <div
-                            className="password-toggle"
-                            onClick={() => passwordOptions?.toggle()}
-                        >
-                            {passwordOptions?.value ? (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                >
-                                    <path
-                                        d="M2 12C2 12 5.63636 5 12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12Z"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                    <path
-                                        d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                >
-                                    <path
-                                        d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            )}
-                        </div>
-                    </div>
-                ) : ["boolean", "checkbox"].some(
-                      (el: string) => el === type
-                  ) ? (
-                    <FilterInput
-                        label={placeholder}
-                        isChecked={isChecked}
-                        onChange={() => {
-                            setIsChecked(!isChecked);
-                            field.onChange(!isChecked);
-                        }}
-                        wrapperStyles={{ height: "50px" }}
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        value={field.value || ""}
-                        onChange={(e) => {
-                            let cleanValue = e.target.value;
-                            if (type === "phone") {
-                                cleanValue = cleanValue.replace(/[^0-9]/g, "");
-                            }
-
-                            field.onChange(cleanValue);
-                        }}
-                        maxLength={type === "phone" ? 10 : undefined}
-                        className={className}
-                        placeholder={placeholder}
-                        readOnly={readOnly || false}
-                    />
-                )}
-            </>
-        ) : (
-            <DropDown
-                label={placeholder}
-                options={options?.options?.map((option: any) => {
-                    const labelField = Array.isArray(options.labelField)
-                        ? options.labelField
-                              .reduce(
-                                  (acc, curr) => acc + ` ${option[curr]}`,
-                                  ""
-                              )
-                              .trim()
-                        : option[options.labelField];
-
-                    const key = `${
-                        !Array.isArray(options.labelField)
-                            ? option[options.labelField]
-                            : options.labelField
+                    )}
+                </>
+            ) : (
+                <DropDown
+                    label={placeholder}
+                    options={options?.options?.map((option: any) => {
+                        const labelField = Array.isArray(options.labelField)
+                            ? options.labelField
                                   .reduce(
                                       (acc, curr) => acc + ` ${option[curr]}`,
                                       ""
                                   )
                                   .trim()
-                    }-${option[options.valueField]}`;
+                            : option[options.labelField];
 
-                    const value = option[options.valueField];
+                        const key = `${
+                            !Array.isArray(options.labelField)
+                                ? option[options.labelField]
+                                : options.labelField
+                                      .reduce(
+                                          (acc, curr) =>
+                                              acc + ` ${option[curr]}`,
+                                          ""
+                                      )
+                                      .trim()
+                        }-${option[options.valueField]}`;
 
-                    return {
-                        name: labelField,
-                        key,
-                        value,
-                    };
+                        const value = option[options.valueField];
+
+                        return {
+                            name: labelField,
+                            key,
+                            value,
+                        };
+                    })}
+                    field={name}
+                    onChosen={(field: any, value: any, label?: string) => {
+                        onChosen(field, value, label);
+                    }}
+                    defaultValue={options?.default}
+                    borderless={false}
+                    needSearch={true}
+                    dynamicLabel={dynamicLabel}
+                />
+            )
+        ) : (
+            <div className="checkout-section-inner-inputs-group">
+                {values.map((valueField: any) => {
+                    const identifier = `${name}_${valueField.value}`;
+
+                    return (
+                        <FilterInput
+                            label={valueField.placeholder}
+                            isChecked={
+                                identifier === currentValue ||
+                                control._formValues?.[name] === valueField.value
+                            }
+                            onChange={() => {
+                                setCurrentValue(identifier);
+                                field.onChange(valueField.value);
+                            }}
+                            wrapperStyles={{ height: "50px" }}
+                        />
+                    );
                 })}
-                field={name}
-                onChosen={(field: any, value: any, label?: string) => {
-                    onChosen(field, value, label);
-                }}
-                defaultValue={options?.default}
-                borderless={false}
-                needSearch={true}
-                dynamicLabel={dynamicLabel}
-            />
+            </div>
         );
     };
 
