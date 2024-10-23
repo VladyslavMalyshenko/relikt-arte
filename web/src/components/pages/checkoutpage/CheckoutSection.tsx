@@ -232,8 +232,8 @@ const CheckoutSection = () => {
             dispatch(ChangeCartProduct(options.currentObject));
         }
 
-        if (options?.data?.total_value !== undefined) {
-            setTotalValue(options.data.total_value);
+        if (options.currentData?.total_value !== undefined) {
+            setTotalValue(options.currentData?.total_value);
         }
     };
 

@@ -15,6 +15,18 @@ type CheckoutProductProps = {
     onQuantityChange?: any;
 };
 
+const debounce = (func: any, delay: any) => {
+    let timeoutId: any;
+    return (...args: any) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+};
+
 const CheckoutProduct = ({
     product,
     setValue,
@@ -25,6 +37,7 @@ const CheckoutProduct = ({
     const [productPhotos, setProductPhotos] = useState<ProductPhotoType[]>([]);
     const [currentPhoto, setCurrentPhoto] = useState<string>("");
     const [currentProduct, setCurrentProduct] = useState<any>({});
+    const [currentProductChild, setCurrentProductChild] = useState<any>({});
     const [productQuantity, setProductQuantity] = useState<number>(1);
     const [previousQuantity, setPreviousQuantity] = useState<number>(1);
     const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -34,16 +47,36 @@ const CheckoutProduct = ({
     const dispatch = useDispatch();
 
     const getProductInfo = async (product: any) => {
-        setCurrentProduct(product.product);
+        setCurrentProduct(product);
+        setCurrentProductChild(product.product);
         setProductQuantity(product.quantity);
         setPreviousQuantity(product.quantity);
         setCurrentPrice(product.product.price);
         setTotalValue(product.total_price);
-        setWithGlass(product?.product?.with_glass || false);
+        setWithGlass(product?.with_glass || false);
     };
 
     useEffect(() => {
-        getProductInfo(product);
+        const newProduct = { ...product };
+        const currentProductClone = { ...currentProduct };
+
+        delete newProduct.product;
+        delete newProduct?.quantity;
+
+        Object.keys(newProduct).forEach((newProductKey: string) => {
+            if (
+                newProduct[newProductKey] ===
+                currentProductClone?.[newProductKey]
+            ) {
+                delete newProduct[newProductKey];
+            }
+        });
+
+        console.log(newProduct, currentProductClone, product);
+
+        if (JSON.stringify(newProduct) !== "{}") {
+            getProductInfo(product);
+        }
     }, [product]);
 
     useEffect(() => {
@@ -68,14 +101,13 @@ const CheckoutProduct = ({
                 setTotalValue(currentPrice * productQuantity);
 
                 if (onQuantityChange) {
-                    console.log(res.data);
-
+                    const currentData = res?.data || res;
                     await onQuantityChange({
                         currentObject: {
                             ...product,
                             quantity: productQuantity,
                         },
-                        data: res.data,
+                        currentData,
                     });
                 }
             });
@@ -88,11 +120,11 @@ const CheckoutProduct = ({
 
     useEffect(() => {
         const getAllowedSizes = async () => {
-            if (currentProduct && currentProduct?.category_id) {
+            if (currentProduct && currentProductChild?.category_id) {
                 let currentSizes: any = [];
 
                 const currentCategory = await getItem(
-                    `api/v1/product/category/${currentProduct.category_id}/`
+                    `api/v1/product/category/${currentProductChild.category_id}/`
                 );
 
                 const allowedSizes = currentCategory.allowed_sizes;
@@ -117,10 +149,10 @@ const CheckoutProduct = ({
         };
 
         const setUpPhotos = () => {
-            if (currentProduct && currentProduct.photos) {
-                setProductPhotos(currentProduct.photos);
+            if (currentProductChild && currentProductChild.photos) {
+                setProductPhotos(currentProductChild.photos);
                 setCurrentPhoto(
-                    currentProduct.photos.find(
+                    currentProductChild.photos.find(
                         (photo: ProductPhotoType) => photo.is_main
                     )?.photo || ""
                 );
@@ -129,7 +161,7 @@ const CheckoutProduct = ({
 
         getAllowedSizes();
         setUpPhotos();
-    }, [currentProduct]);
+    }, [currentProductChild]);
 
     const onChosen = async (fieldName: string, value: any, field: string) => {
         const newPhoto = productPhotos.find(
@@ -154,29 +186,27 @@ const CheckoutProduct = ({
         }
     };
 
-    useEffect(() => {
-        console.log(product);
-    }, [product]);
+    const debouncedOnChosen = useRef(debounce(onChosen, 300)).current;
 
     return (
-        currentProduct && (
+        currentProductChild && (
             <div className="checkout-product">
                 <div className="checkout-product-inner-container">
                     <div className="checkout-product-image-container">
                         <img
                             className="checkout-product-cell"
                             src={currentPhoto || noImage}
-                            alt={`door-${currentProduct.price}-${currentProduct.id}`}
+                            alt={`door-${currentProductChild.price}-${currentProductChild.id}`}
                         />
                     </div>
 
                     <div className="checkout-product-cell main">
                         <div className="checkout-product-info">
                             <p className="small black bold">
-                                {currentProduct.name}
+                                {currentProductChild.name}
                             </p>
                             <p className="small black">
-                                Арт. {currentProduct.sku}
+                                Арт. {currentProductChild.sku}
                             </p>
                         </div>
 
@@ -249,7 +279,7 @@ const CheckoutProduct = ({
                             labelKey: "name",
                         }}
                         onChosen={(fieldName: string, value: any) =>
-                            onChosen(fieldName, value, "color_id")
+                            debouncedOnChosen(fieldName, value, "color_id")
                         }
                         defaultValue={{
                             defaultFieldName: "value",
@@ -267,7 +297,7 @@ const CheckoutProduct = ({
                                 labelKey: "dimensions",
                             }}
                             onChosen={(fieldName: string, value: any) =>
-                                onChosen(fieldName, value, "size_id")
+                                debouncedOnChosen(fieldName, value, "size_id")
                             }
                             defaultValue={{
                                 defaultFieldName: "value",
@@ -276,7 +306,7 @@ const CheckoutProduct = ({
                         />
                     ) : null}
 
-                    {currentProduct?.have_glass && (
+                    {currentProductChild?.have_glass && (
                         <DropDown
                             borderless={false}
                             label="наявність скла"
@@ -292,7 +322,11 @@ const CheckoutProduct = ({
                                 },
                             ]}
                             onChosen={(fieldName: string, value: any) => {
-                                onChosen(fieldName, value, "with_glass");
+                                debouncedOnChosen(
+                                    fieldName,
+                                    value,
+                                    "with_glass"
+                                );
                                 setWithGlass(value);
                             }}
                             defaultValue={{
@@ -312,7 +346,7 @@ const CheckoutProduct = ({
                                 labelKey: "name",
                             }}
                             onChosen={(fieldName: string, value: any) =>
-                                onChosen(fieldName, value, "color_id")
+                                debouncedOnChosen(fieldName, value, "color_id")
                             }
                             defaultValue={{
                                 defaultFieldName: "value",
@@ -321,7 +355,7 @@ const CheckoutProduct = ({
                         />
                     )}
 
-                    {currentProduct?.material_choice && (
+                    {currentProductChild?.material_choice && (
                         <DropDown
                             borderless={false}
                             label="матеріал"
@@ -337,7 +371,11 @@ const CheckoutProduct = ({
                                 },
                             ]}
                             onChosen={(fieldName: string, value: any) =>
-                                onChosen(fieldName, value, "material_choice")
+                                debouncedOnChosen(
+                                    fieldName,
+                                    value,
+                                    "material_choice"
+                                )
                             }
                             defaultValue={{
                                 defaultFieldName: "value",
@@ -346,7 +384,7 @@ const CheckoutProduct = ({
                         />
                     )}
 
-                    {currentProduct?.orientation_choice && (
+                    {currentProductChild?.orientation_choice && (
                         <DropDown
                             borderless={false}
                             label="сторона петель"
@@ -359,7 +397,11 @@ const CheckoutProduct = ({
                                 },
                             ]}
                             onChosen={(fieldName: string, value: any) =>
-                                onChosen(fieldName, value, "type_of_platband")
+                                debouncedOnChosen(
+                                    fieldName,
+                                    value,
+                                    "type_of_platband"
+                                )
                             }
                             defaultValue={{
                                 defaultFieldName: "value",
@@ -384,7 +426,7 @@ const CheckoutProduct = ({
                                 },
                             ]}
                             onChosen={(fieldName: string, value: any) =>
-                                onChosen(
+                                debouncedOnChosen(
                                     fieldName,
                                     value,
                                     "type_of_platband_choice"

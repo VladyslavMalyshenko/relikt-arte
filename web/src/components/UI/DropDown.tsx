@@ -113,15 +113,16 @@ const DropDown = ({
             setCurrentOptions(newOptions);
             setFilteredOptions(newOptions);
 
-            const defaultOption = defaultValue
-                ? newOptions.find(
-                      (opt: any) =>
-                          opt[defaultValue.defaultFieldName] ===
-                          (defaultValue.defaultValue?.value !== undefined
-                              ? defaultValue.defaultValue?.value
-                              : defaultValue.defaultValue)
-                  )
-                : newOptions[0];
+            const defaultOption =
+                defaultValue && defaultValue?.defaultValue !== null
+                    ? newOptions.find(
+                          (opt: any) =>
+                              opt[defaultValue.defaultFieldName] ===
+                              (defaultValue.defaultValue?.value !== undefined
+                                  ? defaultValue.defaultValue?.value
+                                  : defaultValue.defaultValue)
+                      )
+                    : newOptions[0];
 
             if (
                 defaultOption &&
