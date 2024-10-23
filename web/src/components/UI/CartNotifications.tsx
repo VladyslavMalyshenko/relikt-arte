@@ -98,10 +98,6 @@ const CartNotifications = () => {
         (state: any) => state.CartReducer.notifications
     );
 
-    useEffect(() => {
-        console.log(notifications);
-    }, [notifications]);
-
     return (
         <div className="notifications">
             {notifications.map((notification: any, index: number) => (

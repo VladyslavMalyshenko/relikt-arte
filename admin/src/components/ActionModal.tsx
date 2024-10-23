@@ -151,8 +151,6 @@ const ActionModal = () => {
                               dependency.targetValue
                         : currentItem[dependency.dependOn];
 
-                console.log(showDependent, currentItem, item);
-
                 setTimeout(() => {
                     const targetLabel: any = document.querySelector(
                         `label[for="${dependency.target}"]`
@@ -224,8 +222,6 @@ const ActionModal = () => {
                     (field: InputField) =>
                         field.dependencies && field.dependencies?.length > 0
                 );
-
-                console.log("CHE :", fieldWithDependencies);
 
                 await fieldWithDependencies.forEach(async (field: any) => {
                     await field!.dependencies.forEach(
@@ -1407,8 +1403,6 @@ const ActionModal = () => {
         const handleErrors = async () => {
             await trigger();
 
-            console.log(getValues());
-
             let invalidFieldsElements = [
                 ...category.addItemFields.map((field: InputField) => {
                     const fieldName = field.field_name || field.name;
@@ -1442,9 +1436,6 @@ const ActionModal = () => {
                     return;
                 }),
             ];
-
-            console.log(invalidFieldsElements);
-            console.log(errors);
 
             if (errors && Object.keys(errors).length > 0) {
                 invalidFieldsElements.push(
@@ -1570,8 +1561,6 @@ const ActionModal = () => {
                     ) => {
                         const cleanObj = { ...obj };
 
-                        console.log("CLEAN: ", cleanObj);
-
                         const handleProductPhotos = async () => {
                             if (originalItem?.photos) {
                                 const photos = productImages.map(
@@ -1688,11 +1677,6 @@ const ActionModal = () => {
                                     const labelElement = document.querySelector(
                                         `label[for="${fullPath}"]`
                                     ) as any;
-
-                                    console.log(
-                                        fullPath,
-                                        isFieldInCategory(fullPath)
-                                    );
 
                                     if (
                                         (!isFieldInCategory(fullPath) ||

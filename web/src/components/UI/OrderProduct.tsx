@@ -26,8 +26,6 @@ const OrderProduct = ({ product }: OrderProductProps) => {
     );
 
     const getProductInfo = async (product: any) => {
-        console.log(product);
-
         setCurrentProduct(product.product);
         setProductQuantity(product.quantity);
         setTotalValue(product.total_price);
@@ -79,8 +77,6 @@ const OrderProduct = ({ product }: OrderProductProps) => {
 
             if (product.product.have_glass !== undefined) {
                 setWithGlass(product.with_glass ? "Присутнє" : "Відсутнє");
-
-                console.log(product);
 
                 if (product.with_glass && product.glass_color_id !== null) {
                     await axios

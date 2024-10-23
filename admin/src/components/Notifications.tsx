@@ -106,10 +106,6 @@ const Notifications = () => {
         (state: any) => state.notificationsReducer.notifications
     );
 
-    useEffect(() => {
-        console.log(notifications);
-    }, [notifications]);
-
     return (
         <div className="notifications">
             {notifications.map(

@@ -38,8 +38,6 @@ export const getCartToken = async () => {
         setCartToken(currentToken || "");
     }
 
-    console.log(token);
-
     return token;
 };
 
@@ -57,7 +55,6 @@ export const getCart = async () => {
     if (isTokenValid) {
         headers["Authorization"] = `Bearer ${getAccessToken()}`;
     }
-    console.log(url, headers);
 
     const response: any = await axios
         .get(generateUrl(url), { headers })

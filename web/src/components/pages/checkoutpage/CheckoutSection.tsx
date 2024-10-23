@@ -281,8 +281,6 @@ const CheckoutSection = () => {
             delete data?.region;
         }
 
-        console.log(data);
-
         const response = await createOrder(data);
 
         if (response) {

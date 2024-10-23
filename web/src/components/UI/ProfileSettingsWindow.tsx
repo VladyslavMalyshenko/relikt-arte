@@ -101,8 +101,6 @@ const ProfileSettingsWindow = ({
             )
                 delete data[dataKey];
 
-        console.log(data);
-
         if (JSON.stringify(data) !== "{}") {
             if (data?.new_email) {
                 if (previousValues["new_email"] === data.new_email) return;

@@ -72,8 +72,6 @@ const CheckoutProduct = ({
             }
         });
 
-        console.log(newProduct, currentProductClone, product);
-
         if (JSON.stringify(newProduct) !== "{}") {
             getProductInfo(product);
         }

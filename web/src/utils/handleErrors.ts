@@ -9,7 +9,5 @@ export const handleErrors = (errors: any) => {
             errors?.detail || "Щось пішло не так. Спробуйте пізніше ;(";
     }
 
-    console.log(outputError);
-
     return outputError;
 };
